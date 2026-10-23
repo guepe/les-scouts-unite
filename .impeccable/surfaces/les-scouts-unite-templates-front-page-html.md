@@ -1,13 +1,13 @@
 ---
 version: 1
 slug: "les-scouts-unite-templates-front-page-html"
-primary_target: "les-scouts-unite/templates/front-page.html"
+primary_target: "templates/front-page.html"
 related_targets: []
 ---
 
 # Surface brief: page d'accueil (front-page)
 
-Scope: the WordPress front page of the Les Scouts – Unité theme (`les-scouts-unite/templates/front-page.html` and its patterns). Visitor mode: **Persuade** (a new family decides to join) while serving returning parents who come for the next meeting.
+Scope: the WordPress front page of the Les Scouts – Unité theme (`templates/front-page.html` and its patterns). Visitor mode: **Persuade** (a new family decides to join) while serving returning parents who come for the next meeting.
 
 Audience and job: parents on a phone checking the next meeting; new families checking ages and how to register. Proof/content: the next meetings per section, the next unit event, registration status. All dates and places are synthetic placeholders the staff replaces in the editor.
 
