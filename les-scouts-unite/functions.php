@@ -143,6 +143,37 @@ function scoutsunite_site_icon( $url, $size ) {
 add_filter( 'get_site_icon_url', 'scoutsunite_site_icon', 10, 2 );
 
 /**
+ * Reprise d'un site installé avec l'ancien thème scouts-11om-magnee : les pages
+ * créées à partir de ses compositions gardent l'adresse de ses images (logos de
+ * section…), dans un dossier qui n'existe plus. Une seule fois, on les fait
+ * pointer vers ce thème, en https si le site l'est.
+ */
+function scoutsunite_reprise_images() {
+	if ( get_option( 'scoutsunite_reprise_images' ) ) {
+		return;
+	}
+	global $wpdb;
+
+	$wpdb->query( "UPDATE {$wpdb->posts} SET post_content = REPLACE( post_content, '/themes/scouts-11om-magnee/', '/themes/les-scouts-unite/' ) WHERE post_content LIKE '%/themes/scouts-11om-magnee/%'" );
+
+	if ( 'https' === wp_parse_url( home_url(), PHP_URL_SCHEME ) ) {
+		$theme = '://' . wp_parse_url( home_url(), PHP_URL_HOST ) . '/wp-content/themes/les-scouts-unite/';
+		$wpdb->query(
+			$wpdb->prepare(
+				"UPDATE {$wpdb->posts} SET post_content = REPLACE( post_content, %s, %s ) WHERE post_content LIKE %s",
+				'http' . $theme,
+				'https' . $theme,
+				'%' . $wpdb->esc_like( 'http' . $theme ) . '%'
+			)
+		);
+	}
+	wp_cache_flush();
+
+	update_option( 'scoutsunite_reprise_images', 1 );
+}
+add_action( 'init', 'scoutsunite_reprise_images', 20 );
+
+/**
  * Retire un lien fléché qui mène à la page affichée : la règle des âges
  * propose « Découvrir les sections », inutile sur la page Les sections.
  *
