@@ -61,13 +61,12 @@ Tout ce qui est surligné en orange pâle est un exemple à remplacer.
 
 ### Les coordonnées de l’unité : Réglages → Unité
 
-L’adresse du local, le ou les responsables d’unité (nom, téléphone), l’e-mail du staff d’unité, le chef et l’e-mail de chaque section, les tarifs de cotisation (un par ligne, par ex. « 80 € pour le 1er enfant »), le numéro de compte, les places disponibles et les liens des formulaires d’inscription et de contact (Google Forms, extension de formulaire…) s’encodent **une seule fois** dans **Réglages → Unité**. Ils s’affichent d’eux-mêmes dans le pied de page, les infos pratiques de l’accueil, l’affiche d’inscription, la page Contact et la page Inscription, et le lien « Itinéraire » se calcule à partir de l’adresse. Dans l’éditeur, ces blocs montrent la vraie valeur mais ne se modifient pas sur place : on change la valeur dans les réglages. Un champ vide garde son exemple surligné.
+L’adresse du local, le ou les responsables d’unité (nom, téléphone), l’e-mail du staff d’unité, le staff de chaque section (le chef ou la cheffe, puis les animateurs, un par ligne sous la forme « Totem – Prénom ») et son e-mail, les tarifs de cotisation (un par ligne, par ex. « 80 € pour le 1er enfant »), le numéro de compte, les places disponibles et les liens des formulaires d’inscription et de contact (Google Forms, extension de formulaire…) s’encodent **une seule fois** dans **Réglages → Unité**. Ils s’affichent d’eux-mêmes dans le pied de page, l’affiche « Le staff » de chaque page de section (un badge par animateur, le chef en tête), les infos pratiques de l’accueil, l’affiche d’inscription, la page Contact et la page Inscription, et le lien « Itinéraire » se calcule à partir de l’adresse. Dans l’éditeur, ces blocs montrent la vraie valeur mais ne se modifient pas sur place : on change la valeur dans les réglages. Un champ vide garde son exemple surligné.
 
 Ces blocs sont liés aux réglages dans les compositions du thème. Une page créée avant cette fonction (ou un bloc recopié à la main) garde son texte figé : recrée-la à partir de sa composition (« Page Contact », « Page Inscription ») pour profiter des réglages.
 
 ### Le reste, directement dans les pages
 
-- les noms et totems des animateurs de chaque section (pages de section) ;
 - la phrase d’accroche manuscrite du pied de page (« Toujours prêts, de 6 à 18 ans. ») si tu veux la personnaliser ;
 - les photos : une seule photo d’exemple est fournie (celle du dépôt de la fédération).
 

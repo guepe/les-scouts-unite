@@ -45,7 +45,8 @@ function scoutsunite_unite_champs() {
 		if ( 'unite' === $slug ) {
 			continue;
 		}
-		$champs['Les staffs de section'][ $slug . '_chef' ]  = array( $nom . ' : chef ou cheffe de section', 'text', 'Prénom Nom' );
+		$champs['Les staffs de section'][ $slug . '_chef' ]  = array( $nom . ' : chef ou cheffe de section', 'text', 'Totem – Prénom' );
+		$champs['Les staffs de section'][ $slug . '_staff' ] = array( $nom . ' : animateurs (un par ligne)', 'textarea', "Totem – Prénom\nTotem – Prénom" );
 		$champs['Les staffs de section'][ $slug . '_email' ] = array( $nom . ' : e-mail', 'email', $slug . '@example.org' );
 	}
 	return $champs;
@@ -174,6 +175,133 @@ function scoutsunite_unite_toutes() {
 	return $html;
 }
 
+/**
+ * « Akéla – Marie » → [ 'Akéla', 'Marie' ] ; sans tiret ni virgule, un prénom seul.
+ *
+ * @param string $ligne Une ligne du staff.
+ * @return array Totem, prénom.
+ */
+function scoutsunite_unite_personne( $ligne ) {
+	$parts = preg_split( '/\s+[–—-]\s+|\s*,\s*/u', trim( $ligne ), 2 );
+	return 2 === count( $parts ) ? array( trim( $parts[0] ), trim( $parts[1] ) ) : array( '', trim( $parts[0] ) );
+}
+
+/**
+ * Page de section : le staff, chef en tête, chacun avec son totem et son prénom.
+ *
+ * @param array $attributes Attributs du bloc (section).
+ * @return string HTML.
+ */
+function scoutsunite_bloc_staff( $attributes ) {
+	$section = sanitize_key( $attributes['section'] ?? 'baladins' );
+	$chef    = scoutsunite_unite( $section . '_chef' );
+	$autres  = array_filter( array_map( 'trim', explode( "\n", scoutsunite_unite( $section . '_staff' ) ) ) );
+
+	$membre = function ( $totem, $prenom, $est_chef, $exemple = false ) {
+		$initiale = mb_strtoupper( mb_substr( '' !== $totem ? $totem : $prenom, 0, 1 ) );
+		$texte    = function ( $t ) use ( $exemple ) {
+			return $exemple ? '<mark class="a-completer">' . esc_html( $t ) . '</mark>' : esc_html( $t );
+		};
+		$html  = '<li class="staff__membre' . ( $est_chef ? ' staff__membre--chef' : '' ) . '">';
+		$html .= '<span class="staff__pastille" aria-hidden="true">' . esc_html( $initiale ) . '</span>';
+		$html .= '<span class="staff__noms">';
+		if ( '' !== $totem ) {
+			$html .= '<span class="staff__totem">' . $texte( $totem ) . '</span>';
+		}
+		$html .= '<span class="staff__prenom">' . $texte( $prenom ) . '</span>';
+		if ( $est_chef ) {
+			$html .= '<span class="staff__role">chef de section</span>';
+		}
+		return $html . '</span></li>';
+	};
+
+	$liste = '';
+	if ( '' === $chef && ! $autres ) {
+		$liste .= $membre( 'Totem', 'Prénom', true, true ) . $membre( 'Totem', 'Prénom', false, true ) . $membre( 'Totem', 'Prénom', false, true );
+		$total  = '';
+	} else {
+		if ( '' !== $chef ) {
+			list( $totem, $prenom ) = scoutsunite_unite_personne( $chef );
+			$liste                 .= $membre( $totem, $prenom, true );
+		} else {
+			$liste .= $membre( 'Totem', 'Prénom', true, true );
+		}
+		foreach ( $autres as $ligne ) {
+			list( $totem, $prenom ) = scoutsunite_unite_personne( $ligne );
+			$liste                 .= $membre( $totem, $prenom, false );
+		}
+		$nombre = count( $autres ) + ( '' !== $chef ? 1 : 0 );
+		$total  = '<p class="staff__total">' . $nombre . ( 1 === $nombre ? ' animateur' : ' animateurs' ) . '</p>';
+	}
+
+	$wrapper = get_block_wrapper_attributes(
+		array(
+			'class' => 'staff',
+			'style' => '--section: var(--wp--preset--color--' . $section . ');',
+		)
+	);
+	return '<div ' . $wrapper . '><ul class="staff__liste">' . $liste . '</ul>' . $total . '</div>';
+}
+
+/**
+ * Reprise des pages de section déjà créées : la liste d'exemple du staff (encore
+ * surlignée « à compléter ») devient le bloc « Staff de la section ». Une liste
+ * déjà remplie à la main n'est pas touchée.
+ */
+function scoutsunite_reprise_staff() {
+	if ( get_option( 'scoutsunite_reprise_staff' ) ) {
+		return;
+	}
+	global $wpdb;
+
+	$sections = array_keys( scoutsunite_sections() );
+	$pages    = $wpdb->get_results( "SELECT ID, post_name, post_content FROM {$wpdb->posts} WHERE post_type = 'page' AND post_content LIKE '%chef de section</li>%'" );
+	foreach ( $pages as $page ) {
+		$section = in_array( $page->post_name, $sections, true ) ? $page->post_name : '';
+		if ( ! $section && preg_match( '/prochaine-reunion \{"section":"([a-z]+)"/', $page->post_content, $m ) ) {
+			$section = $m[1];
+		}
+		if ( ! $section ) {
+			continue;
+		}
+		$contenu = preg_replace_callback(
+			'#<!-- wp:list(?: \{[^\n]*?\})? -->(?:(?!<!-- /wp:list -->).)*?chef de section</li>(?:(?!<!-- /wp:list -->).)*?<!-- /wp:list -->#s',
+			function ( $liste ) use ( $section ) {
+				return false === strpos( $liste[0], 'a-completer' ) ? $liste[0] : '<!-- wp:scoutsunite/staff {"section":"' . $section . '"} /-->';
+			},
+			$page->post_content
+		);
+		$contenu = str_replace( 'Le staff de le Poste', 'Le staff du Poste', $contenu );
+		if ( $contenu !== $page->post_content ) {
+			$wpdb->update( $wpdb->posts, array( 'post_content' => $contenu ), array( 'ID' => $page->ID ) );
+			clean_post_cache( $page->ID );
+		}
+	}
+
+	update_option( 'scoutsunite_reprise_staff', 1 );
+}
+add_action( 'init', 'scoutsunite_reprise_staff', 20 );
+
+function scoutsunite_unite_bloc() {
+	register_block_type(
+		'scoutsunite/staff',
+		array(
+			'api_version'     => 3,
+			'title'           => 'Staff de la section',
+			'category'        => 'widgets',
+			'editor_script'   => 'scoutsunite-blocs',
+			'attributes'      => array(
+				'section' => array(
+					'type'    => 'string',
+					'default' => 'baladins',
+				),
+			),
+			'render_callback' => 'scoutsunite_bloc_staff',
+		)
+	);
+}
+add_action( 'init', 'scoutsunite_unite_bloc' );
+
 function scoutsunite_unite_bindings() {
 	if ( ! function_exists( 'register_block_bindings_source' ) ) {
 		return;
@@ -196,7 +324,8 @@ add_action( 'init', 'scoutsunite_unite_bindings' );
 function scoutsunite_unite_editeur() {
 	wp_add_inline_script(
 		'scoutsunite-blocs',
-		'window.scoutsuniteUnite = ' . wp_json_encode( scoutsunite_unite_toutes() ) . ';',
+		'window.scoutsuniteUnite = ' . wp_json_encode( scoutsunite_unite_toutes() ) . ';'
+		. 'window.scoutsuniteSectionsBlocs = ' . wp_json_encode( array_diff_key( scoutsunite_agenda_sections(), array( 'unite' => '' ) ) ) . ';',
 		'before'
 	);
 }
@@ -247,6 +376,7 @@ function scoutsunite_unite_page() {
 		<h1>Coordonnées de l’unité</h1>
 		<p>Encode ces informations une seule fois : elles s’affichent d’elles-mêmes dans le pied de page, les infos pratiques de l’accueil, la page Contact et la page Inscription. Les liens des formulaires (Google Forms, extension de formulaire…) deviennent des boutons sur ces deux pages.
 			Un champ laissé vide garde son exemple surligné en orange sur le site, pour qu’on voie ce qu’il reste à compléter.</p>
+		<p>Pour les staffs, écris une personne par ligne sous la forme « Totem – Prénom » (un prénom seul si la personne n’a pas encore de totem). Le chef ou la cheffe de section s’affiche en premier sur la page de la section.</p>
 		<p>Le nom de l’unité se règle dans <a href="<?php echo esc_url( admin_url( 'options-general.php' ) ); ?>">Réglages → Général</a> (titre et slogan du site).</p>
 		<form method="post" action="options.php">
 			<?php settings_fields( 'scoutsunite_unite' ); ?>

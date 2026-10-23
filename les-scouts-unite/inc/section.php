@@ -106,19 +106,7 @@ function scoutsunite_section_pattern( $slug ) {
 <h2 class="wp-block-heading affiche__titre has-x-large-font-size">Le staff <?php echo esc_html( $s['staff'] ); ?></h2>
 <!-- /wp:heading -->
 
-<!-- wp:list {"style":{"spacing":{"padding":{"left":"0"}},"typography":{"lineHeight":"1.9"}}} -->
-<ul style="padding-left:0;line-height:1.9;list-style:none" class="wp-block-list"><!-- wp:list-item -->
-<li><strong><mark class="a-completer">Totem</mark></strong> – <mark class="a-completer">Prénom Nom</mark>, chef de section</li>
-<!-- /wp:list-item -->
-
-<!-- wp:list-item -->
-<li><strong><mark class="a-completer">Totem</mark></strong> – <mark class="a-completer">Prénom Nom</mark></li>
-<!-- /wp:list-item -->
-
-<!-- wp:list-item -->
-<li><strong><mark class="a-completer">Totem</mark></strong> – <mark class="a-completer">Prénom Nom</mark></li>
-<!-- /wp:list-item --></ul>
-<!-- /wp:list -->
+<!-- wp:scoutsunite/staff {"section":"<?php echo esc_attr( $slug ); ?>"} /-->
 
 <!-- wp:paragraph {"className":"lien-fleche","style":{"spacing":{"margin":{"top":"var:preset|spacing|40"}}}} -->
 <p class="lien-fleche" style="margin-top:var(--wp--preset--spacing--40)"><a href="/contact/">Écrire au staff des <?php echo $nom; ?></a></p>
