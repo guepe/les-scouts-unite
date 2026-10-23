@@ -28,6 +28,7 @@ Le menu pointe vers ces adresses. Crée les pages avec ces identifiants (slug) :
 | Baladins, Louveteaux, Éclaireurs, Pionniers | `baladins`, … (page parente : Les sections) | « Page de section : … » + modèle **Page pleine largeur (sans titre)** |
 | Inscription | `inscription` | « Page Inscription » |
 | Contact | `contact` | « Page Contact » |
+| IAmA – Anciens et amis | `iama` | « Page IAmA – Anciens et amis » |
 
 À la création d’une page, WordPress propose les compositions de la catégorie **Pages de l’unité**. L’accueil ne demande rien : le modèle `front-page` l’affiche toujours.
 
@@ -43,6 +44,7 @@ Le menu pointe vers ces adresses. Crée les pages avec ces identifiants (slug) :
 Les réunions s’encodent dans **Agenda → Ajouter** (menu de gauche de l’administration). Dans le panneau **Quand et où ?** à droite : section, date, début, fin, lieu. Le titre est facultatif (« Réunion » par défaut ; mets « Hike », « Week-end »… pour une activité spéciale) et le texte sert de notes pour les parents (à emporter, rendez-vous).
 
 - **Type : Réunion, Week-end ou Camp** : pour un week-end ou un camp, indique aussi la date de fin (« Jusqu’au »). L’activité s’affiche alors « du 13 au 15 novembre » avec une étiquette « Week-end » ou « Camp », reste visible jusqu’à son dernier jour, et apparaît dans le bloc **Week-ends et camp** de la page de sa section (avec ses notes complètes : prix, matériel…). Une activité « Toute l’unité » apparaît sur les pages de toutes les sections.
+- **Section « IAmA »** : pour les activités du clan des anciens et amis (souper, chantier…). Elles apparaissent sur la page IAmA et dans l’agenda, pas dans les « Prochaines réunions » des sections d’âge.
 - **Mettre en avant sur l’accueil** : coche cette case pour les grandes activités (week-end d’unité, souper, fête…). La prochaine activité cochée s’affiche en grand sur l’affiche blanche en haut de l’accueil, les suivantes en dessous, jusqu’à leur date. Sans activité cochée à venir, l’affiche montre la dernière actualité.
 - **Répéter chaque semaine jusqu’au** : à la publication, une copie est créée chaque semaine jusqu’à cette date. Supprime ensuite les semaines de congé dans **Agenda → Toutes les réunions**.
 - **Mise à jour automatique** : le panneau de l’accueil montre la prochaine réunion de chaque section, chaque page de section montre la sienne (avec les dates suivantes), et **/agenda/** liste tout, mois par mois, avec un filtre par section. Les réunions passées disparaissent d’elles-mêmes.
@@ -62,7 +64,7 @@ Tout ce qui est surligné en orange pâle est un exemple à remplacer.
 
 ### Les coordonnées de l’unité : Réglages → Unité
 
-L’adresse du local, le ou les responsables d’unité (nom, téléphone), l’e-mail du staff d’unité, le staff de chaque section (le chef ou la cheffe, puis les animateurs, un par ligne sous la forme « Totem – Prénom ») et son e-mail, les tarifs de cotisation (un par ligne, par ex. « 80 € pour le 1er enfant »), le numéro de compte, les places disponibles et les liens des formulaires d’inscription et de contact (Google Forms, extension de formulaire…) s’encodent **une seule fois** dans **Réglages → Unité**. Ils s’affichent d’eux-mêmes dans le pied de page, l’affiche « Le staff » de chaque page de section (un badge par animateur, le chef en tête), les infos pratiques de l’accueil, l’affiche d’inscription, la page Contact et la page Inscription, et le lien « Itinéraire » se calcule à partir de l’adresse. Dans l’éditeur, ces blocs montrent la vraie valeur mais ne se modifient pas sur place : on change la valeur dans les réglages. Un champ vide garde son exemple surligné.
+L’adresse du local, le ou les responsables d’unité (nom, téléphone), l’e-mail du staff d’unité, le staff de chaque section (le chef ou la cheffe, puis les animateurs, un par ligne sous la forme « Totem – Prénom ») et son e-mail, les tarifs de cotisation (un par ligne, par ex. « 80 € pour le 1er enfant »), le responsable et l’e-mail du clan IAmA, le numéro de compte, les places disponibles et les liens des formulaires d’inscription et de contact (Google Forms, extension de formulaire…) s’encodent **une seule fois** dans **Réglages → Unité**. Ils s’affichent d’eux-mêmes dans le pied de page, l’affiche « Le staff » de chaque page de section (un badge par animateur, le chef en tête), les infos pratiques de l’accueil, l’affiche d’inscription, la page Contact et la page Inscription, et le lien « Itinéraire » se calcule à partir de l’adresse. Dans l’éditeur, ces blocs montrent la vraie valeur mais ne se modifient pas sur place : on change la valeur dans les réglages. Un champ vide garde son exemple surligné.
 
 Ces blocs sont liés aux réglages dans les compositions du thème. Une page créée avant cette fonction (ou un bloc recopié à la main) garde son texte figé : recrée-la à partir de sa composition (« Page Contact », « Page Inscription ») pour profiter des réglages.
 

@@ -125,6 +125,13 @@
 		},
 	} ) );
 
+	wp.blocks.registerBlockType( 'scoutsunite/iama', Object.assign( {}, commun, {
+		title: 'Activités IAmA',
+		description: 'Les prochaines activités du clan IAmA, depuis l’agenda (section « IAmA »).',
+		icon: 'heart',
+		edit: apercu( 'scoutsunite/iama' ),
+	} ) );
+
 	wp.blocks.registerBlockType( 'scoutsunite/staff', Object.assign( {}, commun, {
 		title: 'Staff de la section',
 		description: 'Le chef de section et les animateurs encodés dans Réglages → Unité.',

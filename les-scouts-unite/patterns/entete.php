@@ -40,6 +40,8 @@
 <!-- wp:navigation-link {"label":"Éclaireurs · 12–16 ans","url":"/sections/eclaireurs/","kind":"custom"} /-->
 
 <!-- wp:navigation-link {"label":"Pionniers · 16–18 ans","url":"/sections/pionniers/","kind":"custom"} /-->
+
+<!-- wp:navigation-link {"label":"IAmA · anciens et amis","url":"/iama/","kind":"custom"} /-->
 <!-- /wp:navigation-submenu -->
 
 <!-- wp:navigation-link {"label":"Inscription","url":"/inscription/","kind":"custom"} /-->

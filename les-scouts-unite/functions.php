@@ -174,6 +174,42 @@ function scoutsunite_reprise_images() {
 add_action( 'init', 'scoutsunite_reprise_images', 20 );
 
 /**
+ * La page IAmA publiée, qu'elle soit à la racine (/iama/) ou rangée sous
+ * « Les sections » (/sections/iama/).
+ *
+ * @return WP_Post|null
+ */
+function scoutsunite_page_iama() {
+	foreach ( array( 'iama', 'sections/iama' ) as $chemin ) {
+		$page = get_page_by_path( $chemin );
+		if ( $page && 'publish' === $page->post_status ) {
+			return $page;
+		}
+	}
+	return null;
+}
+
+/**
+ * Sous la règle des âges : un mot pour les anciens, vers la page IAmA si elle
+ * existe. Ajouté au rendu pour valoir aussi sur les pages déjà créées.
+ *
+ * @param string $html  Rendu du groupe.
+ * @param array  $block Bloc.
+ * @return string Rendu, suivi du paragraphe IAmA pour la règle des âges.
+ */
+function scoutsunite_regle_iama( $html, $block ) {
+	if ( ! preg_match( '/(^|\s)regle-ages(\s|$)/', $block['attrs']['className'] ?? '' ) || is_admin() ) {
+		return $html;
+	}
+	$page = scoutsunite_page_iama();
+	if ( ! $page ) {
+		return $html;
+	}
+	return $html . '<p class="regle-ages__iama">Et après 18 ans ? Les anciens et amis de l’unité gardent le lien dans le clan <a href="' . esc_url( get_permalink( $page ) ) . '">IAmA</a>.</p>';
+}
+add_filter( 'render_block_core/group', 'scoutsunite_regle_iama', 10, 2 );
+
+/**
  * Retire un lien fléché qui mène à la page affichée : la règle des âges
  * propose « Découvrir les sections », inutile sur la page Les sections.
  *

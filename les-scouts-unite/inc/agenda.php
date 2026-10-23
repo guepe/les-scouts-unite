@@ -25,7 +25,17 @@ function scoutsunite_agenda_sections() {
 		'eclaireurs' => 'Éclaireurs',
 		'pionniers'  => 'Pionniers',
 		'unite'      => 'Toute l’unité',
+		'iama'       => 'IAmA',
 	);
+}
+
+/**
+ * Les seules sections d'âge (sans « Toute l'unité » ni le clan IAmA).
+ *
+ * @return array Identifiant => nom affiché.
+ */
+function scoutsunite_agenda_sections_age() {
+	return array_diff_key( scoutsunite_agenda_sections(), array_flip( array( 'unite', 'iama' ) ) );
 }
 
 /* ---------------------------------------------------------------------------
@@ -429,7 +439,7 @@ function scoutsunite_agenda_horaire( $post_id ) {
  * Adresse de la page d'une section, si elle existe.
  */
 function scoutsunite_agenda_section_url( $section ) {
-	$page = get_page_by_path( 'sections/' . $section );
+	$page = 'iama' === $section ? scoutsunite_page_iama() : get_page_by_path( 'sections/' . $section );
 	return $page ? get_permalink( $page ) : '';
 }
 
@@ -518,6 +528,16 @@ function scoutsunite_agenda_blocks() {
 		)
 	);
 	register_block_type(
+		'scoutsunite/iama',
+		array(
+			'api_version'     => 3,
+			'title'           => 'Activités IAmA',
+			'category'        => 'widgets',
+			'editor_script'   => 'scoutsunite-blocs',
+			'render_callback' => 'scoutsunite_bloc_iama',
+		)
+	);
+	register_block_type(
 		'scoutsunite/a-la-une',
 		array(
 			'api_version'     => 3,
@@ -555,10 +575,7 @@ function scoutsunite_agenda_ligne( $section, $nom, $quoi, $horaire, $notes = '' 
  */
 function scoutsunite_bloc_prochaines_reunions() {
 	$html = '';
-	foreach ( scoutsunite_agenda_sections() as $slug => $nom ) {
-		if ( 'unite' === $slug ) {
-			continue;
-		}
+	foreach ( scoutsunite_agenda_sections_age() as $slug => $nom ) {
 		$url   = scoutsunite_agenda_section_url( $slug );
 		$label = $url ? '<a href="' . esc_url( $url ) . '">' . esc_html( $nom ) . '</a>' : esc_html( $nom );
 		$next  = scoutsunite_agenda_a_venir( $slug, 1 );
@@ -725,7 +742,7 @@ function scoutsunite_bloc_a_la_une() {
 		$titre = scoutsunite_agenda_type( $r->ID );
 	}
 	if ( '' === $titre ) {
-		$titre = 'unite' === $section ? 'Activité d’unité' : 'Réunion ' . $nom;
+		$titre = in_array( $section, array( 'unite', 'iama' ), true ) ? ( 'unite' === $section ? 'Activité d’unité' : 'Activité IAmA' ) : 'Réunion ' . $nom;
 	}
 	$infos = array_filter( array( scoutsunite_agenda_horaire( $r->ID ), get_post_meta( $r->ID, 'su_lieu', true ) ) );
 
@@ -748,6 +765,34 @@ function scoutsunite_bloc_a_la_une() {
 }
 
 /**
+ * Fiches d'activités (week-ends, camps, activités IAmA) avec leurs notes complètes.
+ *
+ * @param WP_Post[] $activites Réunions à afficher.
+ * @return string HTML.
+ */
+function scoutsunite_agenda_fiches( $activites ) {
+	$html = '';
+	foreach ( $activites as $a ) {
+		$section   = get_post_meta( $a->ID, 'su_section', true );
+		$type      = scoutsunite_agenda_type( $a->ID );
+		$titre     = scoutsunite_agenda_titre( $a );
+		$infos     = array_filter( array( scoutsunite_agenda_horaire( $a->ID ), get_post_meta( $a->ID, 'su_lieu', true ) ) );
+		$qui       = array( 'unite' => 'toute l’unité', 'iama' => 'IAmA' );
+		$etiquette = implode( ' · ', array_filter( array( $type ? $type : ( isset( $qui[ $section ] ) ? 'Activité' : '' ), $qui[ $section ] ?? '' ) ) );
+
+		$html .= '<article class="camp">';
+		$html .= '<p class="camp__type">' . esc_html( $etiquette ) . '</p>';
+		$html .= '<h4 class="wp-block-heading camp__titre"><a href="' . esc_url( get_permalink( $a ) ) . '">' . esc_html( $titre ? $titre : ( $type ? $type : 'Activité' ) ) . '</a></h4>';
+		$html .= '<p class="camp__quand">' . esc_html( ucfirst( scoutsunite_agenda_quand( $a->ID ) ) ) . ( $infos ? '<br>' . esc_html( implode( ' · ', $infos ) ) : '' ) . '</p>';
+		if ( '' !== trim( $a->post_content ) ) {
+			$html .= '<div class="camp__notes">' . apply_filters( 'the_content', $a->post_content ) . '</div>';
+		}
+		$html .= '</article>';
+	}
+	return $html;
+}
+
+/**
  * Page de section : les week-ends et le camp à venir de la section et de toute
  * l'unité, avec leurs notes complètes (prix, matériel…).
  *
@@ -762,21 +807,20 @@ function scoutsunite_bloc_camps( $attributes ) {
 	if ( ! $activites ) {
 		return '<div ' . $wrapper . '><p class="camps__vide">Pas encore de week-end ni de camp annoncé. Dès que le staff les ajoute à l’agenda (type « Week-end » ou « Camp »), ils s’affichent ici avec les dates, le lieu et les infos pratiques.</p></div>';
 	}
+	return '<div ' . $wrapper . '>' . scoutsunite_agenda_fiches( $activites ) . '</div>';
+}
 
-	$html = '';
-	foreach ( $activites as $a ) {
-		$titre = scoutsunite_agenda_titre( $a );
-		$infos = array_filter( array( scoutsunite_agenda_horaire( $a->ID ), get_post_meta( $a->ID, 'su_lieu', true ) ) );
-		$qui   = 'unite' === get_post_meta( $a->ID, 'su_section', true ) ? ' · toute l’unité' : '';
+/**
+ * Page IAmA : les prochaines activités du clan des anciens et amis.
+ *
+ * @return string HTML.
+ */
+function scoutsunite_bloc_iama() {
+	$wrapper   = get_block_wrapper_attributes( array( 'class' => 'camps' ) );
+	$activites = scoutsunite_agenda_a_venir( 'iama', 6 );
 
-		$html .= '<article class="camp">';
-		$html .= '<p class="camp__type">' . esc_html( scoutsunite_agenda_type( $a->ID ) . $qui ) . '</p>';
-		$html .= '<h4 class="wp-block-heading camp__titre"><a href="' . esc_url( get_permalink( $a ) ) . '">' . esc_html( $titre ? $titre : scoutsunite_agenda_type( $a->ID ) ) . '</a></h4>';
-		$html .= '<p class="camp__quand">' . esc_html( ucfirst( scoutsunite_agenda_quand( $a->ID ) ) ) . ( $infos ? '<br>' . esc_html( implode( ' · ', $infos ) ) : '' ) . '</p>';
-		if ( '' !== trim( $a->post_content ) ) {
-			$html .= '<div class="camp__notes">' . apply_filters( 'the_content', $a->post_content ) . '</div>';
-		}
-		$html .= '</article>';
+	if ( ! $activites ) {
+		return '<div ' . $wrapper . '><p class="camps__vide">Pas encore d’activité IAmA annoncée. Les rendez-vous du clan (souper des anciens, coup de main au local…) s’affichent ici dès qu’ils sont ajoutés à l’agenda avec la section « IAmA ».</p></div>';
 	}
-	return '<div ' . $wrapper . '>' . $html . '</div>';
+	return '<div ' . $wrapper . '>' . scoutsunite_agenda_fiches( $activites ) . '</div>';
 }

@@ -102,6 +102,20 @@
 <!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"pionniers-email"}}}}} -->
 <p><mark class="a-completer">pionniers@example.org</mark></p>
 <!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+
+<!-- wp:group {"className":"is-style-ligne-iama","layout":{"type":"default"}} -->
+<div class="wp-block-group is-style-ligne-iama"><!-- wp:paragraph -->
+<p><a href="/iama/">IAmA</a></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"iama-chef"}}}}} -->
+<p><mark class="a-completer">Prénom Nom</mark></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"iama-email"}}}}} -->
+<p><mark class="a-completer">iama@example.org</mark></p>
+<!-- /wp:paragraph --></div>
 <!-- /wp:group --></div>
 <!-- /wp:group -->
 

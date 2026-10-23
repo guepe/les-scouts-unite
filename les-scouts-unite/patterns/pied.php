@@ -40,6 +40,10 @@
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
+<li><a href="/iama/">Anciens et amis (IAmA)</a></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
 <li><a href="/contact/">Contact</a></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></div>

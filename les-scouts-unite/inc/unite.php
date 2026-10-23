@@ -31,6 +31,10 @@ function scoutsunite_unite_champs() {
 			'staff_email'  => array( 'E-mail du staff d’unité', 'email', 'staff@example.org' ),
 		),
 		'Les staffs de section' => array(),
+		'Le clan IAmA'      => array(
+			'iama_chef'  => array( 'Responsable IAmA de l’unité', 'text', 'Prénom Nom' ),
+			'iama_email' => array( 'E-mail du clan IAmA', 'email', 'iama@example.org' ),
+		),
 		'Les formulaires'   => array(
 			'formulaire_inscription' => array( 'Lien du formulaire d’inscription', 'url', 'https://…' ),
 			'formulaire_contact'     => array( 'Lien du formulaire de contact', 'url', 'https://…' ),
@@ -41,10 +45,7 @@ function scoutsunite_unite_champs() {
 			'places'     => array( 'Places disponibles (affiche de l’accueil)', 'text', 'Places disponibles : à préciser par le staff.' ),
 		),
 	);
-	foreach ( scoutsunite_agenda_sections() as $slug => $nom ) {
-		if ( 'unite' === $slug ) {
-			continue;
-		}
+	foreach ( scoutsunite_agenda_sections_age() as $slug => $nom ) {
 		$champs['Les staffs de section'][ $slug . '_chef' ]  = array( $nom . ' : chef ou cheffe de section', 'text', 'Totem – Prénom' );
 		$champs['Les staffs de section'][ $slug . '_staff' ] = array( $nom . ' : animateurs (un par ligne)', 'textarea', "Totem – Prénom\nTotem – Prénom" );
 		$champs['Les staffs de section'][ $slug . '_email' ] = array( $nom . ' : e-mail', 'email', $slug . '@example.org' );
@@ -136,6 +137,8 @@ function scoutsunite_unite_html( $cle ) {
 			return implode( '<br>', $lignes ) . '<br>À verser sur le compte <strong>' . scoutsunite_unite_texte( 'compte' ) . '</strong> avec le nom de l’enfant en communication.';
 		case 'places':
 			return scoutsunite_unite_texte( 'places' );
+		case 'iama-contact':
+			return '<strong>' . scoutsunite_unite_texte( 'iama_chef' ) . '</strong>, responsable IAmA de l’unité<br>' . scoutsunite_unite_lien( 'iama_email', 'mailto' );
 		case 'formulaire-inscription':
 		case 'formulaire-contact':
 			$champ = str_replace( '-', '_', $cle );
@@ -161,12 +164,10 @@ function scoutsunite_unite_html( $cle ) {
  * @return array Clé => HTML.
  */
 function scoutsunite_unite_toutes() {
-	$cles = array( 'adresse', 'itineraire', 'staff-unite', 'responsable', 'email-staff', 'cotisation', 'places', 'formulaire-inscription', 'formulaire-contact' );
-	foreach ( scoutsunite_agenda_sections() as $slug => $nom ) {
-		if ( 'unite' !== $slug ) {
-			$cles[] = $slug . '-chef';
-			$cles[] = $slug . '-email';
-		}
+	$cles = array( 'adresse', 'itineraire', 'staff-unite', 'responsable', 'email-staff', 'cotisation', 'places', 'formulaire-inscription', 'formulaire-contact', 'iama-contact', 'iama-chef', 'iama-email' );
+	foreach ( array_keys( scoutsunite_agenda_sections_age() ) as $slug ) {
+		$cles[] = $slug . '-chef';
+		$cles[] = $slug . '-email';
 	}
 	$html = array();
 	foreach ( $cles as $cle ) {
@@ -361,7 +362,7 @@ function scoutsunite_unite_editeur() {
 	wp_add_inline_script(
 		'scoutsunite-blocs',
 		'window.scoutsuniteUnite = ' . wp_json_encode( scoutsunite_unite_toutes() ) . ';'
-		. 'window.scoutsuniteSectionsBlocs = ' . wp_json_encode( array_diff_key( scoutsunite_agenda_sections(), array( 'unite' => '' ) ) ) . ';',
+		. 'window.scoutsuniteSectionsBlocs = ' . wp_json_encode( scoutsunite_agenda_sections_age() ) . ';',
 		'before'
 	);
 }

@@ -3,7 +3,7 @@ Theme Name: Les Scouts – Unité
 Theme URI: https://github.com/lesscouts/template-unite
 Author: Pierre-Henri Delaval
 Description: Thème de bloc pour le site d’une unité Les Scouts asbl, construit sur la charte graphique de la fédération : bleu de la fédération, toppings, couleurs de section et police Muli. Le nom de l’unité vient du titre du site ; tout se modifie dans l’éditeur de site.
-Version: 2.5.0
+Version: 2.6.3
 Requires at least: 6.5
 Tested up to: 6.8
 Requires PHP: 7.4
@@ -251,6 +251,29 @@ time {
 	background: var(--su-vert);
 }
 
+/* Affiche bleue : pour un logo blanc (IAmA), texte blanc et bouton inversé. */
+.is-style-affiche.affiche--bleue {
+	background: var(--su-bleu);
+}
+
+.is-style-affiche.affiche--bleue :where(h1, h2, h3, h4, p, li) {
+	color: #fff;
+}
+
+.affiche--bleue .wp-block-button__link {
+	background: #fff;
+	color: var(--su-bleu);
+}
+
+.affiche--bleue .wp-block-button__link:hover {
+	background: var(--su-vert);
+	color: var(--su-bleu);
+}
+
+.affiche__logo {
+	margin: 0 0 0.5rem !important;
+}
+
 .is-style-affiche :where(h1, h2, h3, h4, p, li),
 .is-style-affiche-verte :where(h1, h2, h3, h4, p, li) {
 	color: var(--su-bleu);
@@ -390,6 +413,7 @@ time {
 .is-style-ligne-eclaireurs { --section: var(--wp--preset--color--eclaireurs); }
 .is-style-ligne-pionniers { --section: var(--wp--preset--color--pionniers); }
 .is-style-ligne-unite { --section: var(--su-vert); }
+.is-style-ligne-iama { --section: var(--su-vert-fonce); }
 
 @media (max-width: 40rem) {
 	[class*="is-style-ligne-"] {
@@ -568,6 +592,18 @@ time {
 .regle-ages > .wp-block-group:has(h3 a:focus-visible) {
 	outline: 3px solid var(--su-orange);
 	outline-offset: 4px;
+}
+
+.regle-ages__iama {
+	margin-top: var(--wp--preset--spacing--50) !important;
+	padding-top: 1rem;
+	border-top: 2px solid var(--su-trait);
+	font-size: var(--wp--preset--font-size--small);
+	color: var(--su-vert-fonce);
+}
+
+.regle-ages__iama a {
+	font-weight: 800;
 }
 
 .regle-ages__tranche {
@@ -1139,6 +1175,7 @@ a.lien-fleche:hover::after {
 .agenda__filtre-eclaireurs { --section: var(--wp--preset--color--eclaireurs); }
 .agenda__filtre-pionniers { --section: var(--wp--preset--color--pionniers); }
 .agenda__filtre-unite { --section: var(--su-vert); }
+.agenda__filtre-iama { --section: var(--su-vert-fonce); }
 
 .agenda__mois {
 	margin: var(--wp--preset--spacing--60) 0 0.5rem;
