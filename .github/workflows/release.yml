@@ -1,0 +1,39 @@
+# Publie une version du thème quand un tag vX.Y.Z est poussé :
+# vérifie la version de style.css, construit le zip et l'attache à la Release.
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  zip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Vérifier que style.css porte la version du tag
+        run: |
+          version=$(sed -n 's/^Version: *//p' style.css | tr -d '\r')
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::style.css est en $version, le tag est $GITHUB_REF_NAME"
+            exit 1
+          fi
+
+      - name: Construire le zip (sans la doc ni les outils, voir .gitattributes)
+        run: git archive --format=zip --prefix=les-scouts-unite/ -o les-scouts-unite.zip "$GITHUB_REF_NAME"
+
+      - name: Publier la version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          # Notes : la rubrique de cette version dans CHANGELOG.md.
+          awk -v v="$version" '/^## /{p = (index($0, "## " v " ") == 1); next} p' CHANGELOG.md > notes.md
+          prerelease=""
+          case "$version" in *-*) prerelease="--prerelease" ;; esac
+          gh release create "$GITHUB_REF_NAME" les-scouts-unite.zip \
+            --title "Les Scouts – Unité $version" --notes-file notes.md $prerelease

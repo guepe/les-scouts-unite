@@ -1,15 +1,16 @@
-# Thème WordPress – Les Scouts – Unité
+# Les Scouts – Unité
 
-Thème de bloc (Full Site Editing) pour le site d’une unité **Les Scouts asbl**, construit sur la charte graphique Les Scouts asbl de ce dépôt : bleu de la fédération, toppings, couleurs de section, polices Muli et Caveat Brush, logos.
+Thème WordPress (thème de bloc, Full Site Editing) pour le site d’une unité **Les Scouts asbl** : agenda des réunions, pages de section, staffs, inscriptions, contact et clan IAmA, le tout modifiable dans l’éditeur par des animateurs bénévoles, sans code.
+
+Il reprend la charte graphique du [template des sites d’unité](https://github.com/lesscouts/template-unite) publié par Les Scouts asbl : bleu de la fédération, toppings, couleurs de section, polices Muli et Caveat Brush, logos.
+
+**[Essayer le thème en ligne](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/guepe/les-scouts-unite/main/playground/demo.json)** (WordPress Playground, dans le navigateur, rien à installer) · **[Télécharger la dernière version](https://github.com/guepe/les-scouts-unite/releases/latest)**
 
 L’accueil est un **panneau d’affichage** : le bleu de la fédération criblé de toppings, avec les affiches du moment épinglées dessus (prochaines réunions, activité à la une, inscriptions).
 
 ## Installer le thème
 
-1. Crée le zip du thème :
-   ```sh
-   cd wordpress && zip -r les-scouts-unite.zip les-scouts-unite
-   ```
+1. Télécharge `les-scouts-unite.zip` depuis la [dernière version publiée](https://github.com/guepe/les-scouts-unite/releases/latest).
 2. Dans WordPress : **Apparence → Thèmes → Ajouter → Téléverser un thème**, choisis le zip, puis **Activer**.
 3. **Réglages → Général** : le **titre du site** est le nom de ton unité (par ex. `Unité 12XY Localité`) et le **slogan** sa ligne de présentation (par ex. `Unité scoute de Localité`). Le thème les affiche dans l’en-tête, le panneau d’accueil et le pied de page.
 4. **Réglages → Unité** : les coordonnées de l’unité, encodées une seule fois (voir ci-dessous).
@@ -82,19 +83,41 @@ Ces blocs sont liés aux réglages dans les compositions du thème. Une page cr�
 - la phrase d’accroche manuscrite du pied de page (« Toujours prêts, de 6 à 18 ans. ») si tu veux la personnaliser ;
 - les photos : une seule photo d’exemple est fournie (celle du dépôt de la fédération).
 
-## Essayer en local
+## Développer
 
-Avec [WordPress Playground](https://wordpress.github.io/wordpress-playground/), sans rien installer d’autre que Node :
+### Essayer en local
+
+Avec [WordPress Playground](https://wordpress.github.io/wordpress-playground/), sans rien installer d’autre que Node, depuis la racine du dépôt :
 
 ```sh
-cd wordpress
 npx @wp-playground/cli@latest server --port=9400 \
-  --mount=./les-scouts-unite:/wordpress/wp-content/themes/les-scouts-unite \
+  --mount=.:/wordpress/wp-content/themes/les-scouts-unite \
   --blueprint=./blueprint.json
 ```
 
-Puis ouvre http://127.0.0.1:9400 (identifiant `admin`, mot de passe `password`). Le blueprint crée les pages, quatre articles et des réunions d’exemple.
+Puis ouvre http://127.0.0.1:9400 (identifiant `admin`, mot de passe `password`). Le contenu d’exemple (pages, articles, réunions) vient de `playground/contenu-demo.php`, partagé avec la démo en ligne (`playground/demo.json`, qui installe le thème depuis GitHub).
+
+### Publier une version
+
+1. Monte `Version:` dans `style.css` (par ex. `2.8.0`) et note les changements dans `CHANGELOG.md`.
+2. Commite, puis crée et pousse le tag correspondant :
+   ```sh
+   git tag v2.8.0 && git push origin main v2.8.0
+   ```
+3. L’action GitHub [`release`](.github/workflows/release.yml) vérifie que le tag et `style.css` portent la même version, construit `les-scouts-unite.zip` (sans la doc ni les fichiers de développement, voir `.gitattributes`) et publie la version avec le zip.
+
+Pour fabriquer le zip à la main : `git archive --format=zip --prefix=les-scouts-unite/ -o les-scouts-unite.zip HEAD`.
+
+### Documentation technique
+
+- [`docs/agenda-module.md`](docs/agenda-module.md) : l’agenda et les droits, de quoi les reproduire ailleurs.
+- [`DESIGN.md`](DESIGN.md) : le système graphique (couleurs, typographie, composants).
+- [`PRODUCT.md`](PRODUCT.md) : à qui sert le site et ce qu’il doit permettre.
 
 ## Polices
 
 La charte recommande Housepaint, mais elle n’a pas de lettres accentuées : les titres sont donc en Muli Black, et Caveat Brush sert pour les annotations manuscrites des affiches.
+
+## Origine et licences
+
+Ce thème est né dans un fork du [template des sites d’unité](https://github.com/lesscouts/template-unite) de Les Scouts asbl, dont il reprend la charte graphique ; il vit désormais dans son propre dépôt. Le code est sous licence MIT (voir [`LICENSE`](LICENSE)). Les logos, toppings et éléments de la charte restent la propriété de Les Scouts asbl. Muli et Caveat Brush sont sous licence SIL Open Font License.
