@@ -67,7 +67,7 @@ Tous sont enregistrés avec `register_post_meta( 'reunion', … )` :
 | `su_fin` | `H:i` | `''` | heure de fin |
 | `su_lieu` | texte libre | `'au local'` | lieu |
 | `su_repeter` | `Y-m-d` | `''` | « Répéter chaque semaine jusqu'au » |
-| `su_type` | `''`, `'weekend'` ou `'camp'` | `''` | type d'activité ; `''` = réunion ordinaire |
+| `su_type` | `''`, `'weekend'`, `'camp'` ou `'speciale'` | `''` | type d'activité ; `''` = réunion ordinaire |
 | `su_jusqua` | `Y-m-d` | `''` | dernier jour d'un week-end ou d'un camp |
 | `su_avant` | `'1'` ou `''` | `''` | « Mettre en avant sur l'accueil » : alimente le bloc « À la une » |
 | `_su_repete_jusqua` | `Y-m-d` | — | champ privé : jusqu'où les copies ont déjà été créées |
@@ -80,9 +80,10 @@ Le panneau est un plugin `wp.plugins.registerPlugin` qui affiche un `PluginDocum
 
 Champs du panneau :
 - **Section** : `SelectControl`, avec une première option vide « Choisir… » ;
-- **Type** : `SelectControl` Réunion / Week-end / Camp ; revenir à « Réunion » vide aussi `su_jusqua` ;
+- **Type** : `SelectControl` Réunion / Week-end / Camp / Réunion spéciale ; seuls week-end et camp gardent `su_jusqua`, les autres types le vident ;
 - **Date** (libellé « Du » pour un week-end ou un camp) : `TextControl type="date"` ;
 - **Jusqu'au** : `TextControl type="date"`, affiché seulement pour un week-end ou un camp ;
+- la liste des sections ne propose à un animateur que les siennes (voir « Droits »).
 - **Début** et **Fin** : `TextControl type="time"`, côte à côte dans un `Flex` ;
 - **Lieu** : `TextControl`, qui affiche « au local » si le champ est `undefined` ;
 - **Mettre en avant sur l'accueil** : `CheckboxControl` qui enregistre `'1'` ou `''`, avec l'aide « Pour les grandes activités (week-end d'unité, souper, fête…) : elle s'affiche en grand en haut de l'accueil jusqu'à sa date. » ;
@@ -175,8 +176,8 @@ Les blocs :
    - Les suivantes dans `p.a-la-une__suite` : « **Ensuite :** 13 novembre · Week-end d'unité », chacune liée à sa page. Pas de lien « Détails » : le titre mène déjà à la réunion.
    - Sans réunion mise en avant à venir : la dernière actualité (date en étiquette, titre lié, extrait de 22 mots, « Lire la suite »). Sans aucun article : « À la une » et une phrase d'attente.
 
-5. **`scoutsunite/camps`** : « Week-ends et camp », pour les pages de section. Classe `camps`.
-   - Attribut `section`. Liste jusqu'à 6 week-ends et camps à venir de la section et de `unite` (`a_venir( [ $section, 'unite' ], 6, false, [ 'weekend', 'camp' ] )`).
+5. **`scoutsunite/camps`** : « Temps forts de la section », sous le titre « Les temps forts » des pages de section. Classe `camps`.
+   - Attribut `section`. Liste jusqu'à 6 week-ends, camps et réunions spéciales à venir de la section et de `unite` (`a_venir( [ $section, 'unite' ], 6, false, [ 'weekend', 'camp', 'speciale' ] )`).
    - Une fiche `article.camp` par activité : `p.camp__type` (« Camp », « Week-end · toute l'unité »), `h4.camp__titre` lié à la réunion, `p.camp__quand` (période, horaire, lieu), notes complètes dans `div.camp__notes`.
    - Sans activité : `p.camps__vide` qui explique comment en ajouter.
 
@@ -197,6 +198,16 @@ Les blocs :
   - Ces mêmes classes `is-style-ligne-*` sont aussi déclarées comme styles du bloc Groupe (`register_block_style`), pour que l'éditeur puisse les réutiliser à la main.
 - **Affiche** : `.agenda-prochaine__date`, `.agenda-prochaine__notes`, `.agenda-prochaine__suite`, et pour « À la une » `.a-la-une__quand` (gras), `.a-la-une__suite` (petit, filet au-dessus).
 - **Agenda** : `.agenda__filtres a` (pastilles, couleur via `--section` sur `.agenda__filtre-{slug}`, `[aria-current="page"]` pour l'état actif), `.agenda__mois`, `.agenda__liste`, `.agenda__vide`.
+
+## Droits (`inc/droits.php`)
+
+- Le type `reunion` a ses propres droits : `capability_type => [ 'reunion', 'reunions' ]` et `map_meta_cap => true`. Administrateur et éditeur reçoivent `edit_reunions`, `publish_reunions`, etc. Les champs ne s'enregistrent que si `user_can( $user_id, 'edit_post', $post_id )` (`auth_callback`).
+- Rôle **Animateur** (`scoutsunite_animateur`) : `read`, `upload_files`, `edit_pages`, `edit_others_pages`, `edit_published_pages`, tous les droits `*_reunions`, et le droit repère `scoutsunite_animateur`. Ses sections sont dans la méta utilisateur `scoutsunite_sections` (tableau), cochées par un administrateur (`promote_users`) dans le profil.
+- Rôle **Staff d'unité** (`scoutsunite_staff`) : les droits de l'éditeur, les droits `*_reunions` et `manage_unite`, qui ouvre Réglages → Unité (avec `option_page_capability_scoutsunite_unite`).
+- Filtre `map_meta_cap` : pour un animateur (droit repère sans `manage_unite`), `edit_post`, `delete_post` et `publish_post` sur une réunion ne passent que si sa `su_section` est l'une des siennes (ou vide, pour une réunion qu'il crée) ; sur une page, seulement si son identifiant (`post_name`) est l'une de ses sections, et jamais la suppression.
+- Le `sanitize_callback` de `su_section` ramène une section interdite à la première de l'animateur : il ne peut ni créer ni déplacer une réunion hors de ses sections.
+- Dans l'administration, ses listes de réunions et de pages sont filtrées sur ses sections ; sur une page, l'éditeur est verrouillé en `templateLock: 'contentOnly'` (filtre `block_editor_settings_all`).
+- Les rôles sont (ré)écrits quand `SCOUTSUNITE_DROITS_VERSION` change (option `scoutsunite_droits_version`).
 
 ## Installation et mise à jour
 

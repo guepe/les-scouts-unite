@@ -46,7 +46,7 @@ function scoutsunite_agenda_register() {
 	register_post_type(
 		'reunion',
 		array(
-			'labels'        => array(
+			'labels'          => array(
 				'name'               => 'Réunions',
 				'singular_name'      => 'Réunion',
 				'menu_name'          => 'Agenda',
@@ -61,17 +61,20 @@ function scoutsunite_agenda_register() {
 				'not_found_in_trash' => 'Aucune réunion dans la corbeille',
 				'archives'           => 'Agenda',
 			),
-			'public'        => true,
-			'has_archive'   => 'agenda',
-			'rewrite'       => array(
+			'public'          => true,
+			'has_archive'     => 'agenda',
+			'rewrite'         => array(
 				'slug'       => 'agenda',
 				'with_front' => false,
 			),
-			'menu_icon'     => 'dashicons-calendar-alt',
-			'menu_position' => 5,
-			'show_in_rest'  => true,
-			'supports'      => array( 'title', 'editor', 'revisions', 'custom-fields' ),
-			'template'      => array(
+			'menu_icon'       => 'dashicons-calendar-alt',
+			'menu_position'   => 5,
+			'show_in_rest'    => true,
+			// Droits propres aux réunions : un animateur peut gérer celles de sa section (inc/droits.php).
+			'capability_type' => array( 'reunion', 'reunions' ),
+			'map_meta_cap'    => true,
+			'supports'        => array( 'title', 'editor', 'revisions', 'custom-fields' ),
+			'template'        => array(
 				array(
 					'core/paragraph',
 					array( 'placeholder' => 'Notes pour les parents : à emporter, rendez-vous, remarques… (facultatif)' ),
@@ -89,9 +92,9 @@ function scoutsunite_agenda_register() {
 				'single'            => true,
 				'default'           => 'su_lieu' === $key ? 'au local' : '',
 				'show_in_rest'      => true,
-				'sanitize_callback' => 'sanitize_text_field',
-				'auth_callback'     => function () {
-					return current_user_can( 'edit_posts' );
+				'sanitize_callback' => 'su_section' === $key ? 'scoutsunite_droits_section_permise' : 'sanitize_text_field',
+				'auth_callback'     => function ( $permis, $cle, $post_id, $user_id ) {
+					return user_can( $user_id, 'edit_post', $post_id );
 				},
 			)
 		);
@@ -178,7 +181,7 @@ function scoutsunite_agenda_editor_assets() {
 	);
 	wp_add_inline_script(
 		'scoutsunite-reunion',
-		'window.scoutsuniteSections = ' . wp_json_encode( scoutsunite_agenda_sections() ) . ';',
+		'window.scoutsuniteSections = ' . wp_json_encode( scoutsunite_droits_sections_permises() ) . ';',
 		'before'
 	);
 }
@@ -396,8 +399,9 @@ function scoutsunite_agenda_quand( $post_id, $format = 'l j F' ) {
  */
 function scoutsunite_agenda_type( $post_id ) {
 	$types = array(
-		'weekend' => 'Week-end',
-		'camp'    => 'Camp',
+		'weekend'  => 'Week-end',
+		'camp'     => 'Camp',
+		'speciale' => 'Réunion spéciale',
 	);
 	return $types[ get_post_meta( $post_id, 'su_type', true ) ] ?? '';
 }
@@ -515,7 +519,7 @@ function scoutsunite_agenda_blocks() {
 		'scoutsunite/camps',
 		array(
 			'api_version'     => 3,
-			'title'           => 'Week-ends et camp',
+			'title'           => 'Temps forts de la section',
 			'category'        => 'widgets',
 			'editor_script'   => 'scoutsunite-blocs',
 			'attributes'      => array(
@@ -793,8 +797,8 @@ function scoutsunite_agenda_fiches( $activites ) {
 }
 
 /**
- * Page de section : les week-ends et le camp à venir de la section et de toute
- * l'unité, avec leurs notes complètes (prix, matériel…).
+ * Page de section : les temps forts à venir (week-ends, camp, réunions spéciales)
+ * de la section et de toute l'unité, avec leurs notes complètes (prix, matériel…).
  *
  * @param array $attributes Attributs du bloc (section).
  * @return string HTML.
@@ -802,10 +806,10 @@ function scoutsunite_agenda_fiches( $activites ) {
 function scoutsunite_bloc_camps( $attributes ) {
 	$section   = sanitize_key( $attributes['section'] ?? 'baladins' );
 	$wrapper   = get_block_wrapper_attributes( array( 'class' => 'camps' ) );
-	$activites = scoutsunite_agenda_a_venir( array( $section, 'unite' ), 6, false, array( 'weekend', 'camp' ) );
+	$activites = scoutsunite_agenda_a_venir( array( $section, 'unite' ), 6, false, array( 'weekend', 'camp', 'speciale' ) );
 
 	if ( ! $activites ) {
-		return '<div ' . $wrapper . '><p class="camps__vide">Pas encore de week-end ni de camp annoncé. Dès que le staff les ajoute à l’agenda (type « Week-end » ou « Camp »), ils s’affichent ici avec les dates, le lieu et les infos pratiques.</p></div>';
+		return '<div ' . $wrapper . '><p class="camps__vide">Pas encore de temps fort annoncé. Dès que le staff ajoute à l’agenda un week-end, le camp ou une réunion spéciale, ils s’affichent ici avec les dates, le lieu et les infos pratiques.</p></div>';
 	}
 	return '<div ' . $wrapper . '>' . scoutsunite_agenda_fiches( $activites ) . '</div>';
 }

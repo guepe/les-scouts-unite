@@ -96,7 +96,9 @@ function scoutsunite_unite_lien( $cle, $schema ) {
 		return scoutsunite_unite_texte( $cle );
 	}
 	$cible = 'tel' === $schema ? preg_replace( '/[^\d+]/', '', $valeur ) : $valeur;
-	return '<a href="' . esc_url( $schema . ':' . $cible, array( $schema ) ) . '">' . esc_html( $valeur ) . '</a>';
+	// Une adresse trop longue pour sa colonne passe à la ligne après l'arobase, pas au milieu d'un mot.
+	$texte = 'mailto' === $schema ? str_replace( '@', '@<wbr>', esc_html( $valeur ) ) : esc_html( $valeur );
+	return '<a href="' . esc_url( $schema . ':' . $cible, array( $schema ) ) . '">' . $texte . '</a>';
 }
 
 /**
@@ -308,7 +310,7 @@ function scoutsunite_reprise_camps() {
 			'<!-- wp:scoutsunite/camps {"section":"' . $section . '"} /-->',
 			$page->post_content
 		);
-		$contenu = str_replace( 'Le camp d’été</h3>', 'Week-ends et camp</h3>', $contenu );
+		$contenu = str_replace( 'Le camp d’été</h3>', 'Les temps forts</h3>', $contenu );
 		if ( $contenu !== $page->post_content ) {
 			$wpdb->update( $wpdb->posts, array( 'post_content' => $contenu ), array( 'ID' => $page->ID ) );
 			clean_post_cache( $page->ID );
@@ -318,6 +320,21 @@ function scoutsunite_reprise_camps() {
 	update_option( 'scoutsunite_reprise_camps', 1 );
 }
 add_action( 'init', 'scoutsunite_reprise_camps', 20 );
+
+/**
+ * Reprise : le titre « Week-ends et camp » devient « Les temps forts », qui
+ * couvre aussi les réunions spéciales.
+ */
+function scoutsunite_reprise_temps_forts() {
+	if ( get_option( 'scoutsunite_reprise_temps_forts' ) ) {
+		return;
+	}
+	global $wpdb;
+	$wpdb->query( "UPDATE {$wpdb->posts} SET post_content = REPLACE( post_content, 'Week-ends et camp</h3>', 'Les temps forts</h3>' ) WHERE post_type = 'page' AND post_content LIKE '%Week-ends et camp</h3>%'" );
+	wp_cache_flush();
+	update_option( 'scoutsunite_reprise_temps_forts', 1 );
+}
+add_action( 'init', 'scoutsunite_reprise_temps_forts', 20 );
 
 function scoutsunite_unite_bloc() {
 	register_block_type(
@@ -403,8 +420,18 @@ function scoutsunite_unite_reglages() {
 add_action( 'admin_init', 'scoutsunite_unite_reglages' );
 
 function scoutsunite_unite_menu() {
-	add_options_page( 'Coordonnées de l’unité', 'Unité', 'manage_options', 'scoutsunite-unite', 'scoutsunite_unite_page' );
+	add_options_page( 'Coordonnées de l’unité', 'Unité', 'manage_unite', 'scoutsunite-unite', 'scoutsunite_unite_page' );
 }
+
+/**
+ * Le staff d'unité enregistre ces réglages sans être administrateur.
+ */
+add_filter(
+	'option_page_capability_scoutsunite_unite',
+	function () {
+		return 'manage_unite';
+	}
+);
 add_action( 'admin_menu', 'scoutsunite_unite_menu' );
 
 function scoutsunite_unite_page() {

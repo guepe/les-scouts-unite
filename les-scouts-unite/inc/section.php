@@ -126,7 +126,7 @@ function scoutsunite_section_pattern( $slug ) {
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":3} -->
-<h3 class="wp-block-heading">Week-ends et camp</h3>
+<h3 class="wp-block-heading">Les temps forts</h3>
 <!-- /wp:heading -->
 
 <!-- wp:scoutsunite/camps {"section":"<?php echo esc_attr( $slug ); ?>"} /--></div>

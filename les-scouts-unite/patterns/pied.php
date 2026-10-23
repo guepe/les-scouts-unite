@@ -9,8 +9,8 @@
 ?>
 <!-- wp:group {"tagName":"footer","align":"full","className":"is-style-panneau pied-unite","style":{"spacing":{"padding":{"top":"var:preset|spacing|70","bottom":"var:preset|spacing|50"},"margin":{"top":"0"}},"elements":{"link":{"color":{"text":"var:preset|color|blanc"}}}},"textColor":"blanc","layout":{"type":"constrained","contentSize":"78rem"}} -->
 <footer class="wp-block-group alignfull is-style-panneau pied-unite has-blanc-color has-text-color has-link-color" style="margin-top:0;padding-top:var(--wp--preset--spacing--70);padding-bottom:var(--wp--preset--spacing--50)"><!-- wp:columns {"style":{"spacing":{"blockGap":{"left":"var:preset|spacing|60"}}}} -->
-<div class="wp-block-columns"><!-- wp:column {"width":"40%"} -->
-<div class="wp-block-column" style="flex-basis:40%"><!-- wp:site-title {"level":2,"isLink":false,"style":{"typography":{"fontSize":"clamp(2.25rem, 5vw, 3.5rem)","lineHeight":"1.05","letterSpacing":"-0.02em"}}} /-->
+<div class="wp-block-columns"><!-- wp:column {"width":"34%"} -->
+<div class="wp-block-column" style="flex-basis:34%"><!-- wp:site-title {"level":2,"isLink":false,"style":{"typography":{"fontSize":"clamp(2.25rem, 5vw, 3.5rem)","lineHeight":"1.05","letterSpacing":"-0.02em"}}} /-->
 
 <!-- wp:paragraph {"className":"is-style-manuscrit"} -->
 <p class="is-style-manuscrit">Toujours prêts, de 6 à 18 ans.</p>

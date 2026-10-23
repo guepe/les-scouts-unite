@@ -50,6 +50,8 @@
 			}
 		}, [] );
 
+		var plusieursJours = 'weekend' === meta.su_type || 'camp' === meta.su_type;
+
 		// Pas de publication sans section ni date : la réunion n'apparaîtrait nulle part.
 		var incomplet = ! meta.su_section || ! meta.su_date;
 		useEffect(
@@ -93,22 +95,23 @@
 					{ label: 'Réunion', value: '' },
 					{ label: 'Week-end', value: 'weekend' },
 					{ label: 'Camp', value: 'camp' },
+					{ label: 'Réunion spéciale', value: 'speciale' },
 				],
 				onChange: function ( type ) {
-					// Une réunion ordinaire n'a pas de date de fin.
-					editor.editPost( { meta: type ? { su_type: type } : { su_type: '', su_jusqua: '' } } );
+					// Seuls un week-end et un camp durent plusieurs jours.
+					editor.editPost( { meta: 'weekend' === type || 'camp' === type ? { su_type: type } : { su_type: type, su_jusqua: '' } } );
 				},
-				help: meta.su_type ? 'S’affiche aussi dans « Week-ends et camp » sur la page de la section.' : undefined,
+				help: meta.su_type ? 'S’affiche aussi dans « Les temps forts » sur la page de la section.' : undefined,
 				__nextHasNoMarginBottom: true,
 			} ),
 			el( C.TextControl, {
-				label: meta.su_type ? 'Du' : 'Date',
+				label: plusieursJours ? 'Du' : 'Date',
 				type: 'date',
 				value: meta.su_date || '',
 				onChange: set( 'su_date' ),
 				__nextHasNoMarginBottom: true,
 			} ),
-			meta.su_type &&
+			plusieursJours &&
 				el( C.TextControl, {
 					label: 'Jusqu’au',
 					type: 'date',

@@ -93,8 +93,8 @@
 	} ) );
 
 	wp.blocks.registerBlockType( 'scoutsunite/camps', Object.assign( {}, commun, {
-		title: 'Week-ends et camp',
-		description: 'Les week-ends et le camp à venir de la section (et de toute l’unité), depuis l’agenda.',
+		title: 'Temps forts de la section',
+		description: 'Les week-ends, le camp et les réunions spéciales à venir de la section (et de toute l’unité), depuis l’agenda.',
 		icon: 'palmtree',
 		attributes: { section: { type: 'string', default: 'baladins' } },
 		edit: function ( props ) {

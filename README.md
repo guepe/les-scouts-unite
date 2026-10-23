@@ -39,16 +39,25 @@ Le menu pointe vers ces adresses. Crée les pages avec ces identifiants (slug) :
 - **Styles de blocs** ajoutés (panneau latéral → Styles d’un bloc Groupe) : *Panneau*, *Affiche épinglée*, *Affiche épinglée verte*, *Ligne Baladins/Louveteaux/Éclaireurs/Pionniers*, *Bandeau* de chaque section, et *Manuscrit* pour les paragraphes.
 - Les compositions de la catégorie **Unité scoute** (panneau, règle des âges, actualités, infos pratiques) peuvent être insérées n’importe où.
 
+## Les droits d’accès
+
+Le thème ajoute deux rôles (**Comptes → Ajouter** ou **Comptes → Tous les comptes**, puis « Rôle ») :
+
+- **Animateur** : gère les réunions de sa ou ses sections (créer, modifier, publier, supprimer) et modifie les textes et images de la page de sa section, sans pouvoir en changer la mise en page. Il ne voit et ne touche rien d’autre. Un administrateur coche ses sections dans son profil (« Sections de l’animateur ») ; la section « IAmA » peut aussi être attribuée, au responsable du clan par exemple.
+- **Staff d’unité** : gère tout le contenu (réunions de toutes les sections, pages, actualités) et **Réglages → Unité**, sans accès aux extensions, au thème ni aux comptes.
+
+Les limites sont vérifiées par WordPress à l’enregistrement, pas seulement cachées dans l’interface.
+
 ## L’agenda des réunions
 
 Les réunions s’encodent dans **Agenda → Ajouter** (menu de gauche de l’administration). Dans le panneau **Quand et où ?** à droite : section, date, début, fin, lieu. Le titre est facultatif (« Réunion » par défaut ; mets « Hike », « Week-end »… pour une activité spéciale) et le texte sert de notes pour les parents (à emporter, rendez-vous).
 
-- **Type : Réunion, Week-end ou Camp** : pour un week-end ou un camp, indique aussi la date de fin (« Jusqu’au »). L’activité s’affiche alors « du 13 au 15 novembre » avec une étiquette « Week-end » ou « Camp », reste visible jusqu’à son dernier jour, et apparaît dans le bloc **Week-ends et camp** de la page de sa section (avec ses notes complètes : prix, matériel…). Une activité « Toute l’unité » apparaît sur les pages de toutes les sections.
+- **Type : Réunion, Week-end, Camp ou Réunion spéciale** : pour un week-end ou un camp, indique aussi la date de fin (« Jusqu’au »). L’activité s’affiche alors « du 13 au 15 novembre » avec une étiquette « Week-end » ou « Camp », reste visible jusqu’à son dernier jour, et apparaît dans le bloc **Les temps forts** en bas de la page de sa section, comme une réunion spéciale (Halloween, fête de section…) (avec ses notes complètes : prix, matériel…). Une activité « Toute l’unité » apparaît sur les pages de toutes les sections.
 - **Section « IAmA »** : pour les activités du clan des anciens et amis (souper, chantier…). Elles apparaissent sur la page IAmA et dans l’agenda, pas dans les « Prochaines réunions » des sections d’âge.
 - **Mettre en avant sur l’accueil** : coche cette case pour les grandes activités (week-end d’unité, souper, fête…). La prochaine activité cochée s’affiche en grand sur l’affiche blanche en haut de l’accueil, les suivantes en dessous, jusqu’à leur date. Sans activité cochée à venir, l’affiche montre la dernière actualité.
 - **Répéter chaque semaine jusqu’au** : à la publication, une copie est créée chaque semaine jusqu’à cette date. Supprime ensuite les semaines de congé dans **Agenda → Toutes les réunions**.
 - **Mise à jour automatique** : le panneau de l’accueil montre la prochaine réunion de chaque section, chaque page de section montre la sienne (avec les dates suivantes), et **/agenda/** liste tout, mois par mois, avec un filtre par section. Les réunions passées disparaissent d’elles-mêmes.
-- Les blocs **Prochaines réunions**, **À la une**, **Prochaine réunion d’une section**, **Week-ends et camp** et **Agenda complet** peuvent être insérés n’importe où dans l’éditeur.
+- Les blocs **Prochaines réunions**, **À la une**, **Prochaine réunion d’une section**, **Temps forts de la section** et **Agenda complet** peuvent être insérés n’importe où dans l’éditeur.
 
 ### Mettre à jour un site déjà installé
 
