@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="fr-BE"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;700;800;900&family=Caveat+Brush&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden;font-family:Mulish,sans-serif;color:#0A4275}
+.fed{height:32px;background:#304A3C;color:#fff;font-size:13px;display:flex;align-items:center;padding:0 40px;font-weight:700}
+nav{height:76px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 40px}
+.logo{font-weight:900;font-size:22px}.logo small{display:block;font-size:12px;font-weight:700;color:#304A3C}
+nav ul{display:flex;gap:36px;list-style:none;font-weight:800;font-size:15px}
+.board{position:relative;height:792px;background:#0A4275;padding:48px 80px;overflow:hidden}
+.board::before{content:"";position:absolute;inset:0;opacity:.14;background-image:radial-gradient(#fff 4px,transparent 5px),linear-gradient(35deg,transparent 46%,#fff 46%,#fff 54%,transparent 54%);background-size:46px 46px,70px 70px}
+.head{position:relative;color:#fff;display:flex;align-items:baseline;gap:24px}
+.head h1{font-size:84px;font-weight:900;letter-spacing:-.03em;line-height:1}
+.head span{font-family:"Caveat Brush";font-size:34px;color:#95C11F}
+.notes{position:relative;display:grid;grid-template-columns:1.25fr 1fr;gap:40px;margin-top:40px}
+.paper{background:#fff;padding:32px 36px;box-shadow:0 14px 30px rgba(0,0,0,.28);position:relative}
+.paper::before{content:"";position:absolute;top:-10px;left:50%;width:20px;height:20px;border-radius:50%;background:#EF7B00;box-shadow:0 3px 4px rgba(0,0,0,.3)}
+.big{transform:rotate(-1.2deg);min-height:470px}
+.big .lbl{font-family:"Caveat Brush";font-size:30px;color:#EF7B00}
+.big h2{font-size:58px;font-weight:900;line-height:1;margin:8px 0 26px;letter-spacing:-.02em}
+.row{display:grid;grid-template-columns:150px 1fr 150px;padding:14px 0;border-top:2px solid #F2F5F8;font-size:17px;align-items:center}
+.row b{font-weight:900}
+.sw{display:inline-block;width:14px;height:14px;margin-right:10px;vertical-align:-1px}
+.col{display:flex;flex-direction:column;gap:34px}
+.camp{transform:rotate(1.6deg)}
+.camp .lbl,.ins .lbl{font-family:"Caveat Brush";font-size:28px;color:#D51317}
+.camp h3,.ins h3{font-size:34px;font-weight:900;line-height:1.05;margin:6px 0 10px}
+.camp p,.ins p{font-size:17px;line-height:1.5}
+.ins{transform:rotate(-.8deg);background:#95C11F;color:#fff}
+.ins .lbl{color:#0A4275}
+.btn{display:inline-block;margin-top:18px;padding:13px 24px;background:#0A4275;color:#fff;font-weight:800}
+</style></head><body>
+<div class="fed">‹ Les Scouts asbl</div>
+<nav><div class="logo">11OM Magnée<small>Unité scoute · Les Scouts</small></div>
+<ul><li>Agenda</li><li>Sections</li><li>Inscription</li><li>Contact</li></ul></nav>
+<div class="board">
+<div class="head"><h1>Unité 11OM Magnée</h1><span>ce qui se passe au local</span></div>
+<div class="notes">
+<div class="paper big"><div class="lbl">cette semaine</div><h2>Prochaines réunions</h2>
+<div class="row"><b><span class="sw" style="background:#00A0DE"></span>Baladins</b><span>samedi 24 octobre · au local</span><span>14 h – 17 h</span></div>
+<div class="row"><b><span class="sw" style="background:#296F52"></span>Louveteaux</b><span>samedi 24 octobre · au local</span><span>14 h – 17 h 30</span></div>
+<div class="row"><b><span class="sw" style="background:#004F9F"></span>Éclaireurs</b><span>samedi 24 octobre · bois de Magnée</span><span>14 h – 18 h</span></div>
+<div class="row"><b><span class="sw" style="background:#D51317"></span>Pionniers</b><span>vendredi 23 octobre · au local</span><span>19 h – 22 h</span></div>
+</div>
+<div class="col">
+<div class="paper camp"><div class="lbl">à noter</div><h3>Week-end d'unité<br>13 – 15 novembre</h3><p>Toutes les sections, départ du local samedi 9 h.</p></div>
+<div class="paper ins"><div class="lbl">rejoins-nous</div><h3>Inscriptions 2026–2027</h3><p>Encore quelques places chez les Baladins et les Louveteaux.</p><span class="btn">S'inscrire</span></div>
+</div></div></div>
+</body></html>

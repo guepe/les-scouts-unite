@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font",
+        "value": "mulish",
+        "createdAt": "2026-10-22T14:49:17.766Z",
+        "reason": "assistant: Mulish is the Google Fonts name of Muli, the documented text face; only used in the decision-round sketches"
+      }
+    ]
+  }
+}

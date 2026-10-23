@@ -1,0 +1,110 @@
+<?php
+/**
+ * Title: Page « Contact »
+ * Slug: les-scouts-unite/page-contact
+ * Categories: scoutsunite-pages
+ * Keywords: contact, staff, adresse
+ * Block Types: core/post-content
+ * Post Types: page
+ * Viewport Width: 1400
+ */
+?>
+<!-- wp:paragraph {"fontSize":"large"} -->
+<p class="has-large-font-size">Pour une question sur une réunion, écris directement au staff de la section. Pour le reste (inscriptions, cotisation, location du local), c’est le staff d’unité.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:columns {"className":"affiches","style":{"spacing":{"margin":{"top":"var:preset|spacing|60"},"blockGap":{"left":"var:preset|spacing|50","top":"2.75rem"}}}} -->
+<div class="wp-block-columns affiches" style="margin-top:var(--wp--preset--spacing--60)"><!-- wp:column -->
+<div class="wp-block-column"><!-- wp:group {"className":"is-style-affiche","layout":{"type":"default"}} -->
+<div class="wp-block-group is-style-affiche"><!-- wp:heading {"level":2,"className":"affiche__titre","fontSize":"large"} -->
+<h2 class="wp-block-heading affiche__titre has-large-font-size">Le staff d’unité</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong><mark class="a-completer">Prénom Nom</mark></strong><br><a href="tel:+32400000000"><mark class="a-completer">0400 00 00 00</mark></a><br><a href="mailto:staff@example.org"><mark class="a-completer">staff@example.org</mark></a></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group --></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"><!-- wp:group {"className":"is-style-affiche","layout":{"type":"default"}} -->
+<div class="wp-block-group is-style-affiche"><!-- wp:heading {"level":2,"className":"affiche__titre","fontSize":"large"} -->
+<h2 class="wp-block-heading affiche__titre has-large-font-size">Le local</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong><mark class="a-completer">Rue du Local 1</mark></strong><br><mark class="a-completer">0000 Localité</mark></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"className":"lien-fleche"} -->
+<p class="lien-fleche"><a href="https://www.openstreetmap.org/search?query=Magn%C3%A9e%2C%20Belgique">Itinéraire</a></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->
+
+<!-- wp:heading {"style":{"spacing":{"margin":{"top":"var:preset|spacing|70"}}}} -->
+<h2 class="wp-block-heading" style="margin-top:var(--wp--preset--spacing--70)">Les staffs de section</h2>
+<!-- /wp:heading -->
+
+<!-- wp:group {"style":{"spacing":{"margin":{"top":"var:preset|spacing|40"}}},"layout":{"type":"default"}} -->
+<div class="wp-block-group" style="margin-top:var(--wp--preset--spacing--40)"><!-- wp:group {"className":"is-style-ligne-baladins","layout":{"type":"default"}} -->
+<div class="wp-block-group is-style-ligne-baladins"><!-- wp:paragraph -->
+<p>Baladins</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><mark class="a-completer">Prénom Nom</mark></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><a href="mailto:baladins@example.org"><mark class="a-completer">baladins@example.org</mark></a></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+
+<!-- wp:group {"className":"is-style-ligne-louveteaux","layout":{"type":"default"}} -->
+<div class="wp-block-group is-style-ligne-louveteaux"><!-- wp:paragraph -->
+<p>Louveteaux</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><mark class="a-completer">Prénom Nom</mark></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><a href="mailto:louveteaux@example.org"><mark class="a-completer">louveteaux@example.org</mark></a></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+
+<!-- wp:group {"className":"is-style-ligne-eclaireurs","layout":{"type":"default"}} -->
+<div class="wp-block-group is-style-ligne-eclaireurs"><!-- wp:paragraph -->
+<p>Éclaireurs</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><mark class="a-completer">Prénom Nom</mark></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><a href="mailto:eclaireurs@example.org"><mark class="a-completer">eclaireurs@example.org</mark></a></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+
+<!-- wp:group {"className":"is-style-ligne-pionniers","layout":{"type":"default"}} -->
+<div class="wp-block-group is-style-ligne-pionniers"><!-- wp:paragraph -->
+<p>Pionniers</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><mark class="a-completer">Prénom Nom</mark></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><a href="mailto:pionniers@example.org"><mark class="a-completer">pionniers@example.org</mark></a></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group -->
+
+<!-- wp:paragraph {"style":{"spacing":{"margin":{"top":"var:preset|spacing|60"}}}} -->
+<p style="margin-top:var(--wp--preset--spacing--60)"><mark class="a-completer">Pour un formulaire de contact, ajoute ici le bloc de ton extension de formulaire.</mark></p>
+<!-- /wp:paragraph -->

@@ -1,0 +1,46 @@
+{
+  "title": "Page d'accueil — 11OM Magnée",
+  "question": "Trois structures pour l'accueil, dans la charte Les Scouts. Garde celle du tirage, prends une alternative, ou relance.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Les quatre quartiers",
+      "kicker": "THE ROLL",
+      "lineage": "le carré de rassemblement : quatre sections, un centre",
+      "thesis": "L'accueil est l'unité vue d'en haut : quatre aplats de section qui se rejoignent sur la plaque 11OM Magnée.",
+      "palette": ["#00A0DE", "#296F52", "#004F9F", "#D51317", "#0A4275", "#F2F5F8"],
+      "materials": ["aplats de couleur de section", "toppings blancs", "plaque blanche centrale"],
+      "viewport": "Écran coupé en 2×2 aux couleurs des sections, chaque quartier avec âges et prochaine réunion ; au croisement, la plaque blanche avec le nom de l'unité et « S'inscrire ».",
+      "risk": "Quatre couleurs pleines d'un coup : le menu et la plaque doivent rester très lisibles.",
+      "comp": ".impeccable/mocks/decision/assigned.webp",
+      "html": ".impeccable/mocks/decision/assigned.html"
+    },
+    {
+      "id": "dealt-board",
+      "label": "Le tableau d'affichage du local",
+      "lineage": "le panneau de liège à l'entrée du local",
+      "thesis": "Le bleu de la fédération, criblé de toppings, sert de panneau où sont épinglées les affiches du moment.",
+      "palette": ["#0A4275", "#FFFFFF", "#95C11F", "#EF7B00", "#D51317"],
+      "materials": ["fond bleu foncé + topping blanc", "affiches papier épinglées", "rubans de section"],
+      "viewport": "Une grande affiche « Prochaine réunion » à gauche, une affiche camp et une affiche inscriptions à droite, légèrement inclinées ; le nom de l'unité en tête du panneau.",
+      "risk": "Les affiches inclinées peuvent faire gadget si elles sont trop nombreuses.",
+      "comp": ".impeccable/mocks/decision/dealt-board.webp",
+      "html": ".impeccable/mocks/decision/dealt-board.html"
+    },
+    {
+      "id": "dealt-bands",
+      "label": "Quatre bandes",
+      "lineage": "les foulards de section rangés côte à côte",
+      "thesis": "Une page qui descend de 6 à 18 ans : une bande pleine largeur par section, dans l'ordre des âges.",
+      "palette": ["#0A4275", "#00A0DE", "#296F52", "#004F9F", "#D51317"],
+      "materials": ["bandes de couleur pleine largeur", "toppings de section en bord droit", "chiffres d'âge en grand"],
+      "viewport": "Bandeau bleu court avec le nom de l'unité et les deux actions, puis les bandes Baladins et Louveteaux déjà visibles, âge en très grand.",
+      "risk": "La plus attendue des trois ; l'actu passe sous les sections.",
+      "comp": ".impeccable/mocks/decision/dealt-bands.webp",
+      "html": ".impeccable/mocks/decision/dealt-bands.html"
+    }
+  ],
+  "reroll": true,
+  "steer": true,
+  "buildPath": { "value": "code" }
+}

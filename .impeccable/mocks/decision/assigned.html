@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="fr-BE"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden;font-family:Mulish,sans-serif;color:#0A4275;background:#F2F5F8}
+.fed{height:32px;background:#304A3C;color:#fff;font-size:13px;display:flex;align-items:center;padding:0 40px;font-weight:700}
+nav{height:76px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 40px}
+.logo{font-weight:900;font-size:22px;letter-spacing:-.01em}
+.logo small{display:block;font-size:12px;font-weight:700;color:#304A3C}
+nav ul{display:flex;gap:36px;list-style:none;font-weight:800;font-size:15px}
+.grid{position:relative;height:792px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+.q{position:relative;padding:44px 56px;color:#fff;overflow:hidden}
+.q::after{content:"";position:absolute;width:300px;height:300px;opacity:.28;background-image:radial-gradient(#fff 4px,transparent 5px);background-size:34px 34px}
+.b{background:#00A0DE}.b::after{left:-40px;top:-40px}
+.l{background:#296F52;text-align:right}.l::after{right:-40px;top:-40px}
+.e{background:#004F9F}.e::after{left:-40px;bottom:-40px}
+.p{background:#D51317;text-align:right}.p::after{right:-40px;bottom:-40px}
+.e,.p{display:flex;flex-direction:column;justify-content:flex-end}
+.l,.p{align-items:flex-end}
+.q h2{font-size:52px;font-weight:900;line-height:1;letter-spacing:-.02em}
+.age{font-size:18px;font-weight:800;margin-top:8px}
+.next{margin-top:22px;font-size:16px;line-height:1.5;max-width:300px}
+.l .next,.p .next{margin-left:auto}
+.next b{display:block;font-size:22px}
+.plaque{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:520px;background:#fff;padding:40px 44px;text-align:center;box-shadow:0 18px 40px rgba(10,66,117,.25)}
+.plaque .code{font-size:20px;font-weight:900;color:#95C11F;letter-spacing:.02em}
+.plaque h1{font-size:72px;font-weight:900;line-height:.95;letter-spacing:-.03em;margin:6px 0 14px}
+.plaque p{font-size:17px;line-height:1.5;margin-bottom:24px}
+.plaque .btns{display:flex;gap:12px;justify-content:center}
+.btn{padding:14px 26px;font-weight:800;font-size:16px;background:#0A4275;color:#fff}
+.btn.alt{background:#F2F5F8;color:#0A4275}
+</style></head><body>
+<div class="fed">‹ Les Scouts asbl</div>
+<nav><div class="logo">11OM Magnée<small>Unité scoute · Les Scouts</small></div>
+<ul><li>Agenda</li><li>Sections</li><li>Inscription</li><li>Contact</li></ul></nav>
+<div class="grid">
+<section class="q b"><h2>Baladins</h2><div class="age">6 – 8 ans</div><div class="next"><b>sam. 24 octobre</b>14 h – 17 h · au local</div></section>
+<section class="q l"><h2>Louveteaux</h2><div class="age">8 – 12 ans</div><div class="next"><b>sam. 24 octobre</b>14 h – 17 h 30 · au local</div></section>
+<section class="q e"><h2>Éclaireurs</h2><div class="age">12 – 16 ans</div><div class="next"><b>sam. 24 octobre</b>14 h – 18 h · bois de Magnée</div></section>
+<section class="q p"><h2>Pionniers</h2><div class="age">16 – 18 ans</div><div class="next"><b>ven. 23 octobre</b>19 h – 22 h · au local</div></section>
+<div class="plaque"><div class="code">UNITÉ 11OM</div><h1>Magnée</h1><p>Quatre sections, de 6 à 18 ans,<br>chaque samedi et en camp l'été.</p>
+<div class="btns"><span class="btn">S'inscrire pour 2026–2027</span><span class="btn alt">Agenda complet</span></div></div>
+</div>
+</body></html>

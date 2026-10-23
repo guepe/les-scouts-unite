@@ -1,0 +1,466 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-22T14:25:34+00:00",
+  "title": "Design System: Les Scouts – Unité",
+  "extensions": {
+    "colorMeta": {
+      "bleu-fonce": {
+        "role": "primary",
+        "displayName": "Bleu foncé de la Fédération",
+        "canonical": "#0A4275",
+        "tonalRamp": [
+          "#062846",
+          "#0A4275",
+          "#0E5DA4",
+          "#1277D3",
+          "#3A98EE",
+          "#72B6F3",
+          "#B6D5F1",
+          "#EAF3FB"
+        ]
+      },
+      "bleu-nuit": {
+        "role": "primary",
+        "displayName": "Bleu nuit",
+        "canonical": "#062F55",
+        "tonalRamp": [
+          "#052847",
+          "#084277",
+          "#0C5CA7",
+          "#0F77D6",
+          "#3797F1",
+          "#70B5F5",
+          "#B6D5F2",
+          "#E9F3FB"
+        ]
+      },
+      "vert-base": {
+        "role": "secondary",
+        "displayName": "Vert base",
+        "canonical": "#95C11F",
+        "tonalRamp": [
+          "#33420B",
+          "#556E12",
+          "#779A19",
+          "#99C620",
+          "#B7E146",
+          "#CCEA7B",
+          "#DFEDBB",
+          "#F6FAEB"
+        ]
+      },
+      "vert-fonce": {
+        "role": "secondary",
+        "displayName": "Vert foncé",
+        "canonical": "#304A3C",
+        "tonalRamp": [
+          "#1E2E26",
+          "#324D3F",
+          "#466C58",
+          "#5A8B71",
+          "#7DAB92",
+          "#A2C3B1",
+          "#CCDBD3",
+          "#F0F4F2"
+        ]
+      },
+      "orange": {
+        "role": "tertiary",
+        "displayName": "Orange punaise",
+        "canonical": "#EF7B00",
+        "tonalRamp": [
+          "#4C2700",
+          "#804200",
+          "#B25C00",
+          "#E67600",
+          "#FF9729",
+          "#FFB566",
+          "#F6D5B1",
+          "#FCF3E8"
+        ]
+      },
+      "rouge": {
+        "role": "tertiary",
+        "displayName": "Rouge de la charte",
+        "canonical": "#D60F3C",
+        "tonalRamp": [
+          "#470514",
+          "#770821",
+          "#A70C2F",
+          "#D60F3C",
+          "#F13761",
+          "#F5708E",
+          "#F2B6C3",
+          "#FBE9ED"
+        ]
+      },
+      "baladins": {
+        "role": "tertiary",
+        "displayName": "Bleu Baladins",
+        "canonical": "#00A0DE",
+        "tonalRamp": [
+          "#00374C",
+          "#005C80",
+          "#0081B2",
+          "#00A5E6",
+          "#29C3FF",
+          "#66D4FF",
+          "#B1E3F6",
+          "#E8F7FC"
+        ]
+      },
+      "louveteaux": {
+        "role": "tertiary",
+        "displayName": "Vert Louveteaux",
+        "canonical": "#296F52",
+        "tonalRamp": [
+          "#153829",
+          "#225D45",
+          "#308260",
+          "#3EA87C",
+          "#63C59C",
+          "#8FD6B9",
+          "#C4E4D6",
+          "#EEF7F3"
+        ]
+      },
+      "eclaireurs": {
+        "role": "tertiary",
+        "displayName": "Bleu Éclaireurs",
+        "canonical": "#004F9F",
+        "tonalRamp": [
+          "#00264C",
+          "#003F80",
+          "#0059B2",
+          "#0072E6",
+          "#2993FF",
+          "#66B2FF",
+          "#B1D3F6",
+          "#E8F2FC"
+        ]
+      },
+      "pionniers": {
+        "role": "tertiary",
+        "displayName": "Rouge Pionniers",
+        "canonical": "#D51317",
+        "tonalRamp": [
+          "#460608",
+          "#750A0D",
+          "#A40F12",
+          "#D31317",
+          "#ED3A3E",
+          "#F27375",
+          "#F1B7B8",
+          "#FBEAEA"
+        ]
+      },
+      "fond": {
+        "role": "neutral",
+        "displayName": "Fond",
+        "canonical": "#F2F5F8",
+        "tonalRamp": [
+          "#1B2632",
+          "#2D4053",
+          "#3E5974",
+          "#507395",
+          "#7494B4",
+          "#9CB3C9",
+          "#C9D4DE",
+          "#EFF2F5"
+        ]
+      },
+      "trait": {
+        "role": "neutral",
+        "displayName": "Trait",
+        "canonical": "#DCE4EC",
+        "tonalRamp": [
+          "#1B2632",
+          "#2D4053",
+          "#3F5974",
+          "#517395",
+          "#7494B4",
+          "#9CB2C9",
+          "#C9D4DE",
+          "#EFF2F5"
+        ]
+      },
+      "a-completer": {
+        "role": "neutral",
+        "displayName": "Papier à compléter",
+        "canonical": "#FFF4E5",
+        "tonalRamp": [
+          "#4C2C00",
+          "#804A00",
+          "#B26700",
+          "#E68400",
+          "#FFA429",
+          "#FFBE66",
+          "#F6D9B1",
+          "#FCF4E8"
+        ]
+      },
+      "blanc": {
+        "role": "neutral",
+        "displayName": "Blanc papier",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#262626",
+          "#404040",
+          "#595959",
+          "#737373",
+          "#949494",
+          "#B2B2B2",
+          "#D4D4D4",
+          "#F2F2F2"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Affiche",
+        "purpose": "Board titles and section banner titles; fluid 3rem to 5.5rem."
+      },
+      "headline": {
+        "displayName": "Titre",
+        "purpose": "h1 off the board, large notice titles; fluid from 2.5rem."
+      },
+      "title": {
+        "displayName": "Très grand",
+        "purpose": "h2, notice titles, lead news title; fluid from 1.75rem."
+      },
+      "title-small": {
+        "displayName": "Grand",
+        "purpose": "h3, news list titles."
+      },
+      "body": {
+        "displayName": "Normal",
+        "purpose": "Running text in a 46rem column."
+      },
+      "body-small": {
+        "displayName": "Petit",
+        "purpose": "Captions and fine print."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Navigation, buttons, arrow links, times."
+      },
+      "manuscrit": {
+        "displayName": "Manuscrit",
+        "purpose": "Handwritten notes beside a heading or after content, never above a heading."
+      }
+    },
+    "shadows": [
+      {
+        "name": "papier",
+        "value": "0 2px 3px rgba(4, 30, 56, 0.18), 0 14px 28px -6px rgba(4, 30, 56, 0.35)",
+        "purpose": "Pinned paper at rest, banner logo card, submenus."
+      },
+      {
+        "name": "papier-decroche",
+        "value": "0 2px 3px rgba(4, 30, 56, 0.16), 0 26px 40px -10px rgba(4, 30, 56, 0.45)",
+        "purpose": "Notice on hover or focus-within."
+      },
+      {
+        "name": "punaise",
+        "value": "0 3px 4px rgba(4, 30, 56, 0.35)",
+        "purpose": "Under the push-pin."
+      }
+    ],
+    "motion": [
+      {
+        "name": "su-ease",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "All transitions and the pinning animation."
+      },
+      {
+        "name": "epingler",
+        "value": "0.7s su-ease, 0.12s stagger, from translateY(-1.25rem) rotate(tilt + 3.5deg)",
+        "purpose": "Notices pinned one after another on load; disabled with reduced motion and in the editor."
+      },
+      {
+        "name": "decrocher",
+        "value": "transform/box-shadow 0.45s su-ease",
+        "purpose": "Notice straightens and lifts 4px on hover/focus."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "ligne",
+        "value": "40rem"
+      },
+      {
+        "name": "actus",
+        "value": "46rem"
+      },
+      {
+        "name": "regle",
+        "value": "60rem (container query)"
+      },
+      {
+        "name": "wp-columns",
+        "value": "781px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Default action on light grounds and on notices.",
+      "html": "<a class=\"ds-btn\" href=\"#\">S’inscrire</a>",
+      "css": ".ds-btn{display:inline-block;font-family:Muli,'Segoe UI',Helvetica,Arial,sans-serif;font-weight:800;font-size:1.0625rem;line-height:1.2;padding:.9rem 1.5rem;border:0;border-radius:0;text-decoration:none;cursor:pointer;transition:background .2s,color .2s;background:#0A4275;color:#fff}.ds-btn:hover{background:#304A3C}.ds-btn:focus-visible{outline:3px solid #EF7B00;outline-offset:3px;}"
+    },
+    {
+      "name": "Board Button",
+      "kind": "button",
+      "refersTo": "button-panneau",
+      "description": "Action set directly on the bleu foncé board.",
+      "html": "<div class=\"ds-board-sm\"><a class=\"ds-btn-panneau\" href=\"#\">Nous écrire</a></div>",
+      "css": ".ds-board-sm{background:#0A4275;padding:1.5rem}.ds-btn-panneau{display:inline-block;font-family:Muli,'Segoe UI',Helvetica,Arial,sans-serif;font-weight:800;font-size:1.0625rem;line-height:1.2;padding:.9rem 1.5rem;border:0;border-radius:0;text-decoration:none;cursor:pointer;transition:background .2s,color .2s;background:#95C11F;color:#0A4275}.ds-btn-panneau:hover{background:#fff}.ds-btn-panneau:focus-visible{outline:3px solid #EF7B00;outline-offset:3px;}"
+    },
+    {
+      "name": "Banner Button",
+      "kind": "button",
+      "refersTo": "button-bandeau",
+      "description": "Action on a section-coloured banner.",
+      "html": "<div class=\"ds-bandeau-sm\"><a class=\"ds-btn-bandeau\" href=\"#\">Inscrire mon enfant</a></div>",
+      "css": ".ds-bandeau-sm{background:#296F52;padding:1.5rem}.ds-btn-bandeau{display:inline-block;font-family:Muli,'Segoe UI',Helvetica,Arial,sans-serif;font-weight:800;font-size:1.0625rem;line-height:1.2;padding:.9rem 1.5rem;border:0;border-radius:0;text-decoration:none;cursor:pointer;transition:background .2s,color .2s;background:#fff;color:#0A4275}.ds-btn-bandeau:hover{background:#0A4275;color:#fff}.ds-btn-bandeau:focus-visible{outline:3px solid #EF7B00;outline-offset:3px;}"
+    },
+    {
+      "name": "Pinned Notice",
+      "kind": "card",
+      "refersTo": "affiche",
+      "description": "White paper pinned on the board: what happens next. Straightens and lifts on hover or focus.",
+      "html": "<div class=\"ds-board\"><div class=\"ds-affiche\"><h3 class=\"ds-affiche-titre\">Week-end d’unité<br>13 – 15 novembre</h3><p>Toutes les sections ensemble. Départ du local le vendredi à 18 h.</p></div></div>",
+      "css": ".ds-board{background:#0A4275;padding:2.5rem 1.5rem}.ds-affiche{position:relative;padding:clamp(1.5rem,3vw,2.25rem);color:#0A4275;font-family:Muli,'Segoe UI',Helvetica,Arial,sans-serif;box-shadow:0 2px 3px rgba(4,30,56,.18),0 14px 28px -6px rgba(4,30,56,.35);transition:transform .45s cubic-bezier(0.16,1,0.3,1),box-shadow .45s cubic-bezier(0.16,1,0.3,1);background:#fff;transform:rotate(-1.1deg)}.ds-affiche::before{content:'';position:absolute;top:-0.6rem;left:50%;width:1.25rem;height:1.25rem;margin-left:-0.625rem;border-radius:50%;box-shadow:0 3px 4px rgba(4,30,56,.35);background:radial-gradient(circle at 35% 30%,#ffb35c 0 18%,#EF7B00 45%,#b85c00 100%)}.ds-affiche:hover,.ds-affiche:focus-within{transform:rotate(0) translateY(-4px);box-shadow:0 2px 3px rgba(4,30,56,.16),0 26px 40px -10px rgba(4,30,56,.45)}.ds-affiche-titre{margin:0 0 .75rem;font-weight:900;font-size:2.25rem;line-height:1.05;letter-spacing:-0.025em}.ds-affiche p{margin:0;line-height:1.6}"
+    },
+    {
+      "name": "Green Notice",
+      "kind": "card",
+      "refersTo": "affiche-verte",
+      "description": "The one vert base notice per board, carrying the main call to action.",
+      "html": "<div class=\"ds-board\"><div class=\"ds-affiche-verte\"><h3 class=\"ds-affiche-titre\">Inscriptions 2026–2027</h3><p>Inscris ton enfant dans la section de son âge.</p><a class=\"ds-btn\" href=\"#\">S’inscrire</a></div></div>",
+      "css": ".ds-board{background:#0A4275;padding:2.5rem 1.5rem}.ds-affiche-verte{position:relative;padding:clamp(1.5rem,3vw,2.25rem);color:#0A4275;font-family:Muli,'Segoe UI',Helvetica,Arial,sans-serif;box-shadow:0 2px 3px rgba(4,30,56,.18),0 14px 28px -6px rgba(4,30,56,.35);transition:transform .45s cubic-bezier(0.16,1,0.3,1),box-shadow .45s cubic-bezier(0.16,1,0.3,1);background:#95C11F;transform:rotate(1.3deg)}.ds-affiche-verte::before{content:'';position:absolute;top:-0.6rem;left:50%;width:1.25rem;height:1.25rem;margin-left:-0.625rem;border-radius:50%;box-shadow:0 3px 4px rgba(4,30,56,.35);background:radial-gradient(circle at 35% 30%,#7d9fd0 0 18%,#0A4275 50%,#031d36 100%)}.ds-affiche-verte:hover,.ds-affiche-verte:focus-within{transform:rotate(0) translateY(-4px);box-shadow:0 2px 3px rgba(4,30,56,.16),0 26px 40px -10px rgba(4,30,56,.45)}.ds-affiche-titre{margin:0 0 .75rem;font-weight:900;font-size:2.25rem;line-height:1.05;letter-spacing:-0.025em}.ds-affiche-verte p{margin:0 0 1.25rem;line-height:1.6}.ds-btn{display:inline-block;font-family:Muli,'Segoe UI',Helvetica,Arial,sans-serif;font-weight:800;font-size:1.0625rem;line-height:1.2;padding:.9rem 1.5rem;border:0;border-radius:0;text-decoration:none;cursor:pointer;transition:background .2s,color .2s;background:#0A4275;color:#fff}.ds-btn:hover{background:#304A3C}.ds-btn:focus-visible{outline:3px solid #EF7B00;outline-offset:3px;}"
+    },
+    {
+      "name": "Meeting Row",
+      "kind": "custom",
+      "refersTo": "ligne-section",
+      "description": "Section swatch, section, date and place, time. One per section, in age order.",
+      "html": "<div class=\"ds-ligne\" style=\"--section:#00A0DE\"><p>Baladins</p><p>samedi 24 octobre · au local</p><p>14 h – 17 h</p></div><div class=\"ds-ligne\" style=\"--section:#296F52\"><p>Louveteaux</p><p>samedi 24 octobre · au local</p><p>14 h – 17 h 30</p></div>",
+      "css": ".ds-ligne{display:grid;grid-template-columns:minmax(8.5rem,.9fr) 2fr auto;align-items:baseline;gap:.25rem 1.25rem;padding-block:.9rem;border-top:2px solid #F2F5F8;color:#0A4275;font-family:Muli,sans-serif}.ds-ligne>*{margin:0}.ds-ligne>:first-child{font-weight:900;display:flex;align-items:baseline;gap:.6rem}.ds-ligne>:first-child::before{content:'';flex:none;width:.85rem;height:.85rem;background:var(--section,#0A4275)}.ds-ligne>:last-child{font-weight:800;text-align:right;white-space:nowrap}"
+    },
+    {
+      "name": "Board Title with Aside",
+      "kind": "custom",
+      "refersTo": "panneau",
+      "description": "Display title on the board with the handwritten aside beside it, never above.",
+      "html": "<div class=\"ds-panneau\"><h1 class=\"ds-titre\">Unité 12XY Localité</h1><p class=\"ds-aparte\">ce qui se passe au local</p></div>",
+      "css": ".ds-panneau{background:#0A4275;color:#fff;padding:2rem 1.5rem;display:flex;flex-wrap:wrap;align-items:flex-end;gap:.5rem 1.5rem;font-family:Muli,sans-serif}.ds-titre{margin:0;font-weight:900;font-size:3.5rem;line-height:.95;letter-spacing:-0.035em}.ds-aparte{margin:0;font-family:'Caveat Brush',cursive;font-size:1.75rem;line-height:1.1;color:#95C11F}"
+    },
+    {
+      "name": "Arrow Link",
+      "kind": "custom",
+      "refersTo": "lien-fleche",
+      "description": "See-all link with a drawn chevron that slides on hover.",
+      "html": "<a class=\"ds-fleche\" href=\"#\">Tout l’agenda</a>",
+      "css": ".ds-fleche{font-family:Muli,sans-serif;font-weight:800;color:#0A4275;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}.ds-fleche::after{content:'';width:.5rem;height:.5rem;border-right:2.5px solid currentColor;border-top:2.5px solid currentColor;transform:rotate(45deg);transition:transform .3s cubic-bezier(0.16,1,0.3,1)}.ds-fleche:hover::after{transform:translateX(4px) rotate(45deg)}.ds-fleche:focus-visible{outline:3px solid #EF7B00;outline-offset:3px}"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "refersTo": "navigation",
+      "description": "Header menu: Muli 800, vert base underline on hover and current page.",
+      "html": "<nav class=\"ds-nav\"><a href=\"#\" aria-current=\"page\">Actualités</a><a href=\"#\">Sections</a><a href=\"#\">Inscription</a><a href=\"#\">Contact</a></nav>",
+      "css": ".ds-nav{display:flex;gap:2rem;background:#fff;padding:1rem 1.5rem;box-shadow:0 1px 0 #DCE4EC;font-family:Muli,sans-serif}.ds-nav a{font-weight:800;font-size:1rem;color:#0A4275;text-decoration:none;padding-block:.5rem;border-bottom:3px solid transparent;transition:border-color .2s cubic-bezier(0.16,1,0.3,1)}.ds-nav a:hover,.ds-nav a[aria-current]{border-bottom-color:#95C11F}.ds-nav a:focus-visible{outline:3px solid #EF7B00;outline-offset:3px}"
+    },
+    {
+      "name": "Search Input",
+      "kind": "input",
+      "refersTo": "input-search",
+      "description": "Square field with a 2px bleu foncé border.",
+      "html": "<input class=\"ds-input\" type=\"search\" placeholder=\"Rechercher\">",
+      "css": ".ds-input{border:2px solid #0A4275;border-radius:0;padding:.75rem 1rem;font:inherit;font-family:Muli,sans-serif;color:#0A4275;background:#fff}.ds-input::placeholder{color:#4D6F92}.ds-input:focus-visible{outline:3px solid #EF7B00;outline-offset:3px}"
+    },
+    {
+      "name": "Placeholder Highlight",
+      "kind": "chip",
+      "refersTo": "a-completer",
+      "description": "Marks text the staff must replace.",
+      "html": "<p class=\"ds-p\">Rendez-vous au <mark class=\"ds-acompleter\">Rue du Local 1</mark>.</p>",
+      "css": ".ds-p{font-family:Muli,sans-serif;color:#0A4275}.ds-acompleter{background:#FFF4E5;color:#0A4275;box-shadow:.15em 0 0 #FFF4E5,-.15em 0 0 #FFF4E5;box-decoration-break:clone;-webkit-box-decoration-break:clone}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Le panneau du local",
+    "overview": "The site is the notice board at the door of the scout local. The federation's bleu foncé, pricked with the white Fédération topping, is the board; white paper notices are pinned on it with a coloured push-pin and a slight tilt, and they say what happens next. Everything else (section banners, the age ruler, the news list) speaks the same plain, sturdy language: square corners, Muli in heavy weights, flat colour fields from the Les Scouts asbl charter, and a handwritten Caveat Brush note left beside or after the content, the way an animateur scribbles on a poster.\n\nDensity is moderate and practical: parents read this on a phone between two things, so information sits in rows (section swatch, section, date and place, time) rather than in decorative cards. Full-width bands touch each other with no gap (header, board, light content band, white band, board-blue footer), and the rhythm alternates bleu foncé and light grounds down the page.\n\nThe world rejects the hero-headline-over-three-equal-cards arrangement of association sites. Depth exists only where paper is pinned; everything else is flat.",
+    "keyCharacteristics": [
+      "Bleu foncé board with the white Fédération topping tiled at 11% opacity.",
+      "White (and one vert base) paper notices, pinned with a round push-pin, each tilted between -1.1 and +1.3 degrees, straightening and lifting on hover or focus.",
+      "A square colour swatch per section marks every row, ruler segment and banner.",
+      "Muli 900 with tight tracking for every heading; Caveat Brush only for handwritten asides and notes.",
+      "Square corners everywhere; the only round shape is the push-pin.",
+      "Placeholders the staff must replace are visibly highlighted in pale orange, never disguised as real data."
+    ],
+    "rules": [
+      {
+        "name": "The Charter Rule",
+        "body": "Every colour comes from the Les Scouts asbl charter (`scss/_ls-variables.scss`) or is a tint or shade serving legibility of a charter colour. No new hues.",
+        "section": "colors"
+      },
+      {
+        "name": "The Section Swatch Rule",
+        "body": "A section is always identified by its own colour as a flat square or band: 0.85rem swatch in a row, 0.75rem bar on the ruler, full ground on its banner. Section colours never tint text on light grounds.",
+        "section": "colors"
+      },
+      {
+        "name": "The Legible Banner Rule",
+        "body": "Banner text is white, except on Baladins blue, where it is bleu nuit.",
+        "section": "colors"
+      },
+      {
+        "name": "The Beside-Not-Above Rule",
+        "body": "Caveat Brush is placed beside a heading (the board aside on the same baseline) or after content (photo caption, footer motto). It is never a label stacked above a heading.",
+        "section": "typography"
+      },
+      {
+        "name": "The Heavy Muli Rule",
+        "body": "Headings are Muli 900 with negative tracking and balanced wrapping; nothing between 400 and 800 is used for headings.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Time Rule",
+        "body": "Dates, times and ages use tabular numerals.",
+        "section": "typography"
+      },
+      {
+        "name": "The Only Paper Casts Shadow Rule",
+        "body": "If it is not pinned paper or a menu dropping over content, it has no shadow. Hairlines (1px trait) separate the header; tonal bands separate everything else.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Pinning Rule",
+        "body": "On load, notices on the home board drop and settle one after another (0.7s, cubic-bezier(0.16, 1, 0.3, 1), 0.12s stagger). On hover or focus they rotate to 0 and lift. With reduced motion they are shown settled and transitions are off. The editor never animates.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** put what happens next on pinned white paper on the bleu foncé board, with a push-pin and a slight tilt.",
+      "**Do** mark every section with its own charter colour as a flat square, bar or ground.",
+      "**Do** keep headings in Muli 900 with negative tracking and every corner square.",
+      "**Do** place Caveat Brush notes beside a heading or after content, short and lower-case.",
+      "**Do** highlight every unknown fact with the pale orange placeholder instead of inventing it.",
+      "**Do** keep the 3px orange focus ring on every interactive element and honour reduced motion."
+    ],
+    "donts": [
+      "**Don't** use Caveat Brush as a label or kicker above a heading.",
+      "**Don't** use Housepaint for headings: it has no French accents.",
+      "**Don't** add shadows to anything that is not pinned paper or a dropdown menu.",
+      "**Don't** round corners; the push-pin is the only circle.",
+      "**Don't** introduce colours outside the Les Scouts asbl charter.",
+      "**Don't** set white text on Baladins blue; use bleu nuit.",
+      "**Don't** build a hero headline over three equal cards."
+    ]
+  }
+}
