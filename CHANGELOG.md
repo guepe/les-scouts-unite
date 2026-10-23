@@ -2,6 +2,12 @@
 
 Les versions suivent le numéro `Version:` de `style.css`. Chaque version publiée a son zip dans les [Releases](https://github.com/guepe/les-scouts-unite/releases).
 
+## 2.7.1 – 2026-10-23
+
+- Un week-end ou un camp répété chaque semaine garde sa date de fin dans chaque copie.
+- Un animateur ne peut plus modifier ni supprimer une réunion sans section créée par quelqu’un d’autre.
+- Documentation du thème (PRODUCT.md, DESIGN.md) et adresse du thème mises à jour pour le dépôt `les-scouts-unite`.
+
 ## 2.7.0 – 2026-10-23
 
 - Rôles **Animateur** (rattaché à ses sections dans son profil) et **Staff d’unité** (tout le contenu et Réglages → Unité, sans l’administration technique). Un animateur ne gère que les réunions et la page de ses sections, en « textes et images seulement » ; les limites sont vérifiées par WordPress.

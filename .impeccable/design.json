@@ -406,7 +406,7 @@
     "rules": [
       {
         "name": "The Charter Rule",
-        "body": "Every colour comes from the Les Scouts asbl charter (`scss/_ls-variables.scss`) or is a tint or shade serving legibility of a charter colour. No new hues.",
+        "body": "Every colour comes from the Les Scouts asbl charter (palette in `theme.json`) or is a tint or shade serving legibility of a charter colour. No new hues.",
         "section": "colors"
       },
       {

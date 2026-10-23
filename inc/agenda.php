@@ -208,12 +208,21 @@ function scoutsunite_agenda_repeter( $post ) {
 	foreach ( array( 'su_section', 'su_debut', 'su_fin', 'su_lieu', 'su_avant', 'su_type' ) as $key ) {
 		$meta[ $key ] = get_post_meta( $post->ID, $key, true );
 	}
+	// Un week-end ou un camp répété garde sa durée : la date de fin avance avec la copie.
+	$dernier = get_post_meta( $post->ID, 'su_jusqua', true );
+	$dernier = preg_match( '/^\d{4}-\d{2}-\d{2}$/', $dernier ) && $dernier > $date ? new DateTimeImmutable( $dernier, wp_timezone() ) : null;
+
 	$jour = new DateTimeImmutable( $date, wp_timezone() );
 	$fin  = new DateTimeImmutable( $jusqua, wp_timezone() );
 	for ( $i = 1; $i <= 60; $i++ ) {
-		$suivant = $jour->modify( '+' . ( 7 * $i ) . ' days' );
+		$decalage = '+' . ( 7 * $i ) . ' days';
+		$suivant  = $jour->modify( $decalage );
 		if ( $suivant > $fin ) {
 			break;
+		}
+		$dates = array( 'su_date' => $suivant->format( 'Y-m-d' ) );
+		if ( $dernier ) {
+			$dates['su_jusqua'] = $dernier->modify( $decalage )->format( 'Y-m-d' );
 		}
 		wp_insert_post(
 			array(
@@ -222,7 +231,7 @@ function scoutsunite_agenda_repeter( $post ) {
 				'post_title'   => $post->post_title,
 				'post_content' => $post->post_content,
 				'post_author'  => $post->post_author,
-				'meta_input'   => array_merge( $meta, array( 'su_date' => $suivant->format( 'Y-m-d' ) ) ),
+				'meta_input'   => array_merge( $meta, $dates ),
 			)
 		);
 	}

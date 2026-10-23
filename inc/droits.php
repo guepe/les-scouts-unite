@@ -170,8 +170,9 @@ function scoutsunite_droits_limites( $caps, $cap, $user_id, $args ) {
 
 	if ( 'reunion' === $post->post_type ) {
 		$section = get_post_meta( $post->ID, 'su_section', true );
-		// Une réunion qu'il vient de créer n'a pas encore de section.
-		if ( '' === $section || in_array( $section, $miennes, true ) ) {
+		// Une réunion qu'il vient de créer n'a pas encore de section ; celle d'un autre, sans section, ne le regarde pas.
+		$sienne_sans_section = '' === $section && (int) $post->post_author === (int) $user_id;
+		if ( $sienne_sans_section || in_array( $section, $miennes, true ) ) {
 			return $caps;
 		}
 		return array( 'do_not_allow' );

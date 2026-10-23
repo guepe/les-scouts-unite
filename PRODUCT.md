@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-WordPress block theme (Full Site Editing: `theme.json`, HTML templates and template parts, block patterns), living in `wordpress/` inside the `template-unite` repository and reusing its fonts and images. Chosen by the user over a classic PHP theme so that animateurs can edit the site in the WordPress editor without code.
+WordPress block theme (Full Site Editing: `theme.json`, HTML templates and template parts, block patterns), in its own repository (theme at the root), with the fonts and images of the federation's `template-unite` repository copied into `assets/`. Chosen by the user over a classic PHP theme so that animateurs can edit the site in the WordPress editor without code.
 
 ## Users
 
@@ -40,14 +40,14 @@ Not a generic association site: it is the local face of a Les Scouts unit, carry
 
 ## Brand Commitments
 
-The Les Scouts asbl graphic charter in this repository is binding: palette in `scss/_ls-variables.scss` (bleu foncé `#0A4275` as primary, vert base, vert foncé, section colours Baladins `#00A0DE`, Louveteaux `#296F52`, Éclaireurs `#004F9F`, Pionniers `#D51317`), Muli as the text face, and the logos and "toppings" (confetti-like pattern) in `images/`. Language is French (fr-BE), with the federation's informal "tu" voice toward members.
+The Les Scouts asbl graphic charter is binding: palette in `theme.json`, taken from the federation's `template-unite` repository (bleu foncé `#0A4275` as primary, vert base, vert foncé, section colours Baladins `#00A0DE`, Louveteaux `#296F52`, Éclaireurs `#004F9F`, Pionniers `#D51317`), Muli as the text face, and the logos and "toppings" (confetti-like pattern) in `assets/images/`. Language is French (fr-BE), with the federation's informal "tu" voice toward members.
 
 ## Evidence on Hand
 
-- Federation and section logos: `images/logos/`
-- Toppings per section, white and coloured, three sizes: `images/toppings/`
-- One real photo: `images/illustrations/coucher-soleil.png` (camp pioneering tower at sunset)
-- Fonts: `fonts/` (Muli, Caveat Brush, Housepaint, Mali, Roboto Mono)
+- Federation and section logos: `assets/images/logos/`
+- Toppings per section, white, 400 px: `assets/images/toppings/`
+- One real photo: `assets/images/photos/coucher-soleil.png` (camp pioneering tower at sunset)
+- Fonts: `assets/fonts/` (Muli, Caveat Brush)
 - No unit photos, staff names, dates or testimonials yet: placeholders only.
 
 ## Product Principles

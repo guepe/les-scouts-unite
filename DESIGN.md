@@ -171,7 +171,7 @@ The palette is the Les Scouts asbl charter, used as flat fields: bleu foncé own
 - **Blanc** (blanc): notice paper, header ground, text on the board and on dark section banners.
 
 ### Named Rules
-**The Charter Rule.** Every colour comes from the Les Scouts asbl charter (`scss/_ls-variables.scss`) or is a tint or shade serving legibility of a charter colour. No new hues.
+**The Charter Rule.** Every colour comes from the Les Scouts asbl charter (palette in `theme.json`) or is a tint or shade serving legibility of a charter colour. No new hues.
 
 **The Section Swatch Rule.** A section is always identified by its own colour as a flat square or band: 0.85rem swatch in a row, 0.75rem bar on the ruler, full ground on its banner. Section colours never tint text on light grounds.
 
