@@ -117,6 +117,15 @@
 				onChange: set( 'su_lieu' ),
 				__nextHasNoMarginBottom: true,
 			} ),
+			el( C.CheckboxControl, {
+				label: 'Mettre en avant sur l’accueil',
+				checked: meta.su_avant === '1',
+				onChange: function ( coche ) {
+					set( 'su_avant' )( coche ? '1' : '' );
+				},
+				help: 'Pour les grandes activités (week-end d’unité, souper, fête…) : elle s’affiche en grand en haut de l’accueil jusqu’à sa date.',
+				__nextHasNoMarginBottom: true,
+			} ),
 			el( C.TextControl, {
 				label: 'Répéter chaque semaine jusqu’au',
 				type: 'date',

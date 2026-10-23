@@ -33,16 +33,16 @@
 
 <!-- wp:column -->
 <div class="wp-block-column"><!-- wp:group {"className":"is-style-affiche","layout":{"type":"default"}} -->
-<div class="wp-block-group is-style-affiche"><!-- wp:heading {"level":3,"className":"affiche__titre","fontSize":"x-large"} -->
-<h3 class="wp-block-heading affiche__titre has-x-large-font-size"><mark class="a-completer">Rue du Local 1<br>0000 Localité</mark></h3>
+<div class="wp-block-group is-style-affiche"><!-- wp:heading {"level":3,"className":"affiche__titre","fontSize":"x-large","metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"adresse"}}}}} -->
+<h3 class="wp-block-heading affiche__titre has-x-large-font-size"><mark class="a-completer">Rue du Local 1</mark><br><mark class="a-completer">0000 Localité</mark></h3>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
 <p>Les réunions ont lieu le samedi après-midi, sauf mention contraire sur la page de la section.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph {"className":"lien-fleche"} -->
-<p class="lien-fleche"><a href="https://www.openstreetmap.org/search?query=Magn%C3%A9e%2C%20Belgique">Itinéraire</a></p>
+<!-- wp:paragraph {"className":"lien-fleche","metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"itineraire"}}}}} -->
+<p class="lien-fleche"><a href="https://www.openstreetmap.org/">Itinéraire</a></p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group --></div>
 <!-- /wp:column -->
@@ -53,8 +53,8 @@
 <h3 class="wp-block-heading affiche__titre has-x-large-font-size">Le staff d’unité</h3>
 <!-- /wp:heading -->
 
-<!-- wp:paragraph -->
-<p><strong><mark class="a-completer">Prénom Nom</mark></strong>, responsable d’unité<br><a href="tel:+32400000000"><mark class="a-completer">0400 00 00 00</mark></a> <span style="opacity:0.8">(après 17 h)</span></p>
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"responsable"}}}}} -->
+<p><strong><mark class="a-completer">Prénom Nom</mark></strong>, responsable d’unité<br><mark class="a-completer">0400 00 00 00</mark></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:buttons -->

@@ -2,7 +2,7 @@
 
 Thème de bloc (Full Site Editing) pour le site d’une unité **Les Scouts asbl**, construit sur la charte graphique Les Scouts asbl de ce dépôt : bleu de la fédération, toppings, couleurs de section, polices Muli et Caveat Brush, logos.
 
-L’accueil est un **panneau d’affichage** : le bleu de la fédération criblé de toppings, avec les affiches du moment épinglées dessus (prochaines réunions, événement, inscriptions).
+L’accueil est un **panneau d’affichage** : le bleu de la fédération criblé de toppings, avec les affiches du moment épinglées dessus (prochaines réunions, activité à la une, inscriptions).
 
 ## Installer le thème
 
@@ -12,7 +12,8 @@ L’accueil est un **panneau d’affichage** : le bleu de la fédération cribl�
    ```
 2. Dans WordPress : **Apparence → Thèmes → Ajouter → Téléverser un thème**, choisis le zip, puis **Activer**.
 3. **Réglages → Général** : le **titre du site** est le nom de ton unité (par ex. `Unité 12XY Localité`) et le **slogan** sa ligne de présentation (par ex. `Unité scoute de Localité`). Le thème les affiche dans l’en-tête, le panneau d’accueil et le pied de page.
-4. **Réglages → Permaliens** : « Titre de la publication ».
+4. **Réglages → Unité** : les coordonnées de l’unité, encodées une seule fois (voir ci-dessous).
+5. **Réglages → Permaliens** : « Titre de la publication ».
 
 Il faut WordPress 6.5 ou plus récent.
 
@@ -32,7 +33,7 @@ Le menu pointe vers ces adresses. Crée les pages avec ces identifiants (slug) :
 
 ## Modifier le site
 
-- **Accueil, en-tête, pied de page** : **Apparence → Éditeur → Modèles → Page d’accueil**. L’événement et l’affiche d’inscription se modifient directement dans le panneau ; les réunions viennent de l’agenda (voir ci-dessous).
+- **Accueil, en-tête, pied de page** : **Apparence → Éditeur → Modèles → Page d’accueil**. L’affiche d’inscription se modifie directement dans le panneau ; les réunions viennent de l’agenda et l’affiche blanche de droite montre l’activité mise en avant dans l’agenda (voir ci-dessous).
 - **Actualités** : ce sont les articles WordPress. Les 4 derniers s’affichent sur l’accueil, le plus récent en grand avec son image mise en avant.
 - **Styles de blocs** ajoutés (panneau latéral → Styles d’un bloc Groupe) : *Panneau*, *Affiche épinglée*, *Affiche épinglée verte*, *Ligne Baladins/Louveteaux/Éclaireurs/Pionniers*, *Bandeau* de chaque section, et *Manuscrit* pour les paragraphes.
 - Les compositions de la catégorie **Unité scoute** (panneau, règle des âges, actualités, infos pratiques) peuvent être insérées n’importe où.
@@ -41,9 +42,10 @@ Le menu pointe vers ces adresses. Crée les pages avec ces identifiants (slug) :
 
 Les réunions s’encodent dans **Agenda → Ajouter** (menu de gauche de l’administration). Dans le panneau **Quand et où ?** à droite : section, date, début, fin, lieu. Le titre est facultatif (« Réunion » par défaut ; mets « Hike », « Week-end »… pour une activité spéciale) et le texte sert de notes pour les parents (à emporter, rendez-vous).
 
+- **Mettre en avant sur l’accueil** : coche cette case pour les grandes activités (week-end d’unité, souper, fête…). La prochaine activité cochée s’affiche en grand sur l’affiche blanche en haut de l’accueil, les suivantes en dessous, jusqu’à leur date. Sans activité cochée à venir, l’affiche montre la dernière actualité.
 - **Répéter chaque semaine jusqu’au** : à la publication, une copie est créée chaque semaine jusqu’à cette date. Supprime ensuite les semaines de congé dans **Agenda → Toutes les réunions**.
 - **Mise à jour automatique** : le panneau de l’accueil montre la prochaine réunion de chaque section, chaque page de section montre la sienne (avec les dates suivantes), et **/agenda/** liste tout, mois par mois, avec un filtre par section. Les réunions passées disparaissent d’elles-mêmes.
-- Les blocs **Prochaines réunions**, **Prochaine réunion d’une section** et **Agenda complet** peuvent être insérés n’importe où dans l’éditeur.
+- Les blocs **Prochaines réunions**, **À la une**, **Prochaine réunion d’une section** et **Agenda complet** peuvent être insérés n’importe où dans l’éditeur.
 
 ### Mettre à jour un site déjà installé
 
@@ -55,14 +57,18 @@ Les réunions s’encodent dans **Agenda → Ajouter** (menu de gauche de l’ad
 
 ## À compléter avant la mise en ligne
 
-Tout ce qui est surligné en orange pâle est un exemple à remplacer :
+Tout ce qui est surligné en orange pâle est un exemple à remplacer.
 
-- l’adresse du local (`Rue du Local 1, 0000 Localité`), le téléphone et les e-mails (`…@example.org`) dans le pied de page, les infos pratiques et la page contact ;
-- les noms et totems des staffs ;
+### Les coordonnées de l’unité : Réglages → Unité
+
+L’adresse du local, le ou les responsables d’unité (nom, téléphone), l’e-mail du staff d’unité, le chef et l’e-mail de chaque section, les tarifs de cotisation (un par ligne, par ex. « 80 € pour le 1er enfant »), le numéro de compte, les places disponibles et les liens des formulaires d’inscription et de contact (Google Forms, extension de formulaire…) s’encodent **une seule fois** dans **Réglages → Unité**. Ils s’affichent d’eux-mêmes dans le pied de page, les infos pratiques de l’accueil, l’affiche d’inscription, la page Contact et la page Inscription, et le lien « Itinéraire » se calcule à partir de l’adresse. Dans l’éditeur, ces blocs montrent la vraie valeur mais ne se modifient pas sur place : on change la valeur dans les réglages. Un champ vide garde son exemple surligné.
+
+Ces blocs sont liés aux réglages dans les compositions du thème. Une page créée avant cette fonction (ou un bloc recopié à la main) garde son texte figé : recrée-la à partir de sa composition (« Page Contact », « Page Inscription ») pour profiter des réglages.
+
+### Le reste, directement dans les pages
+
+- les noms et totems des animateurs de chaque section (pages de section) ;
 - la phrase d’accroche manuscrite du pied de page (« Toujours prêts, de 6 à 18 ans. ») si tu veux la personnaliser ;
-- le montant de la cotisation et le numéro de compte (inscription) ;
-- le formulaire d’inscription et de contact (bloc d’une extension de formulaire) ;
-- l’événement du panneau d’accueil (les réunions, elles, viennent de l’agenda) ;
 - les photos : une seule photo d’exemple est fournie (celle du dépôt de la fédération).
 
 ## Essayer en local

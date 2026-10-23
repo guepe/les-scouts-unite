@@ -15,9 +15,9 @@ Contraintes :
 
 | Fichier | Rôle |
 |---|---|
-| `inc/agenda.php` (≈ 560 lignes, chargé par `functions.php` via `require`) | type de contenu, champs, répétition, colonnes d'administration, requêtes, 4 blocs dynamiques |
+| `inc/agenda.php` (≈ 560 lignes, chargé par `functions.php` via `require`) | type de contenu, champs, répétition, colonnes d'administration, requêtes, 5 blocs dynamiques |
 | `assets/js/reunion.js` | panneau « Quand et où ? » dans l'éditeur d'une réunion |
-| `assets/js/blocs.js` | déclaration des 4 blocs dans l'éditeur, avec un aperçu rendu par le serveur |
+| `assets/js/blocs.js` | déclaration des 5 blocs dans l'éditeur, avec un aperçu rendu par le serveur |
 | `templates/archive-reunion.html` | page `/agenda/` |
 | `templates/single-reunion.html` | page d'une réunion |
 | `style.css` | styles des lignes, des filtres et de l'affiche (voir « Classes CSS ») |
@@ -67,6 +67,7 @@ Tous sont enregistrés avec `register_post_meta( 'reunion', … )` :
 | `su_fin` | `H:i` | `''` | heure de fin |
 | `su_lieu` | texte libre | `'au local'` | lieu |
 | `su_repeter` | `Y-m-d` | `''` | « Répéter chaque semaine jusqu'au » |
+| `su_avant` | `'1'` ou `''` | `''` | « Mettre en avant sur l'accueil » : alimente le bloc « À la une » |
 | `_su_repete_jusqua` | `Y-m-d` | — | champ privé : jusqu'où les copies ont déjà été créées |
 
 La date est volontairement stockée en texte `Y-m-d` et non en timestamp : le tri alphabétique et la comparaison `DATE` suffisent.
@@ -80,6 +81,7 @@ Champs du panneau :
 - **Date** : `TextControl type="date"` ;
 - **Début** et **Fin** : `TextControl type="time"`, côte à côte dans un `Flex` ;
 - **Lieu** : `TextControl`, qui affiche « au local » si le champ est `undefined` ;
+- **Mettre en avant sur l'accueil** : `CheckboxControl` qui enregistre `'1'` ou `''`, avec l'aide « Pour les grandes activités (week-end d'unité, souper, fête…) : elle s'affiche en grand en haut de l'accueil jusqu'à sa date. » ;
 - **Répéter chaque semaine jusqu'au** : `TextControl type="date"`, avec l'aide « Facultatif. À la publication, une copie est créée chaque semaine jusqu'à cette date. Supprime ensuite les semaines de congé. »
 
 Chaque modification appelle `editPost( { meta: { clé: valeur } } )`.
@@ -95,7 +97,7 @@ Fonction `scoutsunite_agenda_repeter( $post )`, branchée sur `rest_after_insert
 
 1. Elle s'arrête si `su_repeter` n'est pas une date `Y-m-d`, si `su_date` est vide, ou si `su_repeter <= su_date`.
 2. Elle s'arrête si la réunion n'est pas publiée, ou si `_su_repete_jusqua === su_repeter` : les copies jusqu'à cette date existent déjà, ce qui rend l'opération idempotente.
-3. Sinon, elle enregistre `_su_repete_jusqua = su_repeter`, puis crée une copie publiée par semaine (+7 jours), au maximum 60. Chaque copie reprend le titre, le contenu, l'auteur, la section, les heures et le lieu, avec la nouvelle date.
+3. Sinon, elle enregistre `_su_repete_jusqua = su_repeter`, puis crée une copie publiée par semaine (+7 jours), au maximum 60. Chaque copie reprend le titre, le contenu, l'auteur, la section, les heures, le lieu et la mise en avant, avec la nouvelle date.
 4. Les copies sont des réunions indépendantes et ne portent pas `su_repeter`. On supprime les semaines de congé à la main.
 
 Limites à connaître :
@@ -104,15 +106,15 @@ Limites à connaître :
 
 ## Liste dans l'administration
 
-- Colonnes : le titre, puis **Quand** (« samedi 24 octobre 14 h – 17 h »), **Section** (nom affiché) et **Lieu**.
+- Colonnes : le titre, puis **Quand** (« samedi 24 octobre 14 h – 17 h »), **Section** (nom affiché, suivi de « · à la une » si la réunion est mise en avant) et **Lieu**.
 - La colonne « Quand » est triable.
 - Tri par défaut : sur `pre_get_posts`, pour la requête principale de l'admin `reunion` sans `orderby` (ou avec `orderby=su_quand`), tri par `meta_key=su_date`, `orderby=meta_value`, ordre ascendant par défaut.
 
 ## Lecture des réunions
 
-`scoutsunite_agenda_a_venir( $section = '', $nombre = 100 )` :
+`scoutsunite_agenda_a_venir( $section = '', $nombre = 100, $avant = false )` :
 - `get_posts` sur `reunion` publiées, avec `posts_per_page => 300` ;
-- `meta_query` : `su_date >= wp_date( 'Y-m-d' )` (type `DATE`, dans le fuseau du site), plus `su_section = $section` si on filtre ;
+- `meta_query` : `su_date >= wp_date( 'Y-m-d' )` (type `DATE`, dans le fuseau du site), plus `su_section = $section` si on filtre, et `su_avant = '1'` si `$avant` ;
 - tri en PHP par `su_date . su_debut` (`usort` + `strcmp`), donc une réunion sans heure passe en premier dans sa journée ;
 - renvoie les `$nombre` premières.
 
@@ -127,7 +129,7 @@ Fonctions de mise en forme :
 
 ## Blocs dynamiques
 
-Les quatre blocs sont déclarés en PHP avec `register_block_type` :
+Les cinq blocs sont déclarés en PHP avec `register_block_type` :
 - `api_version => 3`, catégorie `widgets` ;
 - `editor_script => 'scoutsunite-blocs'` ;
 - un `render_callback`, avec `save: () => null` côté JS.
@@ -162,7 +164,13 @@ Les blocs :
    - Chaque ligne affiche « **samedi 24 octobre** · titre · lieu », l'horaire, et les notes réduites à 40 mots en texte brut.
    - Liste vide : `p.agenda__vide` « Aucune réunion à venir pour l'instant. Le staff publie les dates ici dès qu'elles sont fixées. ».
 
-4. **`scoutsunite/reunion`** : « Détails de la réunion », pour la page d'une réunion. Classe `agenda-reunion`.
+4. **`scoutsunite/a-la-une`** : « À la une », pour l'affiche blanche du panneau d'accueil. Classe `a-la-une`.
+   - Prend les 4 prochaines réunions mises en avant (`a_venir( '', 4, true )`).
+   - La première en grand : étiquette manuscrite avec le nom de section (`p.affiche__etiquette`), titre en `h2.affiche__titre` lié à la page de la réunion (sans titre : « Activité d'unité » pour `unite`, sinon « Réunion {section} »), puis `p.a-la-une__quand` avec la date (première lettre en majuscule) et « horaire · lieu », puis les notes réduites à 24 mots.
+   - Les suivantes dans `p.a-la-une__suite` : « **Ensuite :** 13 novembre · Week-end d'unité », chacune liée à sa page. Puis un lien « Détails » (`p.lien-fleche`).
+   - Sans réunion mise en avant à venir : la dernière actualité (date en étiquette, titre lié, extrait de 22 mots, « Lire la suite »). Sans aucun article : « À la une » et une phrase d'attente.
+
+5. **`scoutsunite/reunion`** : « Détails de la réunion », pour la page d'une réunion. Classe `agenda-reunion`.
    - `uses_context => [ 'postId' ]`.
    - Affiche une seule ligne : la section, « date · lieu » et l'horaire.
 
@@ -177,7 +185,7 @@ Les blocs :
   - La couleur de section vient de `--section`, définie par `.is-style-ligne-{slug}` ; un `::before` sur le premier enfant affiche une puce de cette couleur.
   - `.ligne__notes` s'étend sur toute la largeur sous la ligne, et `.ligne__vide` est en sourdine.
   - Ces mêmes classes `is-style-ligne-*` sont aussi déclarées comme styles du bloc Groupe (`register_block_style`), pour que l'éditeur puisse les réutiliser à la main.
-- **Affiche** : `.agenda-prochaine__date`, `.agenda-prochaine__notes`, `.agenda-prochaine__suite`.
+- **Affiche** : `.agenda-prochaine__date`, `.agenda-prochaine__notes`, `.agenda-prochaine__suite`, et pour « À la une » `.a-la-une__quand` (gras), `.a-la-une__suite` (petit, filet au-dessus).
 - **Agenda** : `.agenda__filtres a` (pastilles, couleur via `--section` sur `.agenda__filtre-{slug}`, `[aria-current="page"]` pour l'état actif), `.agenda__mois`, `.agenda__liste`, `.agenda__vide`.
 
 ## Installation et mise à jour
@@ -192,4 +200,5 @@ Les blocs :
 - Publier une réunion avec « répéter jusqu'au » crée les copies hebdomadaires une seule fois, même si on l'enregistre de nouveau.
 - Une réunion d'hier disparaît de l'accueil, de la page de section et de `/agenda/`. Une réunion d'aujourd'hui reste visible.
 - `/agenda/?section=xyz`, avec une section inconnue, affiche toutes les réunions sans erreur.
+- Cocher « Mettre en avant » sur une activité à venir la fait apparaître en grand sur l'accueil ; une fois sa date passée, la suivante prend sa place, puis la dernière actualité quand il n'en reste aucune.
 - Les dates s'affichent en français et dans le bon fuseau (`wp_timezone()`), sans décalage d'un jour.

@@ -36,6 +36,12 @@
 		edit: apercu( 'scoutsunite/prochaines-reunions' ),
 	} ) );
 
+	wp.blocks.registerBlockType( 'scoutsunite/a-la-une', Object.assign( {}, commun, {
+		title: 'À la une',
+		description: 'La prochaine activité mise en avant dans l’agenda, ou à défaut la dernière actualité.',
+		edit: apercu( 'scoutsunite/a-la-une' ),
+	} ) );
+
 	wp.blocks.registerBlockType( 'scoutsunite/agenda', Object.assign( {}, commun, {
 		title: 'Agenda complet',
 		description: 'Toutes les réunions à venir, mois par mois, avec un filtre par section.',
@@ -85,4 +91,23 @@
 			);
 		},
 	} ) );
+
+	// Coordonnées de l'unité (Réglages → Unité) : l'éditeur montre les vraies valeurs.
+	if ( wp.blocks.registerBlockBindingsSource ) {
+		wp.blocks.registerBlockBindingsSource( {
+			name: 'scoutsunite/unite',
+			label: 'Coordonnées de l’unité',
+			getValues: function ( args ) {
+				var valeurs = {};
+				Object.keys( args.bindings ).forEach( function ( attribut ) {
+					var cle = ( args.bindings[ attribut ].args || {} ).key;
+					valeurs[ attribut ] = ( window.scoutsuniteUnite || {} )[ cle ] || '';
+				} );
+				return valeurs;
+			},
+			canUserEditValue: function () {
+				return false;
+			},
+		} );
+	}
 } )( window.wp );

@@ -33,8 +33,8 @@
 <p>Le staff d’unité reprend contact avec toi dans la semaine pour confirmer la place.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
-<p><mark class="a-completer">Ajoute ici le formulaire d’inscription (bloc d’une extension de formulaire) ou un lien vers celui de l’unité.</mark></p>
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"formulaire-inscription"}}}}} -->
+<p><mark class="a-completer">Ajoute le lien du formulaire d’inscription dans Réglages → Unité.</mark></p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->
 
@@ -44,7 +44,15 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>La cotisation couvre l’assurance et l’affiliation à la fédération. Montant : <mark class="a-completer">… €</mark>, à verser sur le compte <mark class="a-completer">BE00 0000 0000 0000</mark> avec le nom de l’enfant en communication. Si le prix est un frein, parles-en au staff d’unité : une solution existe toujours.</p>
+<p>La cotisation couvre l’assurance et l’affiliation à la fédération.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"cotisation"}}}}} -->
+<p><mark class="a-completer">… € par enfant</mark><br>À verser sur le compte <strong><mark class="a-completer">BE00 0000 0000 0000</mark></strong> avec le nom de l’enfant en communication.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Si le prix est un frein, parles-en au staff d’unité : une solution existe toujours.</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->
 

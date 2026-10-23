@@ -20,8 +20,8 @@
 <h2 class="wp-block-heading affiche__titre has-large-font-size">Le staff d’unité</h2>
 <!-- /wp:heading -->
 
-<!-- wp:paragraph -->
-<p><strong><mark class="a-completer">Prénom Nom</mark></strong><br><a href="tel:+32400000000"><mark class="a-completer">0400 00 00 00</mark></a><br><a href="mailto:staff@example.org"><mark class="a-completer">staff@example.org</mark></a></p>
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"staff-unite"}}}}} -->
+<p><strong><mark class="a-completer">Prénom Nom</mark></strong><br><mark class="a-completer">0400 00 00 00</mark><br><mark class="a-completer">staff@example.org</mark></p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group --></div>
 <!-- /wp:column -->
@@ -32,12 +32,12 @@
 <h2 class="wp-block-heading affiche__titre has-large-font-size">Le local</h2>
 <!-- /wp:heading -->
 
-<!-- wp:paragraph -->
-<p><strong><mark class="a-completer">Rue du Local 1</mark></strong><br><mark class="a-completer">0000 Localité</mark></p>
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"adresse"}}}}} -->
+<p><mark class="a-completer">Rue du Local 1</mark><br><mark class="a-completer">0000 Localité</mark></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph {"className":"lien-fleche"} -->
-<p class="lien-fleche"><a href="https://www.openstreetmap.org/search?query=Magn%C3%A9e%2C%20Belgique">Itinéraire</a></p>
+<!-- wp:paragraph {"className":"lien-fleche","metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"itineraire"}}}}} -->
+<p class="lien-fleche"><a href="https://www.openstreetmap.org/">Itinéraire</a></p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group --></div>
 <!-- /wp:column --></div>
@@ -53,12 +53,12 @@
 <p>Baladins</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"baladins-chef"}}}}} -->
 <p><mark class="a-completer">Prénom Nom</mark></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
-<p><a href="mailto:baladins@example.org"><mark class="a-completer">baladins@example.org</mark></a></p>
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"baladins-email"}}}}} -->
+<p><mark class="a-completer">baladins@example.org</mark></p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->
 
@@ -67,12 +67,12 @@
 <p>Louveteaux</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"louveteaux-chef"}}}}} -->
 <p><mark class="a-completer">Prénom Nom</mark></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
-<p><a href="mailto:louveteaux@example.org"><mark class="a-completer">louveteaux@example.org</mark></a></p>
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"louveteaux-email"}}}}} -->
+<p><mark class="a-completer">louveteaux@example.org</mark></p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->
 
@@ -81,12 +81,12 @@
 <p>Éclaireurs</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"eclaireurs-chef"}}}}} -->
 <p><mark class="a-completer">Prénom Nom</mark></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
-<p><a href="mailto:eclaireurs@example.org"><mark class="a-completer">eclaireurs@example.org</mark></a></p>
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"eclaireurs-email"}}}}} -->
+<p><mark class="a-completer">eclaireurs@example.org</mark></p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->
 
@@ -95,16 +95,16 @@
 <p>Pionniers</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"pionniers-chef"}}}}} -->
 <p><mark class="a-completer">Prénom Nom</mark></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
-<p><a href="mailto:pionniers@example.org"><mark class="a-completer">pionniers@example.org</mark></a></p>
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"pionniers-email"}}}}} -->
+<p><mark class="a-completer">pionniers@example.org</mark></p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group --></div>
 <!-- /wp:group -->
 
-<!-- wp:paragraph {"style":{"spacing":{"margin":{"top":"var:preset|spacing|60"}}}} -->
-<p style="margin-top:var(--wp--preset--spacing--60)"><mark class="a-completer">Pour un formulaire de contact, ajoute ici le bloc de ton extension de formulaire.</mark></p>
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"formulaire-contact"}}}},"style":{"spacing":{"margin":{"top":"var:preset|spacing|60"}}}} -->
+<p style="margin-top:var(--wp--preset--spacing--60)"><mark class="a-completer">Ajoute le lien du formulaire de contact dans Réglages → Unité.</mark></p>
 <!-- /wp:paragraph -->

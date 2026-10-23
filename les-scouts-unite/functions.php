@@ -121,6 +121,28 @@ function scoutsunite_image( $path ) {
 }
 
 /**
+ * Icône du site par défaut : les silhouettes de la fédération, tant que l'unité
+ * n'a pas choisi la sienne (icône du site dans les réglages WordPress). Sert aussi
+ * /favicon.ico, que WordPress redirige vers cette adresse.
+ *
+ * @param string $url  Adresse calculée par WordPress.
+ * @param int    $size Taille demandée, en pixels.
+ * @return string Adresse de l'icône.
+ */
+function scoutsunite_site_icon( $url, $size ) {
+	if ( get_option( 'site_icon' ) ) {
+		return $url;
+	}
+	foreach ( array( 32, 180, 192, 270, 512 ) as $taille ) {
+		if ( $size <= $taille ) {
+			break;
+		}
+	}
+	return scoutsunite_image( 'favicon/favicon-' . $taille . '.png' );
+}
+add_filter( 'get_site_icon_url', 'scoutsunite_site_icon', 10, 2 );
+
+/**
  * Retire un lien fléché qui mène à la page affichée : la règle des âges
  * propose « Découvrir les sections », inutile sur la page Les sections.
  *
@@ -154,3 +176,4 @@ add_filter( 'render_block_core/paragraph', 'scoutsunite_lien_fleche' );
 
 require get_template_directory() . '/inc/section.php';
 require get_template_directory() . '/inc/agenda.php';
+require get_template_directory() . '/inc/unite.php';

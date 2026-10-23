@@ -50,12 +50,12 @@
 <h3 class="wp-block-heading" style="font-size:1rem">Le local</h3>
 <!-- /wp:heading -->
 
-<!-- wp:paragraph -->
-<p><mark class="a-completer">Rue du Local 1<br>0000 Localité</mark></p>
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"adresse"}}}}} -->
+<p><mark class="a-completer">Rue du Local 1</mark><br><mark class="a-completer">0000 Localité</mark></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
-<p><a href="mailto:staff@example.org"><mark class="a-completer">staff@example.org</mark></a></p>
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"email-staff"}}}}} -->
+<p><mark class="a-completer">staff@example.org</mark></p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column -->
 

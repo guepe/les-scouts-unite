@@ -70,7 +70,7 @@ function scoutsunite_agenda_register() {
 		)
 	);
 
-	foreach ( array( 'su_section', 'su_date', 'su_debut', 'su_fin', 'su_lieu', 'su_repeter' ) as $key ) {
+	foreach ( array( 'su_section', 'su_date', 'su_debut', 'su_fin', 'su_lieu', 'su_repeter', 'su_avant' ) as $key ) {
 		register_post_meta(
 			'reunion',
 			$key,
@@ -97,6 +97,42 @@ function scoutsunite_agenda_flush() {
 	flush_rewrite_rules();
 }
 add_action( 'after_switch_theme', 'scoutsunite_agenda_flush' );
+
+/**
+ * Reprise d'un site installé avec l'ancien thème scouts-11om-magnee : ses réunions
+ * gardaient leurs champs sous s11_* et ses pages appelaient les blocs scouts11om/*.
+ * Une seule fois, on recopie les champs vers su_* (sans toucher aux anciens, ni à
+ * un champ su_* déjà rempli) et on renomme les blocs dans les contenus.
+ */
+function scoutsunite_agenda_reprise() {
+	if ( get_option( 'scoutsunite_reprise_s11' ) ) {
+		return;
+	}
+	global $wpdb;
+
+	$cles = array( 'section', 'date', 'debut', 'fin', 'lieu', 'repeter' );
+	$ids  = $wpdb->get_col( "SELECT DISTINCT post_id FROM {$wpdb->postmeta} WHERE meta_key LIKE 's11\_%' OR meta_key = '_s11_repete_jusqua'" );
+	foreach ( $ids as $id ) {
+		foreach ( array_merge( $cles, array( 'repete_jusqua' ) ) as $cle ) {
+			$prefixe = 'repete_jusqua' === $cle ? '_' : '';
+			$ancien  = get_metadata_raw( 'post', $id, $prefixe . 's11_' . $cle, true );
+			$nouveau = get_metadata_raw( 'post', $id, $prefixe . 'su_' . $cle, true );
+			if ( null !== $ancien && '' !== $ancien && ( null === $nouveau || '' === $nouveau ) ) {
+				update_post_meta( $id, $prefixe . 'su_' . $cle, $ancien );
+			}
+		}
+	}
+
+	$wpdb->query(
+		"UPDATE {$wpdb->posts}
+		SET post_content = REPLACE( REPLACE( post_content, 'wp:scouts11om/', 'wp:scoutsunite/' ), '\"slug\":\"scouts-11om-magnee/', '\"slug\":\"les-scouts-unite/' )
+		WHERE post_content LIKE '%wp:scouts11om/%' OR post_content LIKE '%scouts-11om-magnee/%'"
+	);
+	wp_cache_flush();
+
+	update_option( 'scoutsunite_reprise_s11', 1 );
+}
+add_action( 'init', 'scoutsunite_agenda_reprise', 20 );
 
 function scoutsunite_agenda_title_placeholder( $text, $post ) {
 	return 'reunion' === $post->post_type ? 'Réunion, hike, week-end…' : $text;
@@ -156,7 +192,7 @@ function scoutsunite_agenda_repeter( $post ) {
 	update_post_meta( $post->ID, '_su_repete_jusqua', $jusqua );
 
 	$meta = array();
-	foreach ( array( 'su_section', 'su_debut', 'su_fin', 'su_lieu' ) as $key ) {
+	foreach ( array( 'su_section', 'su_debut', 'su_fin', 'su_lieu', 'su_avant' ) as $key ) {
 		$meta[ $key ] = get_post_meta( $post->ID, $key, true );
 	}
 	$jour = new DateTimeImmutable( $date, wp_timezone() );
@@ -208,7 +244,7 @@ function scoutsunite_agenda_column( $column, $post_id ) {
 			break;
 		case 'su_section':
 			$s = get_post_meta( $post_id, 'su_section', true );
-			echo esc_html( $sections[ $s ] ?? '—' );
+			echo esc_html( ( $sections[ $s ] ?? '—' ) . ( get_post_meta( $post_id, 'su_avant', true ) ? ' · à la une' : '' ) );
 			break;
 		case 'su_lieu':
 			echo esc_html( get_post_meta( $post_id, 'su_lieu', true ) );
@@ -247,9 +283,10 @@ add_action( 'pre_get_posts', 'scoutsunite_agenda_admin_order' );
  *
  * @param string $section Identifiant de section, ou '' pour toutes.
  * @param int    $nombre  Nombre maximum de réunions.
+ * @param bool   $avant   Seulement les activités mises en avant sur l'accueil.
  * @return WP_Post[]
  */
-function scoutsunite_agenda_a_venir( $section = '', $nombre = 100 ) {
+function scoutsunite_agenda_a_venir( $section = '', $nombre = 100, $avant = false ) {
 	$meta_query = array(
 		array(
 			'key'     => 'su_date',
@@ -262,6 +299,12 @@ function scoutsunite_agenda_a_venir( $section = '', $nombre = 100 ) {
 		$meta_query[] = array(
 			'key'   => 'su_section',
 			'value' => $section,
+		);
+	}
+	if ( $avant ) {
+		$meta_query[] = array(
+			'key'   => 'su_avant',
+			'value' => '1',
 		);
 	}
 	$reunions = get_posts(
@@ -390,6 +433,16 @@ function scoutsunite_agenda_blocks() {
 			'editor_script'   => 'scoutsunite-blocs',
 			'uses_context'    => array( 'postId' ),
 			'render_callback' => 'scoutsunite_bloc_reunion',
+		)
+	);
+	register_block_type(
+		'scoutsunite/a-la-une',
+		array(
+			'api_version'     => 3,
+			'title'           => 'À la une',
+			'category'        => 'widgets',
+			'editor_script'   => 'scoutsunite-blocs',
+			'render_callback' => 'scoutsunite_bloc_a_la_une',
 		)
 	);
 }
@@ -556,4 +609,54 @@ function scoutsunite_bloc_reunion( $attributes, $content, $block ) {
 		$quoi,
 		scoutsunite_agenda_horaire( $post_id )
 	) . '</div>';
+}
+
+/**
+ * Accueil : la prochaine activité mise en avant, en grand, puis les suivantes.
+ * Sans activité à venir, la dernière actualité prend la place.
+ */
+function scoutsunite_bloc_a_la_une() {
+	$wrapper  = get_block_wrapper_attributes( array( 'class' => 'a-la-une' ) );
+	$reunions = scoutsunite_agenda_a_venir( '', 4, true );
+
+	if ( ! $reunions ) {
+		$actu = get_posts( array( 'numberposts' => 1 ) );
+		if ( ! $actu ) {
+			return '<div ' . $wrapper . '><h2 class="wp-block-heading affiche__titre has-x-large-font-size">À la une</h2><p>Les grandes activités de l’unité s’afficheront ici.</p></div>';
+		}
+		$a     = $actu[0];
+		$html  = '<p class="affiche__etiquette">' . esc_html( get_the_date( 'j F Y', $a ) ) . '</p>';
+		$html .= '<h2 class="wp-block-heading affiche__titre has-x-large-font-size"><a href="' . esc_url( get_permalink( $a ) ) . '">' . esc_html( get_the_title( $a ) ) . '</a></h2>';
+		$html .= '<p>' . esc_html( wp_trim_words( get_the_excerpt( $a ), 22 ) ) . '</p>';
+		$html .= '<p class="lien-fleche"><a href="' . esc_url( get_permalink( $a ) ) . '">Lire la suite</a></p>';
+		return '<div ' . $wrapper . '>' . $html . '</div>';
+	}
+
+	$sections = scoutsunite_agenda_sections();
+	$r        = $reunions[0];
+	$section  = get_post_meta( $r->ID, 'su_section', true );
+	$nom      = $sections[ $section ] ?? '';
+	$titre    = scoutsunite_agenda_titre( $r );
+	if ( '' === $titre ) {
+		$titre = 'unite' === $section ? 'Activité d’unité' : 'Réunion ' . $nom;
+	}
+	$infos = array_filter( array( scoutsunite_agenda_horaire( $r->ID ), get_post_meta( $r->ID, 'su_lieu', true ) ) );
+
+	$html  = '<p class="affiche__etiquette">' . esc_html( $nom ) . '</p>';
+	$html .= '<h2 class="wp-block-heading affiche__titre has-x-large-font-size"><a href="' . esc_url( get_permalink( $r ) ) . '">' . esc_html( $titre ) . '</a></h2>';
+	$html .= '<p class="a-la-une__quand">' . esc_html( ucfirst( scoutsunite_agenda_jour( get_post_meta( $r->ID, 'su_date', true ) ) ) ) . ( $infos ? '<br>' . esc_html( implode( ' · ', $infos ) ) : '' ) . '</p>';
+	if ( '' !== trim( $r->post_content ) ) {
+		$html .= '<p>' . esc_html( wp_trim_words( wp_strip_all_tags( $r->post_content ), 24 ) ) . '</p>';
+	}
+	if ( count( $reunions ) > 1 ) {
+		$suite = array();
+		foreach ( array_slice( $reunions, 1 ) as $s ) {
+			$t       = scoutsunite_agenda_titre( $s );
+			$suite[] = '<a href="' . esc_url( get_permalink( $s ) ) . '">' . esc_html( scoutsunite_agenda_jour( get_post_meta( $s->ID, 'su_date', true ), 'j F' ) . ( $t ? ' · ' . $t : '' ) ) . '</a>';
+		}
+		$html .= '<p class="a-la-une__suite"><strong>Ensuite :</strong> ' . implode( ', ', $suite ) . '</p>';
+	}
+	$html .= '<p class="lien-fleche"><a href="' . esc_url( get_permalink( $r ) ) . '">Détails</a></p>';
+
+	return '<div ' . $wrapper . '>' . $html . '</div>';
 }

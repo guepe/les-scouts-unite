@@ -3,7 +3,7 @@
  * Title: Panneau d'affichage (accueil)
  * Slug: les-scouts-unite/panneau-accueil
  * Categories: scoutsunite, banner
- * Description: Le panneau bleu de l'unité avec les prochaines réunions, un événement et les inscriptions.
+ * Description: Le panneau bleu de l’unité avec les prochaines réunions, l’activité mise en avant et les inscriptions.
  * Keywords: accueil, réunions, agenda, affiche, inscription
  */
 ?>
@@ -29,13 +29,7 @@
 
 <!-- wp:column {"width":"43%","style":{"spacing":{"blockGap":"2.75rem"}}} -->
 <div class="wp-block-column" style="flex-basis:43%"><!-- wp:group {"className":"is-style-affiche","layout":{"type":"default"}} -->
-<div class="wp-block-group is-style-affiche"><!-- wp:heading {"level":2,"className":"affiche__titre","fontSize":"x-large"} -->
-<h2 class="wp-block-heading affiche__titre has-x-large-font-size">Week-end d’unité<br>13 – 15 novembre</h2>
-<!-- /wp:heading -->
-
-<!-- wp:paragraph -->
-<p>Toutes les sections ensemble. Départ du local le vendredi à 18 h, retour le dimanche à 16 h.</p>
-<!-- /wp:paragraph --></div>
+<div class="wp-block-group is-style-affiche"><!-- wp:scoutsunite/a-la-une /--></div>
 <!-- /wp:group -->
 
 <!-- wp:group {"className":"is-style-affiche-verte","layout":{"type":"default"}} -->
@@ -44,7 +38,11 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Inscris ton enfant dans la section de son âge. <mark class="a-completer">Places disponibles : à préciser par le staff.</mark></p>
+<p>Inscris ton enfant dans la section de son âge.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"places"}}}}} -->
+<p><mark class="a-completer">Places disponibles : à préciser par le staff.</mark></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:buttons -->
