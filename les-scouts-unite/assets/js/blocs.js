@@ -92,6 +92,39 @@
 		},
 	} ) );
 
+	wp.blocks.registerBlockType( 'scoutsunite/camps', Object.assign( {}, commun, {
+		title: 'Week-ends et camp',
+		description: 'Les week-ends et le camp à venir de la section (et de toute l’unité), depuis l’agenda.',
+		icon: 'palmtree',
+		attributes: { section: { type: 'string', default: 'baladins' } },
+		edit: function ( props ) {
+			var sections = window.scoutsuniteSectionsBlocs || {};
+			return el(
+				wp.element.Fragment,
+				null,
+				el(
+					InspectorControls,
+					null,
+					el(
+						PanelBody,
+						{ title: 'Section' },
+						el( SelectControl, {
+							label: 'Section',
+							value: props.attributes.section,
+							options: Object.keys( sections ).map( function ( slug ) {
+								return { label: sections[ slug ], value: slug };
+							} ),
+							onChange: function ( section ) {
+								props.setAttributes( { section: section } );
+							},
+						} )
+					)
+				),
+				apercu( 'scoutsunite/camps' )( props )
+			);
+		},
+	} ) );
+
 	wp.blocks.registerBlockType( 'scoutsunite/staff', Object.assign( {}, commun, {
 		title: 'Staff de la section',
 		description: 'Le chef de section et les animateurs encodés dans Réglages → Unité.',

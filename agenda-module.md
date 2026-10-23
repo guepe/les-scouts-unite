@@ -15,9 +15,9 @@ Contraintes :
 
 | Fichier | Rôle |
 |---|---|
-| `inc/agenda.php` (≈ 560 lignes, chargé par `functions.php` via `require`) | type de contenu, champs, répétition, colonnes d'administration, requêtes, 5 blocs dynamiques |
+| `inc/agenda.php` (≈ 560 lignes, chargé par `functions.php` via `require`) | type de contenu, champs, répétition, colonnes d'administration, requêtes, 6 blocs dynamiques |
 | `assets/js/reunion.js` | panneau « Quand et où ? » dans l'éditeur d'une réunion |
-| `assets/js/blocs.js` | déclaration des 5 blocs dans l'éditeur, avec un aperçu rendu par le serveur |
+| `assets/js/blocs.js` | déclaration des 6 blocs dans l'éditeur, avec un aperçu rendu par le serveur |
 | `templates/archive-reunion.html` | page `/agenda/` |
 | `templates/single-reunion.html` | page d'une réunion |
 | `style.css` | styles des lignes, des filtres et de l'affiche (voir « Classes CSS ») |
@@ -67,6 +67,8 @@ Tous sont enregistrés avec `register_post_meta( 'reunion', … )` :
 | `su_fin` | `H:i` | `''` | heure de fin |
 | `su_lieu` | texte libre | `'au local'` | lieu |
 | `su_repeter` | `Y-m-d` | `''` | « Répéter chaque semaine jusqu'au » |
+| `su_type` | `''`, `'weekend'` ou `'camp'` | `''` | type d'activité ; `''` = réunion ordinaire |
+| `su_jusqua` | `Y-m-d` | `''` | dernier jour d'un week-end ou d'un camp |
 | `su_avant` | `'1'` ou `''` | `''` | « Mettre en avant sur l'accueil » : alimente le bloc « À la une » |
 | `_su_repete_jusqua` | `Y-m-d` | — | champ privé : jusqu'où les copies ont déjà été créées |
 
@@ -78,7 +80,9 @@ Le panneau est un plugin `wp.plugins.registerPlugin` qui affiche un `PluginDocum
 
 Champs du panneau :
 - **Section** : `SelectControl`, avec une première option vide « Choisir… » ;
-- **Date** : `TextControl type="date"` ;
+- **Type** : `SelectControl` Réunion / Week-end / Camp ; revenir à « Réunion » vide aussi `su_jusqua` ;
+- **Date** (libellé « Du » pour un week-end ou un camp) : `TextControl type="date"` ;
+- **Jusqu'au** : `TextControl type="date"`, affiché seulement pour un week-end ou un camp ;
 - **Début** et **Fin** : `TextControl type="time"`, côte à côte dans un `Flex` ;
 - **Lieu** : `TextControl`, qui affiche « au local » si le champ est `undefined` ;
 - **Mettre en avant sur l'accueil** : `CheckboxControl` qui enregistre `'1'` ou `''`, avec l'aide « Pour les grandes activités (week-end d'unité, souper, fête…) : elle s'affiche en grand en haut de l'accueil jusqu'à sa date. » ;
@@ -114,7 +118,7 @@ Limites à connaître :
 
 `scoutsunite_agenda_a_venir( $section = '', $nombre = 100, $avant = false )` :
 - `get_posts` sur `reunion` publiées, avec `posts_per_page => 300` ;
-- `meta_query` : `su_date >= wp_date( 'Y-m-d' )` (type `DATE`, dans le fuseau du site), plus `su_section = $section` si on filtre, et `su_avant = '1'` si `$avant` ;
+- `meta_query` : `su_date >= aujourd'hui` OU `su_jusqua >= aujourd'hui` (type `DATE`, dans le fuseau du site : un week-end en cours reste visible), `su_section` égal ou `IN` si on passe un tableau, `su_type IN $types` si on filtre par type, plus `su_section = $section` si on filtre, et `su_avant = '1'` si `$avant` ;
 - tri en PHP par `su_date . su_debut` (`usort` + `strcmp`), donc une réunion sans heure passe en premier dans sa journée ;
 - renvoie les `$nombre` premières.
 
@@ -122,6 +126,7 @@ Une réunion reste donc visible toute la journée où elle a lieu.
 
 Fonctions de mise en forme :
 - `agenda_jour( 'Y-m-d', $format = 'l j F' )` renvoie « samedi 24 octobre ». Elle construit la date à 12:00 dans `wp_timezone()` puis appelle `wp_date`, ce qui évite les décalages de jour.
+- `agenda_quand( $id, $format )` renvoie la date, ou la période d'un week-end ou d'un camp : « du vendredi 13 au dimanche 15 novembre » (format long), « 13 – 15 novembre » (format `j F`). `agenda_type( $id )` renvoie « Week-end », « Camp » ou `''`, et `agenda_etiquette( $id )` le `span.ligne__type` placé devant la date dans les lignes.
 - `agenda_heure( '14:30' )` renvoie « 14 h 30 », et `'14:00'` renvoie « 14 h ».
 - `agenda_horaire( $id )` renvoie « 14 h – 17 h », « dès 14 h » s'il n'y a pas de fin, ou `''`.
 - `agenda_section_url( $slug )` renvoie le permalien de la page `sections/{slug}` si elle existe, sinon `''`.
@@ -129,7 +134,7 @@ Fonctions de mise en forme :
 
 ## Blocs dynamiques
 
-Les cinq blocs sont déclarés en PHP avec `register_block_type` :
+Les six blocs de l’agenda sont déclarés en PHP avec `register_block_type` :
 - `api_version => 3`, catégorie `widgets` ;
 - `editor_script => 'scoutsunite-blocs'` ;
 - un `render_callback`, avec `save: () => null` côté JS.
@@ -167,10 +172,15 @@ Les blocs :
 4. **`scoutsunite/a-la-une`** : « À la une », pour l'affiche blanche du panneau d'accueil. Classe `a-la-une`.
    - Prend les 4 prochaines réunions mises en avant (`a_venir( '', 4, true )`).
    - La première en grand : étiquette manuscrite avec le nom de section (`p.affiche__etiquette`), titre en `h2.affiche__titre` lié à la page de la réunion (sans titre : « Activité d'unité » pour `unite`, sinon « Réunion {section} »), puis `p.a-la-une__quand` avec la date (première lettre en majuscule) et « horaire · lieu », puis les notes réduites à 24 mots.
-   - Les suivantes dans `p.a-la-une__suite` : « **Ensuite :** 13 novembre · Week-end d'unité », chacune liée à sa page. Puis un lien « Détails » (`p.lien-fleche`).
+   - Les suivantes dans `p.a-la-une__suite` : « **Ensuite :** 13 novembre · Week-end d'unité », chacune liée à sa page. Pas de lien « Détails » : le titre mène déjà à la réunion.
    - Sans réunion mise en avant à venir : la dernière actualité (date en étiquette, titre lié, extrait de 22 mots, « Lire la suite »). Sans aucun article : « À la une » et une phrase d'attente.
 
-5. **`scoutsunite/reunion`** : « Détails de la réunion », pour la page d'une réunion. Classe `agenda-reunion`.
+5. **`scoutsunite/camps`** : « Week-ends et camp », pour les pages de section. Classe `camps`.
+   - Attribut `section`. Liste jusqu'à 6 week-ends et camps à venir de la section et de `unite` (`a_venir( [ $section, 'unite' ], 6, false, [ 'weekend', 'camp' ] )`).
+   - Une fiche `article.camp` par activité : `p.camp__type` (« Camp », « Week-end · toute l'unité »), `h4.camp__titre` lié à la réunion, `p.camp__quand` (période, horaire, lieu), notes complètes dans `div.camp__notes`.
+   - Sans activité : `p.camps__vide` qui explique comment en ajouter.
+
+6. **`scoutsunite/reunion`** : « Détails de la réunion », pour la page d'une réunion. Classe `agenda-reunion`.
    - `uses_context => [ 'postId' ]`.
    - Affiche une seule ligne : la section, « date · lieu » et l'horaire.
 

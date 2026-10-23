@@ -126,12 +126,10 @@ function scoutsunite_section_pattern( $slug ) {
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":3} -->
-<h3 class="wp-block-heading">Le camp d’été</h3>
+<h3 class="wp-block-heading">Week-ends et camp</h3>
 <!-- /wp:heading -->
 
-<!-- wp:paragraph -->
-<p>Dates, lieu, prix et liste du matériel : ajoute-les dès qu’ils sont connus.</p>
-<!-- /wp:paragraph --></div>
+<!-- wp:scoutsunite/camps {"section":"<?php echo esc_attr( $slug ); ?>"} /--></div>
 <!-- /wp:group -->
 	<?php
 }

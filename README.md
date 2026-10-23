@@ -42,10 +42,11 @@ Le menu pointe vers ces adresses. Crée les pages avec ces identifiants (slug) :
 
 Les réunions s’encodent dans **Agenda → Ajouter** (menu de gauche de l’administration). Dans le panneau **Quand et où ?** à droite : section, date, début, fin, lieu. Le titre est facultatif (« Réunion » par défaut ; mets « Hike », « Week-end »… pour une activité spéciale) et le texte sert de notes pour les parents (à emporter, rendez-vous).
 
+- **Type : Réunion, Week-end ou Camp** : pour un week-end ou un camp, indique aussi la date de fin (« Jusqu’au »). L’activité s’affiche alors « du 13 au 15 novembre » avec une étiquette « Week-end » ou « Camp », reste visible jusqu’à son dernier jour, et apparaît dans le bloc **Week-ends et camp** de la page de sa section (avec ses notes complètes : prix, matériel…). Une activité « Toute l’unité » apparaît sur les pages de toutes les sections.
 - **Mettre en avant sur l’accueil** : coche cette case pour les grandes activités (week-end d’unité, souper, fête…). La prochaine activité cochée s’affiche en grand sur l’affiche blanche en haut de l’accueil, les suivantes en dessous, jusqu’à leur date. Sans activité cochée à venir, l’affiche montre la dernière actualité.
 - **Répéter chaque semaine jusqu’au** : à la publication, une copie est créée chaque semaine jusqu’à cette date. Supprime ensuite les semaines de congé dans **Agenda → Toutes les réunions**.
 - **Mise à jour automatique** : le panneau de l’accueil montre la prochaine réunion de chaque section, chaque page de section montre la sienne (avec les dates suivantes), et **/agenda/** liste tout, mois par mois, avec un filtre par section. Les réunions passées disparaissent d’elles-mêmes.
-- Les blocs **Prochaines réunions**, **À la une**, **Prochaine réunion d’une section** et **Agenda complet** peuvent être insérés n’importe où dans l’éditeur.
+- Les blocs **Prochaines réunions**, **À la une**, **Prochaine réunion d’une section**, **Week-ends et camp** et **Agenda complet** peuvent être insérés n’importe où dans l’éditeur.
 
 ### Mettre à jour un site déjà installé
 

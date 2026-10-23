@@ -3,7 +3,7 @@ Theme Name: Les Scouts – Unité
 Theme URI: https://github.com/lesscouts/template-unite
 Author: Pierre-Henri Delaval
 Description: Thème de bloc pour le site d’une unité Les Scouts asbl, construit sur la charte graphique de la fédération : bleu de la fédération, toppings, couleurs de section et police Muli. Le nom de l’unité vient du titre du site ; tout se modifie dans l’éditeur de site.
-Version: 2.4.0
+Version: 2.5.0
 Requires at least: 6.5
 Tested up to: 6.8
 Requires PHP: 7.4
@@ -917,6 +917,72 @@ a.lien-fleche:hover::after {
 	padding-top: 0.9rem;
 	border-top: 2px solid var(--su-fond);
 	font-size: var(--wp--preset--font-size--small);
+}
+
+/* Week-ends et camps : une étiquette dans les lignes d'agenda… */
+.ligne__type {
+	display: inline-block;
+	margin-right: 0.35rem;
+	padding: 0 0.5rem;
+	border-radius: 999px;
+	background: var(--su-bleu);
+	color: #fff;
+	font-size: 0.75rem;
+	font-weight: 800;
+	line-height: 1.6;
+	vertical-align: 0.1em;
+}
+
+/* … et sur la page de section, une fiche par activité avec ses notes complètes. */
+.camps {
+	margin-top: var(--wp--preset--spacing--40);
+}
+
+.camp {
+	padding-block: 1.25rem;
+	border-top: 2px solid var(--su-fond);
+}
+
+.camp:first-child {
+	border-top: 4px solid var(--su-bleu);
+}
+
+.camp__type {
+	margin: 0;
+	font-family: var(--wp--preset--font-family--caveat);
+	font-size: 1.5rem;
+	line-height: 1;
+	color: var(--su-rouge);
+}
+
+.camp__titre {
+	margin: 0.35rem 0 0;
+	font-size: var(--wp--preset--font-size--large);
+}
+
+.camp__titre a {
+	text-decoration: none;
+}
+
+.camp__titre a:hover {
+	text-decoration: underline;
+}
+
+.camp__quand {
+	margin: 0.4rem 0 0;
+	font-weight: 800;
+}
+
+.camp__notes {
+	margin-top: 0.75rem;
+}
+
+.camp__notes > :first-child {
+	margin-top: 0;
+}
+
+.camps__vide {
+	color: var(--su-vert-fonce);
 }
 
 /* Staff de la section : un badge par animateur, le chef en tête sur toute la ligne.

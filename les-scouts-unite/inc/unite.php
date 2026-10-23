@@ -282,6 +282,42 @@ function scoutsunite_reprise_staff() {
 }
 add_action( 'init', 'scoutsunite_reprise_staff', 20 );
 
+/**
+ * Reprise des pages de section déjà créées : le texte d'exemple du camp d'été
+ * devient le bloc « Week-ends et camp », alimenté par l'agenda.
+ */
+function scoutsunite_reprise_camps() {
+	if ( get_option( 'scoutsunite_reprise_camps' ) ) {
+		return;
+	}
+	global $wpdb;
+
+	$sections = array_keys( scoutsunite_sections() );
+	$pages    = $wpdb->get_results( "SELECT ID, post_name, post_content FROM {$wpdb->posts} WHERE post_type = 'page' AND post_content LIKE '%Dates, lieu, prix et liste du matériel%'" );
+	foreach ( $pages as $page ) {
+		$section = in_array( $page->post_name, $sections, true ) ? $page->post_name : '';
+		if ( ! $section && preg_match( '/(?:prochaine-reunion|staff) \{"section":"([a-z]+)"/', $page->post_content, $m ) ) {
+			$section = $m[1];
+		}
+		if ( ! $section ) {
+			continue;
+		}
+		$contenu = preg_replace(
+			'#<!-- wp:paragraph -->\s*<p[^>]*>Dates, lieu, prix et liste du matériel : ajoute-les dès qu’ils sont connus\.</p>\s*<!-- /wp:paragraph -->#u',
+			'<!-- wp:scoutsunite/camps {"section":"' . $section . '"} /-->',
+			$page->post_content
+		);
+		$contenu = str_replace( 'Le camp d’été</h3>', 'Week-ends et camp</h3>', $contenu );
+		if ( $contenu !== $page->post_content ) {
+			$wpdb->update( $wpdb->posts, array( 'post_content' => $contenu ), array( 'ID' => $page->ID ) );
+			clean_post_cache( $page->ID );
+		}
+	}
+
+	update_option( 'scoutsunite_reprise_camps', 1 );
+}
+add_action( 'init', 'scoutsunite_reprise_camps', 20 );
+
 function scoutsunite_unite_bloc() {
 	register_block_type(
 		'scoutsunite/staff',

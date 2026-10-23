@@ -70,7 +70,7 @@ function scoutsunite_agenda_register() {
 		)
 	);
 
-	foreach ( array( 'su_section', 'su_date', 'su_debut', 'su_fin', 'su_lieu', 'su_repeter', 'su_avant' ) as $key ) {
+	foreach ( array( 'su_section', 'su_date', 'su_debut', 'su_fin', 'su_lieu', 'su_repeter', 'su_avant', 'su_type', 'su_jusqua' ) as $key ) {
 		register_post_meta(
 			'reunion',
 			$key,
@@ -192,7 +192,7 @@ function scoutsunite_agenda_repeter( $post ) {
 	update_post_meta( $post->ID, '_su_repete_jusqua', $jusqua );
 
 	$meta = array();
-	foreach ( array( 'su_section', 'su_debut', 'su_fin', 'su_lieu', 'su_avant' ) as $key ) {
+	foreach ( array( 'su_section', 'su_debut', 'su_fin', 'su_lieu', 'su_avant', 'su_type' ) as $key ) {
 		$meta[ $key ] = get_post_meta( $post->ID, $key, true );
 	}
 	$jour = new DateTimeImmutable( $date, wp_timezone() );
@@ -240,7 +240,7 @@ function scoutsunite_agenda_column( $column, $post_id ) {
 	switch ( $column ) {
 		case 'su_quand':
 			$date = get_post_meta( $post_id, 'su_date', true );
-			echo esc_html( $date ? scoutsunite_agenda_jour( $date ) . ' ' . scoutsunite_agenda_horaire( $post_id ) : '—' );
+			echo esc_html( $date ? trim( scoutsunite_agenda_type( $post_id ) . ' ' . scoutsunite_agenda_quand( $post_id ) . ' ' . scoutsunite_agenda_horaire( $post_id ) ) : '—' );
 			break;
 		case 'su_section':
 			$s = get_post_meta( $post_id, 'su_section', true );
@@ -284,21 +284,41 @@ add_action( 'pre_get_posts', 'scoutsunite_agenda_admin_order' );
  * @param string $section Identifiant de section, ou '' pour toutes.
  * @param int    $nombre  Nombre maximum de réunions.
  * @param bool   $avant   Seulement les activités mises en avant sur l'accueil.
+ * @param array  $types   Seulement ces types (« weekend », « camp ») ; vide pour tous.
  * @return WP_Post[]
  */
-function scoutsunite_agenda_a_venir( $section = '', $nombre = 100, $avant = false ) {
+function scoutsunite_agenda_a_venir( $section = '', $nombre = 100, $avant = false, $types = array() ) {
+	$aujourdhui = wp_date( 'Y-m-d' );
+	// Un week-end ou un camp reste « à venir » jusqu'à son dernier jour.
 	$meta_query = array(
 		array(
-			'key'     => 'su_date',
-			'value'   => wp_date( 'Y-m-d' ),
-			'compare' => '>=',
-			'type'    => 'DATE',
+			'relation' => 'OR',
+			array(
+				'key'     => 'su_date',
+				'value'   => $aujourdhui,
+				'compare' => '>=',
+				'type'    => 'DATE',
+			),
+			array(
+				'key'     => 'su_jusqua',
+				'value'   => $aujourdhui,
+				'compare' => '>=',
+				'type'    => 'DATE',
+			),
 		),
 	);
 	if ( $section ) {
 		$meta_query[] = array(
-			'key'   => 'su_section',
-			'value' => $section,
+			'key'     => 'su_section',
+			'value'   => $section,
+			'compare' => is_array( $section ) ? 'IN' : '=',
+		);
+	}
+	if ( $types ) {
+		$meta_query[] = array(
+			'key'     => 'su_type',
+			'value'   => $types,
+			'compare' => 'IN',
 		);
 	}
 	if ( $avant ) {
@@ -335,6 +355,52 @@ function scoutsunite_agenda_a_venir( $section = '', $nombre = 100, $avant = fals
 function scoutsunite_agenda_jour( $date, $format = 'l j F' ) {
 	$jour = DateTimeImmutable::createFromFormat( 'Y-m-d H:i', $date . ' 12:00', wp_timezone() );
 	return $jour ? wp_date( $format, $jour->getTimestamp() ) : '';
+}
+
+/**
+ * Date d'une activité : un jour, ou une période pour un week-end ou un camp.
+ * Format long : « du vendredi 13 au dimanche 15 novembre » ; court (« j F ») : « 13 – 15 novembre ».
+ *
+ * @param int    $post_id Réunion.
+ * @param string $format  'l j F' (long) ou 'j F' (court).
+ * @return string
+ */
+function scoutsunite_agenda_quand( $post_id, $format = 'l j F' ) {
+	$debut = get_post_meta( $post_id, 'su_date', true );
+	$fin   = get_post_meta( $post_id, 'su_jusqua', true );
+	if ( ! $fin || $fin <= $debut || ! get_post_meta( $post_id, 'su_type', true ) ) {
+		return scoutsunite_agenda_jour( $debut, $format );
+	}
+	$meme_mois = substr( $debut, 0, 7 ) === substr( $fin, 0, 7 );
+	if ( 'j F' === $format ) {
+		return scoutsunite_agenda_jour( $debut, $meme_mois ? 'j' : 'j F' ) . ' – ' . scoutsunite_agenda_jour( $fin, 'j F' );
+	}
+	return 'du ' . scoutsunite_agenda_jour( $debut, $meme_mois ? 'l j' : 'l j F' ) . ' au ' . scoutsunite_agenda_jour( $fin, 'l j F' );
+}
+
+/**
+ * « Camp », « Week-end » ou '' pour une réunion ordinaire.
+ *
+ * @param int $post_id Réunion.
+ * @return string
+ */
+function scoutsunite_agenda_type( $post_id ) {
+	$types = array(
+		'weekend' => 'Week-end',
+		'camp'    => 'Camp',
+	);
+	return $types[ get_post_meta( $post_id, 'su_type', true ) ] ?? '';
+}
+
+/**
+ * Étiquette de type à placer devant une ligne d'agenda.
+ *
+ * @param int $post_id Réunion.
+ * @return string HTML.
+ */
+function scoutsunite_agenda_etiquette( $post_id ) {
+	$type = scoutsunite_agenda_type( $post_id );
+	return $type ? '<span class="ligne__type">' . esc_html( $type ) . '</span> ' : '';
 }
 
 /**
@@ -436,6 +502,22 @@ function scoutsunite_agenda_blocks() {
 		)
 	);
 	register_block_type(
+		'scoutsunite/camps',
+		array(
+			'api_version'     => 3,
+			'title'           => 'Week-ends et camp',
+			'category'        => 'widgets',
+			'editor_script'   => 'scoutsunite-blocs',
+			'attributes'      => array(
+				'section' => array(
+					'type'    => 'string',
+					'default' => 'baladins',
+				),
+			),
+			'render_callback' => 'scoutsunite_bloc_camps',
+		)
+	);
+	register_block_type(
 		'scoutsunite/a-la-une',
 		array(
 			'api_version'     => 3,
@@ -483,7 +565,7 @@ function scoutsunite_bloc_prochaines_reunions() {
 		if ( $next ) {
 			$r     = $next[0];
 			$titre = scoutsunite_agenda_titre( $r );
-			$quoi  = esc_html( scoutsunite_agenda_jour( get_post_meta( $r->ID, 'su_date', true ) ) );
+			$quoi  = scoutsunite_agenda_etiquette( $r->ID ) . esc_html( scoutsunite_agenda_quand( $r->ID ) );
 			$lieu  = get_post_meta( $r->ID, 'su_lieu', true );
 			if ( $titre ) {
 				$quoi .= ' · ' . esc_html( $titre );
@@ -516,11 +598,12 @@ function scoutsunite_bloc_prochaine_reunion( $attributes ) {
 
 	$r     = $next[0];
 	$titre = scoutsunite_agenda_titre( $r );
+	$titre = $titre ? $titre : scoutsunite_agenda_type( $r->ID );
 	$lieu  = get_post_meta( $r->ID, 'su_lieu', true );
 	$infos = array_filter( array( scoutsunite_agenda_horaire( $r->ID ), $lieu ) );
 
 	$html  = '<h2 class="wp-block-heading affiche__titre has-x-large-font-size">Prochaine réunion</h2>';
-	$html .= '<p class="agenda-prochaine__date">' . esc_html( ucfirst( scoutsunite_agenda_jour( get_post_meta( $r->ID, 'su_date', true ) ) ) ) . '</p>';
+	$html .= '<p class="agenda-prochaine__date">' . esc_html( ucfirst( scoutsunite_agenda_quand( $r->ID ) ) ) . '</p>';
 	$html .= '<p class="has-large-font-size" style="font-weight:800">' . esc_html( implode( ' · ', array_filter( array( $titre, implode( ' · ', $infos ) ) ) ) ) . '</p>';
 	if ( '' !== trim( $r->post_content ) ) {
 		$html .= '<div class="agenda-prochaine__notes">' . apply_filters( 'the_content', $r->post_content ) . '</div>';
@@ -531,7 +614,8 @@ function scoutsunite_bloc_prochaine_reunion( $attributes ) {
 		$dates = array();
 		foreach ( array_slice( $suite, 1 ) as $s ) {
 			$titre   = scoutsunite_agenda_titre( $s );
-			$dates[] = esc_html( scoutsunite_agenda_jour( get_post_meta( $s->ID, 'su_date', true ), 'j F' ) . ( $titre ? ' (' . $titre . ')' : '' ) );
+			$titre   = $titre ? $titre : scoutsunite_agenda_type( $s->ID );
+			$dates[] = esc_html( scoutsunite_agenda_quand( $s->ID, 'j F' ) . ( $titre ? ' (' . $titre . ')' : '' ) );
 		}
 		$html .= implode( ', ', $dates ) . '. <a href="' . esc_url( add_query_arg( 'section', $section, get_post_type_archive_link( 'reunion' ) ) ) . '">Voir l’agenda</a></p>';
 	}
@@ -573,7 +657,7 @@ function scoutsunite_bloc_agenda() {
 		$section = get_post_meta( $r->ID, 'su_section', true );
 		$titre   = scoutsunite_agenda_titre( $r );
 		$lieu    = get_post_meta( $r->ID, 'su_lieu', true );
-		$quoi    = '<strong>' . esc_html( scoutsunite_agenda_jour( $date ) ) . '</strong>';
+		$quoi    = scoutsunite_agenda_etiquette( $r->ID ) . '<strong>' . esc_html( scoutsunite_agenda_quand( $r->ID ) ) . '</strong>';
 		if ( $titre ) {
 			$quoi .= ' · ' . esc_html( $titre );
 		}
@@ -598,7 +682,7 @@ function scoutsunite_bloc_reunion( $attributes, $content, $block ) {
 	}
 	$sections = scoutsunite_agenda_sections();
 	$section  = get_post_meta( $post_id, 'su_section', true );
-	$quoi     = esc_html( scoutsunite_agenda_jour( get_post_meta( $post_id, 'su_date', true ) ) );
+	$quoi     = scoutsunite_agenda_etiquette( $post_id ) . esc_html( scoutsunite_agenda_quand( $post_id ) );
 	$lieu     = get_post_meta( $post_id, 'su_lieu', true );
 	if ( $lieu ) {
 		$quoi .= ' · ' . esc_html( $lieu );
@@ -638,13 +722,16 @@ function scoutsunite_bloc_a_la_une() {
 	$nom      = $sections[ $section ] ?? '';
 	$titre    = scoutsunite_agenda_titre( $r );
 	if ( '' === $titre ) {
+		$titre = scoutsunite_agenda_type( $r->ID );
+	}
+	if ( '' === $titre ) {
 		$titre = 'unite' === $section ? 'Activité d’unité' : 'Réunion ' . $nom;
 	}
 	$infos = array_filter( array( scoutsunite_agenda_horaire( $r->ID ), get_post_meta( $r->ID, 'su_lieu', true ) ) );
 
-	$html  = '<p class="affiche__etiquette">' . esc_html( $nom ) . '</p>';
+	$html  = '<p class="affiche__etiquette">' . esc_html( implode( ' · ', array_filter( array( $nom, scoutsunite_agenda_type( $r->ID ) ) ) ) ) . '</p>';
 	$html .= '<h2 class="wp-block-heading affiche__titre has-x-large-font-size"><a href="' . esc_url( get_permalink( $r ) ) . '">' . esc_html( $titre ) . '</a></h2>';
-	$html .= '<p class="a-la-une__quand">' . esc_html( ucfirst( scoutsunite_agenda_jour( get_post_meta( $r->ID, 'su_date', true ) ) ) ) . ( $infos ? '<br>' . esc_html( implode( ' · ', $infos ) ) : '' ) . '</p>';
+	$html .= '<p class="a-la-une__quand">' . esc_html( ucfirst( scoutsunite_agenda_quand( $r->ID ) ) ) . ( $infos ? '<br>' . esc_html( implode( ' · ', $infos ) ) : '' ) . '</p>';
 	if ( '' !== trim( $r->post_content ) ) {
 		$html .= '<p>' . esc_html( wp_trim_words( wp_strip_all_tags( $r->post_content ), 24 ) ) . '</p>';
 	}
@@ -652,11 +739,44 @@ function scoutsunite_bloc_a_la_une() {
 		$suite = array();
 		foreach ( array_slice( $reunions, 1 ) as $s ) {
 			$t       = scoutsunite_agenda_titre( $s );
-			$suite[] = '<a href="' . esc_url( get_permalink( $s ) ) . '">' . esc_html( scoutsunite_agenda_jour( get_post_meta( $s->ID, 'su_date', true ), 'j F' ) . ( $t ? ' · ' . $t : '' ) ) . '</a>';
+			$suite[] = '<a href="' . esc_url( get_permalink( $s ) ) . '">' . esc_html( scoutsunite_agenda_quand( $s->ID, 'j F' ) . ( $t ? ' · ' . $t : '' ) ) . '</a>';
 		}
 		$html .= '<p class="a-la-une__suite"><strong>Ensuite :</strong> ' . implode( ', ', $suite ) . '</p>';
 	}
-	$html .= '<p class="lien-fleche"><a href="' . esc_url( get_permalink( $r ) ) . '">Détails</a></p>';
 
+	return '<div ' . $wrapper . '>' . $html . '</div>';
+}
+
+/**
+ * Page de section : les week-ends et le camp à venir de la section et de toute
+ * l'unité, avec leurs notes complètes (prix, matériel…).
+ *
+ * @param array $attributes Attributs du bloc (section).
+ * @return string HTML.
+ */
+function scoutsunite_bloc_camps( $attributes ) {
+	$section   = sanitize_key( $attributes['section'] ?? 'baladins' );
+	$wrapper   = get_block_wrapper_attributes( array( 'class' => 'camps' ) );
+	$activites = scoutsunite_agenda_a_venir( array( $section, 'unite' ), 6, false, array( 'weekend', 'camp' ) );
+
+	if ( ! $activites ) {
+		return '<div ' . $wrapper . '><p class="camps__vide">Pas encore de week-end ni de camp annoncé. Dès que le staff les ajoute à l’agenda (type « Week-end » ou « Camp »), ils s’affichent ici avec les dates, le lieu et les infos pratiques.</p></div>';
+	}
+
+	$html = '';
+	foreach ( $activites as $a ) {
+		$titre = scoutsunite_agenda_titre( $a );
+		$infos = array_filter( array( scoutsunite_agenda_horaire( $a->ID ), get_post_meta( $a->ID, 'su_lieu', true ) ) );
+		$qui   = 'unite' === get_post_meta( $a->ID, 'su_section', true ) ? ' · toute l’unité' : '';
+
+		$html .= '<article class="camp">';
+		$html .= '<p class="camp__type">' . esc_html( scoutsunite_agenda_type( $a->ID ) . $qui ) . '</p>';
+		$html .= '<h4 class="wp-block-heading camp__titre"><a href="' . esc_url( get_permalink( $a ) ) . '">' . esc_html( $titre ? $titre : scoutsunite_agenda_type( $a->ID ) ) . '</a></h4>';
+		$html .= '<p class="camp__quand">' . esc_html( ucfirst( scoutsunite_agenda_quand( $a->ID ) ) ) . ( $infos ? '<br>' . esc_html( implode( ' · ', $infos ) ) : '' ) . '</p>';
+		if ( '' !== trim( $a->post_content ) ) {
+			$html .= '<div class="camp__notes">' . apply_filters( 'the_content', $a->post_content ) . '</div>';
+		}
+		$html .= '</article>';
+	}
 	return '<div ' . $wrapper . '>' . $html . '</div>';
 }

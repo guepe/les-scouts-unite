@@ -86,13 +86,37 @@
 				onChange: set( 'su_section' ),
 				__nextHasNoMarginBottom: true,
 			} ),
+			el( C.SelectControl, {
+				label: 'Type',
+				value: meta.su_type || '',
+				options: [
+					{ label: 'Réunion', value: '' },
+					{ label: 'Week-end', value: 'weekend' },
+					{ label: 'Camp', value: 'camp' },
+				],
+				onChange: function ( type ) {
+					// Une réunion ordinaire n'a pas de date de fin.
+					editor.editPost( { meta: type ? { su_type: type } : { su_type: '', su_jusqua: '' } } );
+				},
+				help: meta.su_type ? 'S’affiche aussi dans « Week-ends et camp » sur la page de la section.' : undefined,
+				__nextHasNoMarginBottom: true,
+			} ),
 			el( C.TextControl, {
-				label: 'Date',
+				label: meta.su_type ? 'Du' : 'Date',
 				type: 'date',
 				value: meta.su_date || '',
 				onChange: set( 'su_date' ),
 				__nextHasNoMarginBottom: true,
 			} ),
+			meta.su_type &&
+				el( C.TextControl, {
+					label: 'Jusqu’au',
+					type: 'date',
+					min: meta.su_date || undefined,
+					value: meta.su_jusqua || '',
+					onChange: set( 'su_jusqua' ),
+					__nextHasNoMarginBottom: true,
+				} ),
 			el(
 				C.Flex,
 				{ align: 'flex-start' },
