@@ -8,6 +8,13 @@ Il reprend la charte graphique du [template des sites d’unité](https://github
 
 L’accueil est un **panneau d’affichage** : le bleu de la fédération criblé de toppings, avec les affiches du moment épinglées dessus (prochaines réunions, activité à la une, inscriptions).
 
+## Modes d’emploi
+
+Deux guides pas à pas, à envoyer aux personnes qui tiennent le site :
+
+- [Mode d’emploi pour les animateurs](docs/mode-emploi-animateurs.md) : les réunions, une réunion annulée, les documents et la page de sa section.
+- [Mode d’emploi pour les chefs d’unité](docs/mode-emploi-chefs-unite.md) : les rôles, les comptes des animateurs, Réglages → Unité, les pages, les réglages et la mise à jour du thème.
+
 ## Installer le thème
 
 1. Télécharge `les-scouts-unite.zip` depuis la [dernière version publiée](https://github.com/guepe/les-scouts-unite/releases/latest).
