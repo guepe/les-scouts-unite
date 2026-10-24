@@ -31,6 +31,7 @@ function scoutsunite_unite_champs() {
 			'staff_email'  => array( 'E-mail du staff d’unité', 'email', 'staff@example.org' ),
 		),
 		'Les staffs de section' => array(),
+		'Les groupes WhatsApp'  => array(),
 		'Le clan IAmA'      => array(
 			'iama_chef'  => array( 'Responsable IAmA de l’unité', 'text', 'Prénom Nom' ),
 			'iama_email' => array( 'E-mail du clan IAmA', 'email', 'iama@example.org' ),
@@ -46,9 +47,12 @@ function scoutsunite_unite_champs() {
 		),
 	);
 	foreach ( scoutsunite_agenda_sections_age() as $slug => $nom ) {
-		$champs['Les staffs de section'][ $slug . '_chef' ]  = array( $nom . ' : chef ou cheffe de section', 'text', 'Totem – Prénom' );
-		$champs['Les staffs de section'][ $slug . '_staff' ] = array( $nom . ' : animateurs (un par ligne)', 'textarea', "Totem – Prénom\nTotem – Prénom" );
+		$champs['Les staffs de section'][ $slug . '_chef' ]  = array( $nom . ' : chef ou cheffe de section', 'text', 'Totem – Prénom (fonction) 0470 00 00 00' );
+		$champs['Les staffs de section'][ $slug . '_staff' ] = array( $nom . ' : animateurs (un par ligne)', 'textarea', "Totem – Prénom (santé) 0470 00 00 00\nTotem – Prénom (communication)" );
 		$champs['Les staffs de section'][ $slug . '_email' ] = array( $nom . ' : e-mail', 'email', $slug . '@example.org' );
+	}
+	foreach ( scoutsunite_agenda_sections() as $slug => $nom ) {
+		$champs['Les groupes WhatsApp'][ 'whatsapp_' . $slug ] = array( 'unite' === $slug ? 'Groupe de toute l’unité' : 'Groupe ' . scoutsunite_whatsapp_de( $slug ), 'url', 'https://chat.whatsapp.com/…' );
 	}
 	return $champs;
 }
@@ -179,14 +183,40 @@ function scoutsunite_unite_toutes() {
 }
 
 /**
- * « Akéla – Marie » → [ 'Akéla', 'Marie' ] ; sans tiret ni virgule, un prénom seul.
+ * « Akéla – Marie (santé, communication) 0470 12 34 56 » → [ 'Akéla', 'Marie', 'santé, communication', '0470 12 34 56' ].
+ * La fonction entre parenthèses et le GSM sont facultatifs ; sans tiret ni virgule, un prénom seul.
  *
  * @param string $ligne Une ligne du staff.
- * @return array Totem, prénom.
+ * @return array Totem, prénom, fonction, GSM.
  */
 function scoutsunite_unite_personne( $ligne ) {
-	$parts = preg_split( '/\s+[–—-]\s+|\s*,\s*/u', trim( $ligne ), 2 );
-	return 2 === count( $parts ) ? array( trim( $parts[0] ), trim( $parts[1] ) ) : array( '', trim( $parts[0] ) );
+	$ligne    = trim( $ligne );
+	$fonction = '';
+	$gsm      = '';
+	if ( preg_match( '/\(([^)]*)\)/u', $ligne, $m ) ) {
+		$fonction = trim( $m[1] );
+		$ligne    = str_replace( $m[0], ' ', $ligne );
+	}
+	// Un numéro belge ou international : « 0470 12 34 56 », « 0470/12.34.56 », « +32 470 12 34 56 ».
+	if ( preg_match( '/(?:\+|\b0)\d[\d .\/]{6,}\d/u', $ligne, $m ) ) {
+		$gsm   = trim( $m[0] );
+		$ligne = str_replace( $m[0], ' ', $ligne );
+	}
+	$ligne = preg_replace( array( '/\s+/u', '/^[\s–—,·-]+|[\s–—,·-]+$/u' ), array( ' ', '' ), $ligne );
+	$parts = preg_split( '/\s+[–—-]\s+|\s*,\s*/u', $ligne, 2 );
+	return 2 === count( $parts )
+		? array( trim( $parts[0] ), trim( $parts[1] ), $fonction, $gsm )
+		: array( '', trim( $parts[0] ), $fonction, $gsm );
+}
+
+/**
+ * GSM en lien cliquable.
+ *
+ * @param string $gsm Numéro tel qu'encodé.
+ * @return string HTML.
+ */
+function scoutsunite_unite_gsm( $gsm ) {
+	return '<a href="' . esc_url( 'tel:' . preg_replace( '/[^\d+]/', '', $gsm ), array( 'tel' ) ) . '">' . esc_html( $gsm ) . '</a>';
 }
 
 /**
@@ -200,7 +230,7 @@ function scoutsunite_bloc_staff( $attributes ) {
 	$chef    = scoutsunite_unite( $section . '_chef' );
 	$autres  = array_filter( array_map( 'trim', explode( "\n", scoutsunite_unite( $section . '_staff' ) ) ) );
 
-	$membre = function ( $totem, $prenom, $est_chef, $exemple = false ) {
+	$membre = function ( $totem, $prenom, $est_chef, $exemple = false, $fonction = '', $gsm = '' ) {
 		$initiale = mb_strtoupper( mb_substr( '' !== $totem ? $totem : $prenom, 0, 1 ) );
 		$texte    = function ( $t ) use ( $exemple ) {
 			return $exemple ? '<mark class="a-completer">' . esc_html( $t ) . '</mark>' : esc_html( $t );
@@ -215,6 +245,12 @@ function scoutsunite_bloc_staff( $attributes ) {
 		if ( $est_chef ) {
 			$html .= '<span class="staff__role">chef de section</span>';
 		}
+		if ( '' !== $fonction ) {
+			$html .= '<span class="staff__fonction">' . esc_html( $fonction ) . '</span>';
+		}
+		if ( '' !== $gsm ) {
+			$html .= '<span class="staff__gsm">' . scoutsunite_unite_gsm( $gsm ) . '</span>';
+		}
 		return $html . '</span></li>';
 	};
 
@@ -224,14 +260,14 @@ function scoutsunite_bloc_staff( $attributes ) {
 		$total  = '';
 	} else {
 		if ( '' !== $chef ) {
-			list( $totem, $prenom ) = scoutsunite_unite_personne( $chef );
-			$liste                 .= $membre( $totem, $prenom, true );
+			list( $totem, $prenom, $fonction, $gsm ) = scoutsunite_unite_personne( $chef );
+			$liste .= $membre( $totem, $prenom, true, false, $fonction, $gsm );
 		} else {
 			$liste .= $membre( 'Totem', 'Prénom', true, true );
 		}
 		foreach ( $autres as $ligne ) {
-			list( $totem, $prenom ) = scoutsunite_unite_personne( $ligne );
-			$liste                 .= $membre( $totem, $prenom, false );
+			list( $totem, $prenom, $fonction, $gsm ) = scoutsunite_unite_personne( $ligne );
+			$liste .= $membre( $totem, $prenom, false, false, $fonction, $gsm );
 		}
 		$nombre = count( $autres ) + ( '' !== $chef ? 1 : 0 );
 		$total  = '<p class="staff__total">' . $nombre . ( 1 === $nombre ? ' animateur' : ' animateurs' ) . '</p>';
@@ -243,7 +279,11 @@ function scoutsunite_bloc_staff( $attributes ) {
 			'style' => '--section: var(--wp--preset--color--' . $section . ');',
 		)
 	);
-	return '<div ' . $wrapper . '><ul class="staff__liste">' . $liste . '</ul>' . $total . '</div>';
+	$whatsapp = scoutsunite_whatsapp_cartes( array( $section ) );
+	if ( '' !== $whatsapp ) {
+		$whatsapp = '<div class="whatsapp">' . $whatsapp . '</div>';
+	}
+	return '<div ' . $wrapper . '><ul class="staff__liste">' . $liste . '</ul>' . $total . $whatsapp . '</div>';
 }
 
 /**
@@ -379,7 +419,8 @@ function scoutsunite_unite_editeur() {
 	wp_add_inline_script(
 		'scoutsunite-blocs',
 		'window.scoutsuniteUnite = ' . wp_json_encode( scoutsunite_unite_toutes() ) . ';'
-		. 'window.scoutsuniteSectionsBlocs = ' . wp_json_encode( scoutsunite_agenda_sections_age() ) . ';',
+		. 'window.scoutsuniteSectionsBlocs = ' . wp_json_encode( scoutsunite_agenda_sections_age() ) . ';'
+		. 'window.scoutsuniteGroupes = ' . wp_json_encode( scoutsunite_agenda_sections() ) . ';',
 		'before'
 	);
 }
@@ -440,7 +481,8 @@ function scoutsunite_unite_page() {
 		<h1>Coordonnées de l’unité</h1>
 		<p>Encode ces informations une seule fois : elles s’affichent d’elles-mêmes dans le pied de page, les infos pratiques de l’accueil, la page Contact et la page Inscription. Les liens des formulaires (Google Forms, extension de formulaire…) deviennent des boutons sur ces deux pages.
 			Un champ laissé vide garde son exemple surligné en orange sur le site, pour qu’on voie ce qu’il reste à compléter.</p>
-		<p>Pour les staffs, écris une personne par ligne sous la forme « Totem – Prénom » (un prénom seul si la personne n’a pas encore de totem). Le chef ou la cheffe de section s’affiche en premier sur la page de la section.</p>
+		<p>Pour les staffs, écris une personne par ligne sous la forme « Totem – Prénom » (un prénom seul si la personne n’a pas encore de totem). Tu peux ajouter sa fonction entre parenthèses et son GSM : « Castor – Marie (santé, communication) 0470 12 34 56 ». Le chef ou la cheffe de section s’affiche en premier sur la page de la section. Les GSM sont visibles par tout le monde sur le site et sur les feuilles à imprimer.</p>
+		<p>Pour un groupe WhatsApp, colle son lien d’invitation (dans WhatsApp : infos du groupe → Inviter via un lien). Le site en fait un QR code, affiché sur la page Contact, la page de la section et les feuilles à imprimer. Toute personne qui a le lien peut rejoindre le groupe : garde l’approbation des nouveaux membres activée dans WhatsApp.</p>
 		<p>Le nom de l’unité se règle dans <a href="<?php echo esc_url( admin_url( 'options-general.php' ) ); ?>">Réglages → Général</a> (titre et slogan du site).</p>
 		<form method="post" action="options.php">
 			<?php settings_fields( 'scoutsunite_unite' ); ?>

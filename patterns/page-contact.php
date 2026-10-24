@@ -119,6 +119,16 @@
 <!-- /wp:group --></div>
 <!-- /wp:group -->
 
+<!-- wp:heading {"style":{"spacing":{"margin":{"top":"var:preset|spacing|70"}}}} -->
+<h2 class="wp-block-heading" style="margin-top:var(--wp--preset--spacing--70)">Les groupes WhatsApp</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Les infos de dernière minute passent par WhatsApp : scanne le code de ta section avec ton téléphone, ou clique dessus.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:scoutsunite/whatsapp /-->
+
 <!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"scoutsunite/unite","args":{"key":"formulaire-contact"}}}},"style":{"spacing":{"margin":{"top":"var:preset|spacing|60"}}}} -->
 <p style="margin-top:var(--wp--preset--spacing--60)"><mark class="a-completer">Ajoute le lien du formulaire de contact dans Réglages → Unité.</mark></p>
 <!-- /wp:paragraph -->

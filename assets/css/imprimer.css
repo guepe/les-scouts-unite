@@ -1,0 +1,441 @@
+/*
+ * Feuilles à imprimer (inc/imprimer.php) : programme d'une section, convocation d'une réunion.
+ * Une page A4 à l'impression ; à l'écran, la même page posée sur un fond gris.
+ */
+
+@font-face { font-family: Muli; font-weight: 400; font-display: swap; src: url(../fonts/Muli-Regular.ttf); }
+@font-face { font-family: Muli; font-weight: 400; font-style: italic; font-display: swap; src: url(../fonts/Muli-Italic.ttf); }
+@font-face { font-family: Muli; font-weight: 700; font-display: swap; src: url(../fonts/Muli-Bold.ttf); }
+@font-face { font-family: Muli; font-weight: 800; font-display: swap; src: url(../fonts/Muli-ExtraBold.ttf); }
+@font-face { font-family: Muli; font-weight: 900; font-display: swap; src: url(../fonts/Muli-Black.ttf); }
+
+:root {
+	--bleu: #0A4275;
+	--trait: #DCE4EC;
+	--fond: #F2F5F8;
+}
+
+.feuille--baladins { --section: #00A0DE; }
+.feuille--louveteaux { --section: #296F52; }
+.feuille--eclaireurs { --section: #004F9F; }
+.feuille--pionniers { --section: #D51317; }
+.feuille--unite { --section: #95C11F; --section-texte: #304A3C; }
+.feuille--iama { --section: #304A3C; }
+
+@page {
+	size: A4;
+	margin: 12mm;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html {
+	-webkit-print-color-adjust: exact;
+	print-color-adjust: exact;
+}
+
+body {
+	margin: 0;
+	background: #C9D3DD;
+	color: var(--bleu);
+	font: 400 10.5pt/1.45 Muli, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+/* Barre d'outils, à l'écran seulement */
+
+.barre {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.75rem 1.25rem;
+	max-width: 210mm;
+	margin: 0 auto;
+	padding: 1rem;
+	font-size: 0.9375rem;
+}
+
+.barre a {
+	color: var(--bleu);
+	font-weight: 800;
+}
+
+.barre select,
+.barre button {
+	font: inherit;
+}
+
+.barre__imprimer {
+	margin-left: auto;
+	padding: 0.6rem 1.1rem;
+	border: 0;
+	border-radius: 999px;
+	background: var(--bleu);
+	color: #fff;
+	font-weight: 800 !important;
+	cursor: pointer;
+}
+
+.barre__aide {
+	flex-basis: 100%;
+	margin: 0;
+	text-align: right;
+	font-size: 0.8125rem;
+	opacity: 0.8;
+}
+
+/* La feuille */
+
+.feuille {
+	width: 210mm;
+	max-width: 100%;
+	min-height: 297mm;
+	margin: 0 auto 2rem;
+	padding: 14mm;
+	background: #fff;
+	border-top: 4mm solid var(--section);
+	box-shadow: 0 2px 3px rgba(4, 30, 56, 0.18), 0 14px 28px -6px rgba(4, 30, 56, 0.35);
+}
+
+.feuille h1,
+.feuille h2,
+.feuille p {
+	margin: 0;
+}
+
+.feuille__entete {
+	display: flex;
+	align-items: center;
+	gap: 7mm;
+	padding-bottom: 6mm;
+	border-bottom: 0.6mm solid var(--trait);
+}
+
+.feuille__logo {
+	flex: none;
+	width: 30mm;
+	max-height: 30mm;
+	object-fit: contain;
+}
+
+.feuille--unite .feuille__logo,
+.feuille--iama .feuille__logo {
+	width: 48mm;
+}
+
+.feuille__unite {
+	font-weight: 800;
+	font-size: 10pt;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	opacity: 0.75;
+}
+
+.feuille h1 {
+	color: var(--section-texte, var(--section));
+	font-weight: 900;
+	font-size: 34pt;
+	line-height: 1;
+	letter-spacing: -0.02em;
+}
+
+.feuille__titre {
+	margin-top: 1.5mm !important;
+	font-weight: 900;
+	font-size: 16pt;
+	line-height: 1.15;
+}
+
+.feuille__titre span {
+	font-weight: 700;
+	opacity: 0.7;
+}
+
+.feuille__titre span::before {
+	content: "· ";
+}
+
+.feuille__vide {
+	margin: 10mm 0 !important;
+	font-size: 12pt;
+}
+
+/* Programme */
+
+.feuille__reunions {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.feuille__reunion {
+	display: flex;
+	gap: 5mm;
+	padding: 2.5mm 0;
+	border-bottom: 0.3mm solid var(--trait);
+	break-inside: avoid;
+}
+
+.feuille__pastille {
+	flex: none;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 22mm;
+	padding: 1.5mm 1mm;
+	border-radius: 2.5mm;
+	background: var(--section);
+	color: #fff;
+	line-height: 1.1;
+	text-align: center;
+}
+
+/* Le vert de l'unité est trop clair pour du texte blanc. */
+.feuille__reunion.feuille--unite .feuille__pastille {
+	color: var(--section-texte);
+}
+
+.feuille__pastille span {
+	font-weight: 800;
+	font-size: 8.5pt;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.feuille__pastille strong {
+	font-weight: 900;
+	font-size: 17pt;
+	white-space: nowrap;
+}
+
+.feuille__details {
+	min-width: 0;
+	padding-top: 0.5mm;
+}
+
+.feuille__quoi {
+	font-weight: 900;
+	font-size: 12.5pt;
+	line-height: 1.2;
+}
+
+.feuille__tag {
+	display: inline-block;
+	margin-left: 1mm;
+	padding: 0.3mm 2mm;
+	border: 0.3mm solid var(--section);
+	border-radius: 999px;
+	color: var(--bleu);
+	font-weight: 800;
+	font-size: 8pt;
+	vertical-align: 0.15em;
+}
+
+.feuille__infos {
+	font-weight: 700;
+}
+
+.feuille__notes {
+	margin-top: 1mm;
+	font-size: 9.5pt;
+}
+
+.feuille__notes > * {
+	margin: 0 0 1mm;
+}
+
+.feuille__notes ul,
+.feuille__notes ol {
+	padding-left: 5mm;
+}
+
+.feuille__notes img {
+	max-width: 60mm;
+	height: auto;
+}
+
+/* Convocation */
+
+.feuille__convocation {
+	padding: 8mm 0 4mm;
+}
+
+.feuille__quand {
+	color: var(--section-texte, var(--section));
+	font-weight: 900;
+	font-size: 24pt;
+	line-height: 1.1;
+}
+
+.feuille__pratique {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 3mm 12mm;
+	margin: 5mm 0 6mm;
+}
+
+.feuille__pratique dt {
+	font-weight: 800;
+	font-size: 8.5pt;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	opacity: 0.7;
+}
+
+.feuille__pratique dd {
+	margin: 0;
+	font-weight: 900;
+	font-size: 15pt;
+}
+
+.feuille__convocation .feuille__notes {
+	padding-top: 5mm;
+	border-top: 0.3mm solid var(--trait);
+	font-size: 11pt;
+}
+
+.feuille__convocation .feuille__notes > * {
+	margin-bottom: 2.5mm;
+}
+
+/* Staff et pied */
+
+.feuille__staff {
+	display: flex;
+	gap: 6mm;
+	margin-top: 7mm;
+	padding: 5mm 6mm;
+	border-radius: 2.5mm;
+	background: var(--fond);
+	break-inside: avoid;
+}
+
+.feuille__equipe {
+	flex: 1;
+	min-width: 0;
+}
+
+.feuille__staff h2 {
+	margin-bottom: 2mm;
+	font-weight: 900;
+	font-size: 12pt;
+}
+
+.feuille__membres {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(42mm, 1fr));
+	gap: 2mm 5mm;
+	margin: 0 0 3mm;
+	padding: 0;
+	list-style: none;
+}
+
+.feuille__membres li {
+	display: flex;
+	flex-direction: column;
+	line-height: 1.3;
+}
+
+.feuille__membres em {
+	font-style: normal;
+	font-size: 8.5pt;
+	opacity: 0.75;
+}
+
+.feuille__gsm {
+	font-weight: 800;
+	font-size: 9.5pt;
+	white-space: nowrap;
+}
+
+/* Groupes WhatsApp : un QR code par groupe, à droite du staff, à scanner depuis le frigo */
+
+.feuille__whatsapp {
+	display: flex;
+	flex: none;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	align-content: flex-start;
+	gap: 2mm 4mm;
+	max-width: 76mm;
+}
+
+.feuille__groupe {
+	width: 30mm;
+	text-align: center;
+}
+
+.feuille__groupe .qr {
+	display: block;
+	width: 26mm;
+	height: 26mm;
+	margin: 0 auto 1mm;
+}
+
+.feuille__groupe p {
+	font-weight: 800;
+	font-size: 8pt;
+	line-height: 1.2;
+}
+
+.feuille__scanne {
+	flex-basis: 100%;
+	font-size: 7.5pt;
+	text-align: center;
+	opacity: 0.75;
+}
+
+.feuille__contact {
+	font-size: 9.5pt;
+}
+
+.feuille__pied {
+	margin-top: 5mm;
+	font-size: 8.5pt;
+	opacity: 0.75;
+}
+
+@media screen and (max-width: 220mm) {
+	.feuille {
+		min-height: 0;
+		padding: 7mm 5mm;
+	}
+
+	.feuille__entete {
+		gap: 4mm;
+	}
+
+	.feuille__logo {
+		width: 20mm;
+	}
+
+	.feuille h1 {
+		font-size: 24pt;
+	}
+}
+
+@media print {
+	body {
+		background: #fff;
+	}
+
+	.barre {
+		display: none;
+	}
+
+	.feuille {
+		width: auto;
+		min-height: 0;
+		margin: 0;
+		padding: 0;
+		border-top: 0;
+		box-shadow: none;
+	}
+
+	.feuille__entete {
+		border-top: 3mm solid var(--section);
+		padding-top: 5mm;
+	}
+}

@@ -166,6 +166,42 @@
 		},
 	} ) );
 
+	wp.blocks.registerBlockType( 'scoutsunite/whatsapp', Object.assign( {}, commun, {
+		title: 'Groupes WhatsApp',
+		description: 'Les groupes WhatsApp encodés dans Réglages → Unité, chacun avec son QR code.',
+		icon: 'format-chat',
+		attributes: { section: { type: 'string', default: '' } },
+		edit: function ( props ) {
+			var sections = window.scoutsuniteGroupes || {};
+			return el(
+				wp.element.Fragment,
+				null,
+				el(
+					InspectorControls,
+					null,
+					el(
+						PanelBody,
+						{ title: 'Groupes' },
+						el( SelectControl, {
+							label: 'Groupes affichés',
+							value: props.attributes.section,
+							options: [ { label: 'Tous les groupes', value: '' } ].concat(
+								Object.keys( sections ).map( function ( slug ) {
+									return { label: 'unite' === slug ? sections[ slug ] : sections[ slug ] + ' (et l’unité)', value: slug };
+								} )
+							),
+							help: 'Les liens des groupes se modifient dans Réglages → Unité.',
+							onChange: function ( section ) {
+								props.setAttributes( { section: section } );
+							},
+						} )
+					)
+				),
+				apercu( 'scoutsunite/whatsapp' )( props )
+			);
+		},
+	} ) );
+
 	// Coordonnées de l'unité (Réglages → Unité) : l'éditeur montre les vraies valeurs.
 	if ( wp.blocks.registerBlockBindingsSource ) {
 		wp.blocks.registerBlockBindingsSource( {

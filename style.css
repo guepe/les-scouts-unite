@@ -3,7 +3,7 @@ Theme Name: Les Scouts – Unité
 Theme URI: https://github.com/guepe/les-scouts-unite
 Author: Pierre-Henri Delaval
 Description: Thème de bloc pour le site d’une unité Les Scouts asbl, construit sur la charte graphique de la fédération : bleu de la fédération, toppings, couleurs de section et police Muli. Le nom de l’unité vient du titre du site ; tout se modifie dans l’éditeur de site.
-Version: 2.7.1
+Version: 2.8.0
 Requires at least: 6.5
 Tested up to: 6.8
 Requires PHP: 7.4
@@ -955,6 +955,18 @@ a.lien-fleche:hover::after {
 	font-size: var(--wp--preset--font-size--small);
 }
 
+/* « Programme à imprimer », « Convocation à imprimer » : vers les feuilles d'inc/imprimer.php. */
+.lien-imprimer {
+	margin-top: var(--wp--preset--spacing--30);
+	font-size: var(--wp--preset--font-size--small);
+	font-weight: 800;
+}
+
+.lien-imprimer a {
+	color: inherit;
+	text-underline-offset: 0.2em;
+}
+
 /* Week-ends et camps : une étiquette dans les lignes d'agenda… */
 .ligne__type {
 	display: inline-block;
@@ -1097,6 +1109,79 @@ a.lien-fleche:hover::after {
 	font-size: 0.75rem;
 	font-weight: 800;
 	line-height: 1.5;
+}
+
+.staff__fonction {
+	margin-top: 0.2rem;
+	font-size: var(--wp--preset--font-size--small);
+	line-height: 1.3;
+	color: var(--su-vert-fonce);
+}
+
+.staff__gsm a {
+	font-size: var(--wp--preset--font-size--small);
+	font-weight: 800;
+	color: inherit;
+	white-space: nowrap;
+}
+
+/* Groupes WhatsApp (inc/whatsapp.php) : une carte par groupe, QR code et lien. */
+.whatsapp {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+	gap: 1rem;
+	margin-top: var(--wp--preset--spacing--40);
+}
+
+.whatsapp__groupe {
+	--section: var(--su-bleu);
+	display: grid;
+	grid-template-columns: 6.5rem 1fr;
+	align-items: center;
+	gap: 1rem;
+	padding: 0.75rem;
+	border: 2px solid var(--su-trait);
+	border-left: 0.4rem solid var(--section);
+	border-radius: 0.5rem;
+	background: #fff;
+	color: var(--su-bleu);
+	text-decoration: none;
+	transition: border-color 0.2s var(--su-ease);
+}
+
+.whatsapp__groupe:hover {
+	border-color: var(--section);
+}
+
+.whatsapp--baladins { --section: var(--wp--preset--color--baladins); }
+.whatsapp--louveteaux { --section: var(--wp--preset--color--louveteaux); }
+.whatsapp--eclaireurs { --section: var(--wp--preset--color--eclaireurs); }
+.whatsapp--pionniers { --section: var(--wp--preset--color--pionniers); }
+.whatsapp--unite { --section: var(--su-vert); }
+.whatsapp--iama { --section: var(--su-vert-fonce); }
+
+.whatsapp__groupe .qr {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.whatsapp__texte {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	font-size: var(--wp--preset--font-size--small);
+	line-height: 1.4;
+}
+
+.whatsapp__texte strong {
+	font-size: 1.0625rem;
+	font-weight: 900;
+	line-height: 1.2;
+	text-decoration: underline;
+	text-decoration-color: var(--section);
+	text-decoration-thickness: 2px;
+	text-underline-offset: 0.2em;
 }
 
 .staff__total {

@@ -649,6 +649,7 @@ function scoutsunite_bloc_prochaine_reunion( $attributes ) {
 		}
 		$html .= implode( ', ', $dates ) . '. <a href="' . esc_url( add_query_arg( 'section', $section, get_post_type_archive_link( 'reunion' ) ) ) . '">Voir l’agenda</a></p>';
 	}
+	$html .= '<p class="lien-imprimer"><a href="' . esc_url( scoutsunite_imprimer_url( $section ) ) . '">Programme à imprimer</a></p>';
 	return '<div ' . $wrapper . '>' . $html . '</div>';
 }
 
@@ -698,6 +699,7 @@ function scoutsunite_bloc_agenda() {
 		$html .= scoutsunite_agenda_ligne( isset( $sections[ $section ] ) ? $section : 'unite', esc_html( $sections[ $section ] ?? '' ), $quoi, scoutsunite_agenda_horaire( $r->ID ), $notes );
 	}
 	$html .= '</div>';
+	$html .= '<p class="lien-imprimer"><a href="' . esc_url( scoutsunite_imprimer_url( $filtre ) ) . '">' . esc_html( $filtre ? 'Programme ' . ( array( 'unite' => 'de toute l’unité', 'iama' => 'du clan IAmA' )[ $filtre ] ?? 'des ' . $sections[ $filtre ] ) . ' à imprimer' : 'Agenda à imprimer' ) . '</a></p>';
 
 	return '<div ' . get_block_wrapper_attributes( array( 'class' => 'agenda' ) ) . '>' . $nav . $html . '</div>';
 }
@@ -722,7 +724,7 @@ function scoutsunite_bloc_reunion( $attributes, $content, $block ) {
 		esc_html( $sections[ $section ] ?? '' ),
 		$quoi,
 		scoutsunite_agenda_horaire( $post_id )
-	) . '</div>';
+	) . '<p class="lien-imprimer"><a href="' . esc_url( scoutsunite_imprimer_url( '', $post_id ) ) . '">Convocation à imprimer</a></p></div>';
 }
 
 /**

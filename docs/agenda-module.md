@@ -209,6 +209,21 @@ Les blocs :
 - Dans l'administration, ses listes de réunions et de pages sont filtrées sur ses sections ; sur une page, l'éditeur est verrouillé en `templateLock: 'contentOnly'` (filtre `block_editor_settings_all`).
 - Les rôles sont (ré)écrits quand `SCOUTSUNITE_DROITS_VERSION` change (option `scoutsunite_droits_version`).
 
+## Feuilles à imprimer (`inc/imprimer.php`)
+
+- Sur `template_redirect`, une adresse portant `?imprimer` est servie par une page HTML autonome (sans en-tête ni pied du site, `noindex`), stylée par `assets/css/imprimer.css` (A4, `@page`, barre d'outils masquée à l'impression). Le PDF vient de la fenêtre d'impression du navigateur : aucune bibliothèque côté serveur.
+- `/agenda/?section={slug}&imprimer&mois={1|3|6|12}` : programme. Une section d'âge reçoit aussi les activités `unite`, comme dans « Temps forts ». Sans section valide : tout l'agenda. Durée par défaut : 3 mois.
+- `/agenda/{réunion}/?imprimer` : convocation d'une réunion (date en grand, horaire, lieu, notes complètes).
+- Le pied de chaque feuille liste le staff de la section, ses contacts et l'adresse du local ; un champ vide de Réglages → Unité est omis, sans exemple « à compléter ».
+- Liens `p.lien-imprimer` : bloc « Prochaine réunion d'une section », bloc « Agenda complet » (selon le filtre), bloc « Détails de la réunion » et action de ligne dans la liste des réunions (réunions publiées seulement).
+
+## Staff et groupes WhatsApp (`inc/unite.php`, `inc/whatsapp.php`)
+
+- Une ligne du staff : `Totem – Prénom (fonction) GSM`. `scoutsunite_unite_personne()` renvoie `[ totem, prénom, fonction, gsm ]` : la fonction est le texte entre parenthèses, le GSM le premier numéro commençant par `0` ou `+`. Les anciennes lignes « Totem – Prénom » ou « Totem, Prénom » donnent le même résultat qu'avant.
+- Champs `whatsapp_{section}` (URL) pour chaque entrée de `scoutsunite_agenda_sections()`, y compris `unite` et `iama`.
+- `scoutsunite_qr_svg( $texte, $label )` dessine le QR (niveau M, mode octet, marge de 4 modules) en un seul tracé SVG, avec la bibliothèque MIT de Kazuhiko Arase copiée dans `inc/lib/qrcode.php`, ses classes et constantes préfixées `SU_`.
+- Bloc `scoutsunite/whatsapp` (attribut `section`, `''` = tous les groupes, sinon la section et l'unité), une carte `a.whatsapp__groupe` par groupe encodé. L'affiche du staff de section ajoute la carte de sa section ; les feuilles à imprimer, celles de la section et de l'unité.
+
 ## Installation et mise à jour
 
 - **Activation** : `after_switch_theme` appelle `flush_rewrite_rules()` (après `scoutsunite_agenda_register()`), pour que `/agenda/` existe dès l'activation.

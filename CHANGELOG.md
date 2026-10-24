@@ -2,6 +2,12 @@
 
 Les versions suivent le numéro `Version:` de `style.css`. Chaque version publiée a son zip dans les [Releases](https://github.com/guepe/les-scouts-unite/releases).
 
+## 2.8.0 – 2026-10-24
+
+- **Feuilles à imprimer** pour le frigo, à imprimer ou à enregistrer en PDF : le programme d’une section (ou de toute l’unité) sur 1 à 12 mois, et la convocation d’une réunion avec ses notes. Chaque feuille porte le logo de la section, le staff et les contacts de Réglages → Unité. Les liens se trouvent sur les pages de section, sous l’agenda, sur la page d’une réunion et dans la liste des réunions de l’administration.
+- **Fonction et GSM des animateurs** dans Réglages → Unité : « Castor – Marie (santé, communication) 0470 12 34 56 ». Ils s’affichent sous chaque badge du staff (GSM cliquable) et sur les feuilles à imprimer. Les anciennes lignes « Totem – Prénom » restent valables.
+- **Groupes WhatsApp** : un lien d’invitation par section, pour toute l’unité et pour le clan IAmA, dans Réglages → Unité. Chaque groupe s’affiche avec son QR code, dessiné par le thème sans service extérieur : dans l’affiche du staff de la section, sur la page Contact (nouveau bloc « Groupes WhatsApp ») et sur les feuilles à imprimer.
+
 ## 2.7.1 – 2026-10-23
 
 - Un week-end ou un camp répété chaque semaine garde sa date de fin dans chaque copie.
