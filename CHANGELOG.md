@@ -2,6 +2,11 @@
 
 Les versions suivent le numéro `Version:` de `style.css`. Chaque version publiée a son zip dans les [Releases](https://github.com/guepe/les-scouts-unite/releases).
 
+## 2.10.1 – 2026-10-24
+
+- **Correction importante des droits des animateurs** : sur sa page de section, un animateur voyait « Soumettre à la relecture » au lieu d’« Enregistrer ». S’il cliquait, la page passait en attente de relecture et disparaissait du site. L’animateur peut désormais enregistrer la page de ses sections directement, et une page publiée qu’il modifie reste publiée. Il ne peut toujours pas créer de page, ni toucher à celles des autres sections. Les rôles sont réécrits automatiquement à la mise à jour.
+- Modes d’emploi : « Enregistrer » à la place de « Mettre à jour », le libellé de WordPress 7.
+
 ## 2.10.0 – 2026-10-24
 
 - **Documents à télécharger** : nouveau menu **Documents** dans l’administration (titre, fichier de la médiathèque, section ou toute l’unité, une ligne d’explication, ordre). Ils s’affichent sous « Les documents » sur chaque page de section (avec ceux de toute l’unité) et sur une nouvelle page « Documents », rangés par section. Un animateur ne gère que les documents de ses sections. Les pages de section déjà créées reçoivent le bloc automatiquement.

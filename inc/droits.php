@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /** Version des rôles : l'augmenter pour réécrire les rôles au prochain chargement. */
-const SCOUTSUNITE_DROITS_VERSION = 2;
+const SCOUTSUNITE_DROITS_VERSION = 3;
 
 /**
  * Droits sur les réunions (type de contenu « reunion »).
@@ -67,6 +67,9 @@ function scoutsunite_droits_roles() {
 				'edit_pages'            => true,
 				'edit_others_pages'     => true,
 				'edit_published_pages'  => true,
+				// Sans ce droit, l'éditeur propose « Soumettre à la relecture » et la page quitte le site.
+				// Il ne vaut que pour les pages de ses sections (map_meta_cap) ; créer une page reste interdit.
+				'publish_pages'         => true,
 				'scoutsunite_animateur' => true,
 			),
 			$reunions
@@ -250,6 +253,54 @@ function scoutsunite_droits_avis() {
 	}
 }
 add_action( 'admin_notices', 'scoutsunite_droits_avis' );
+
+/**
+ * Un animateur ne crée pas de page : il modifie seulement celles de ses sections.
+ * Bloque la création par l'API (l'éditeur, une application) et l'écran « Ajouter une page ».
+ *
+ * @param stdClass|WP_Error $page    Page préparée pour l'enregistrement.
+ * @param WP_REST_Request   $request Requête.
+ * @return stdClass|WP_Error
+ */
+function scoutsunite_droits_pas_de_nouvelle_page( $page, $request ) {
+	if ( ! is_wp_error( $page ) && empty( $page->ID ) && scoutsunite_droits_est_limite() ) {
+		return new WP_Error( 'rest_cannot_create', 'Un animateur ne peut pas créer de page.', array( 'status' => 403 ) );
+	}
+	return $page;
+}
+add_filter( 'rest_pre_insert_page', 'scoutsunite_droits_pas_de_nouvelle_page', 10, 2 );
+
+function scoutsunite_droits_ecran_nouvelle_page() {
+	if ( isset( $_GET['post_type'] ) && 'page' === $_GET['post_type'] && scoutsunite_droits_est_limite() ) { // phpcs:ignore WordPress.Security.NonceVerification
+		wp_die( 'Un animateur ne peut pas créer de page : il modifie la page de sa section.', '', array( 'response' => 403, 'back_link' => true ) );
+	}
+}
+add_action( 'load-post-new.php', 'scoutsunite_droits_ecran_nouvelle_page' );
+
+function scoutsunite_droits_menu() {
+	if ( scoutsunite_droits_est_limite() ) {
+		remove_submenu_page( 'edit.php?post_type=page', 'post-new.php?post_type=page' );
+	}
+}
+add_action( 'admin_menu', 'scoutsunite_droits_menu', 99 );
+
+/**
+ * Filet de sécurité : une page publiée modifiée par un animateur reste publiée,
+ * même si l'éditeur demande « en attente de relecture ».
+ *
+ * @param array $data    Données de la page.
+ * @param array $postarr Données reçues, avec l'ID.
+ * @return array
+ */
+function scoutsunite_droits_garde_publiee( $data, $postarr ) {
+	if ( 'page' === $data['post_type'] && 'pending' === $data['post_status'] && ! empty( $postarr['ID'] ) && scoutsunite_droits_est_limite()
+		&& 'publish' === get_post_status( $postarr['ID'] ) ) {
+		$data['post_status'] = 'publish';
+		$data['post_name']   = get_post_field( 'post_name', $postarr['ID'] );
+	}
+	return $data;
+}
+add_filter( 'wp_insert_post_data', 'scoutsunite_droits_garde_publiee', 10, 2 );
 
 /* ---------------------------------------------------------------------------
    Profil : les sections de l'animateur

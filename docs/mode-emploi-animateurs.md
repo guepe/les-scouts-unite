@@ -44,8 +44,8 @@ Tant que la section ou la date manque, le bouton Publier reste bloqué et un mes
 
 Toutes tes réunions sont dans **Agenda → Toutes les réunions**, de la plus proche à la plus lointaine. Clique sur une réunion pour l’ouvrir.
 
-- **Modifier ou déplacer** : change la date, l’heure, le lieu ou les notes dans le panneau « Quand et où ? », puis clique sur **Mettre à jour**. Le site et le calendrier des parents suivent tout seuls (Google Agenda peut mettre quelques heures).
-- **Annuler** : ne supprime pas la réunion. Coche **Réunion annulée** et, si tu veux, écris une ligne dans **Pourquoi ?** (« Local indisponible, rendez-vous samedi prochain »), puis **Mettre à jour**. La réunion reste affichée jusqu’à sa date, barrée avec une étiquette rouge « Annulée » : les parents le voient sur le site, sur le programme imprimé et dans leur calendrier. Sur ta page, la « Prochaine réunion » passe à la suivante.
+- **Modifier ou déplacer** : change la date, l’heure, le lieu ou les notes dans le panneau « Quand et où ? », puis clique sur **Enregistrer** (en haut à droite). Le site et le calendrier des parents suivent tout seuls (Google Agenda peut mettre quelques heures).
+- **Annuler** : ne supprime pas la réunion. Coche **Réunion annulée** et, si tu veux, écris une ligne dans **Pourquoi ?** (« Local indisponible, rendez-vous samedi prochain »), puis **Enregistrer**. La réunion reste affichée jusqu’à sa date, barrée avec une étiquette rouge « Annulée » : les parents le voient sur le site, sur le programme imprimé et dans leur calendrier. Sur ta page, la « Prochaine réunion » passe à la suivante.
 - **Supprimer** : seulement pour une erreur ou une semaine de congé créée par la répétition. Dans la liste, survole la réunion et clique sur **Corbeille**.
 
 Une réunion annulée par erreur se rétablit en décochant la case.
@@ -71,7 +71,7 @@ Tu peux changer les textes et les images de la page de ta section. La mise en pa
 1. Clique sur **Pages**, puis sur le nom de ta section (par exemple « Éclaireurs »).
 2. Clique dans un texte pour le réécrire, par exemple sous « L’année chez les … » : raconte comment vit ta section, ses traditions, ce que les enfants y apprennent.
 3. Pour une image, clique dessus puis sur **Remplacer**.
-4. Clique sur **Mettre à jour**.
+4. Clique sur **Enregistrer**, en haut à droite.
 
 Certaines parties de la page se remplissent toutes seules et ne se modifient pas ici :
 

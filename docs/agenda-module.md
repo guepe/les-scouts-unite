@@ -202,12 +202,13 @@ Les blocs :
 ## Droits (`inc/droits.php`)
 
 - Le type `reunion` a ses propres droits : `capability_type => [ 'reunion', 'reunions' ]` et `map_meta_cap => true`. Administrateur et éditeur reçoivent `edit_reunions`, `publish_reunions`, etc. Les champs ne s'enregistrent que si `user_can( $user_id, 'edit_post', $post_id )` (`auth_callback`).
-- Rôle **Animateur** (`scoutsunite_animateur`) : `read`, `upload_files`, `edit_pages`, `edit_others_pages`, `edit_published_pages`, tous les droits `*_reunions`, et le droit repère `scoutsunite_animateur`. Ses sections sont dans la méta utilisateur `scoutsunite_sections` (tableau), cochées par un administrateur (`promote_users`) dans le profil.
+- Rôle **Animateur** (`scoutsunite_animateur`) : `read`, `upload_files`, `edit_pages`, `edit_others_pages`, `edit_published_pages`, `publish_pages` (sans lui, l'éditeur propose « Soumettre à la relecture » et la page quitte le site), tous les droits `*_reunions` et `*_documents`, et le droit repère `scoutsunite_animateur`. Ses sections sont dans la méta utilisateur `scoutsunite_sections` (tableau), cochées par un administrateur (`promote_users`) dans le profil.
 - Rôle **Staff d'unité** (`scoutsunite_staff`) : les droits de l'éditeur, les droits `*_reunions` et `manage_unite`, qui ouvre Réglages → Unité (avec `option_page_capability_scoutsunite_unite`).
 - Filtre `map_meta_cap` : pour un animateur (droit repère sans `manage_unite`), `edit_post`, `delete_post` et `publish_post` sur une réunion ne passent que si sa `su_section` est l'une des siennes (ou vide, pour une réunion qu'il crée) ; sur une page, seulement si son identifiant (`post_name`) est l'une de ses sections, et jamais la suppression.
 - Le `sanitize_callback` de `su_section` ramène une section interdite à la première de l'animateur : il ne peut ni créer ni déplacer une réunion hors de ses sections.
 - Dans l'administration, ses listes de réunions et de pages sont filtrées sur ses sections ; sur une page, l'éditeur est verrouillé en `templateLock: 'contentOnly'` (filtre `block_editor_settings_all`).
-- Les rôles sont (ré)écrits quand `SCOUTSUNITE_DROITS_VERSION` change (option `scoutsunite_droits_version`).
+- Un animateur ne crée pas de page : `rest_pre_insert_page` refuse une nouvelle page, `load-post-new.php` refuse l'écran « Ajouter une page » et le sous-menu est retiré. Filet de sécurité sur `wp_insert_post_data` : une page publiée qu'il modifie garde le statut `publish` et son identifiant.
+- Les rôles sont (ré)écrits quand `SCOUTSUNITE_DROITS_VERSION` change (option `scoutsunite_droits_version`, version 3 depuis la 2.10.1).
 
 ## Documents (`inc/documents.php`)
 
