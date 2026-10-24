@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Fiche 6 – Les pages et le menu</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&amp;family=Mulish:wght@400;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0A4275}a:hover{color:#062F55}
+</style>
+</helmet>
+<div style="width: 540px; height: 960px; box-sizing: border-box; background: #F2F5F8; color: #0A4275; font-family: Mulish, sans-serif; display: flex; flex-direction: column">
+  <div style="background: #304A3C; color: #FFFFFF; padding: 30px 36px 26px; display: flex; align-items: center; gap: 18px">
+    <span style="width: 58px; height: 58px; flex: none; border-radius: 50%; background: #EF7B00; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 900">6</span>
+    <h1 style="margin: 0; font-size: 32px; line-height: 1.05; font-weight: 900">Les pages et le menu</h1>
+  </div>
+  <div style="padding: 22px 36px; display: flex; flex-direction: column; gap: 14px; flex: 1">
+    <p style="margin: 0; font-size: 16px; line-height: 1.45">Le menu se construit tout seul, à une condition : chaque page a <strong>exactement</strong> le bon <strong>slug</strong> (la fin de son adresse).</p>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 12px; background: #FFFFFF; padding: 12px 14px; font-size: 14px; line-height: 1.35">
+      <span>Les sections</span><strong>sections</strong>
+      <span>Baladins…</span><strong>baladins, louveteaux…</strong>
+      <span>Inscription</span><strong>inscription</strong>
+      <span>Contact</span><strong>contact</strong>
+      <span>Documents</span><strong>documents</strong>
+      <span>Questions fréquentes</span><strong>questions-frequentes</strong>
+    </div>
+    <p style="margin: 0; font-size: 15px; line-height: 1.4">Pour le vérifier : <strong>Pages</strong>, survole la page, <strong>Modification rapide</strong>.</p>
+    <img src="/_blob/2dab3a9a2f5ad1cdb79212d44894309d" alt="La modification rapide, le champ Slug entouré" style="width: 100%; height: auto; background: #FFFFFF; border: 2px solid #DCE4EC">
+    <p style="margin: 0; font-size: 15px; line-height: 1.4">Documents et Questions fréquentes apparaissent dans le menu <strong>Parents</strong> dès qu’elles sont <strong>publiées</strong> :</p>
+    <img src="/_blob/c4aa07e644192d6ace723c707856300d" alt="Le menu Parents ouvert sur le site" style="width: 100%; height: auto; border: 2px solid #DCE4EC">
+    <div style="margin-top: auto; background: #FFFFFF; border-top: 5px solid #95C11F; padding: 12px 18px; font-size: 15px; line-height: 1.45"><strong>Nouvelle page ?</strong> À la création, WordPress propose les compositions « Pages de l’unité » : choisis la bonne, puis remplace les exemples surlignés.</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":540,"height":960}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

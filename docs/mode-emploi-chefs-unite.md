@@ -2,6 +2,8 @@
 
 Thème 2.10.0 · 24 octobre 2026
 
+> Plus rapide à lire : [le site en 8 fiches](fiches-chefs-unite/), avec les vrais écrans ([PDF](fiches-chefs-unite/fiches-chefs-unite.pdf)).
+
 Ce guide est pour le staff d’unité : régler le site une fois, donner accès aux animateurs, puis tenir à jour ce qui concerne toute l’unité. Pour les réunions et les documents d’une section, le [guide des animateurs](mode-emploi-animateurs.md) explique le détail ; tu peux faire tout ce qu’il décrit, pour toutes les sections.
 
 ## Les rôles

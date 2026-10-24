@@ -4,7 +4,7 @@ Un geste par fiche, avec les vrais écrans de WordPress. Les fiches se lisent su
 
 **[Télécharger toutes les fiches en PDF](fiches-animateurs.pdf)** (8 pages)
 
-Le même contenu en texte, plus détaillé : [Mode d’emploi pour les animateurs](../mode-emploi-animateurs.md). Pour le staff d’unité : [Mode d’emploi pour les chefs d’unité](../mode-emploi-chefs-unite.md).
+Le même contenu en texte, plus détaillé : [Mode d’emploi pour les animateurs](../mode-emploi-animateurs.md). Pour le staff d’unité : [les 8 fiches des chefs d’unité](../fiches-chefs-unite/) et le [mode d’emploi pour les chefs d’unité](../mode-emploi-chefs-unite.md).
 
 <p>
 <a href="00-couverture.png"><img src="00-couverture.png" width="260" alt="Couverture : le site de l’unité en 7 fiches"></a>
