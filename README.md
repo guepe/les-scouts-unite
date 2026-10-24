@@ -12,7 +12,8 @@ L’accueil est un **panneau d’affichage** : le bleu de la fédération cribl�
 
 Deux guides pas à pas, à envoyer aux personnes qui tiennent le site :
 
-- [Mode d’emploi pour les animateurs](docs/mode-emploi-animateurs.md) : les réunions, une réunion annulée, les documents et la page de sa section.
+- [Le site en 7 fiches, pour les animateurs](docs/fiches-animateurs/) : un geste par fiche, avec les vrais écrans, à lire sur un téléphone ou à envoyer en images ([PDF](docs/fiches-animateurs/fiches-animateurs.pdf)).
+- [Mode d’emploi pour les animateurs](docs/mode-emploi-animateurs.md) : le même contenu en texte, plus détaillé (les réunions, une réunion annulée, les documents et la page de sa section).
 - [Mode d’emploi pour les chefs d’unité](docs/mode-emploi-chefs-unite.md) : les rôles, les comptes des animateurs, Réglages → Unité, les pages, les réglages et la mise à jour du thème.
 
 ## Installer le thème

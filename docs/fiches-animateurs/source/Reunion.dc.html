@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Fiche 1 – Ajouter une réunion</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&amp;family=Mulish:wght@400;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0A4275}a:hover{color:#062F55}
+</style>
+</helmet>
+<div style="width: 540px; height: 960px; box-sizing: border-box; background: #F2F5F8; color: #0A4275; font-family: Mulish, sans-serif; display: flex; flex-direction: column">
+  <div style="background: #0A4275; color: #FFFFFF; padding: 30px 36px 26px; display: flex; align-items: center; gap: 18px">
+    <span style="width: 58px; height: 58px; flex: none; border-radius: 50%; background: #EF7B00; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 900">1</span>
+    <h1 style="margin: 0; font-size: 34px; line-height: 1.05; font-weight: 900">Ajouter une réunion</h1>
+  </div>
+  <div style="padding: 24px 36px; display: flex; flex-direction: column; gap: 18px; flex: 1">
+    <div style="display: flex; gap: 18px; align-items: flex-start">
+      <img src="/_blob/796a7ba8c457410085404fee0b465ed2" alt="Le panneau « Quand et où ? » : section et date entourées" style="width: 200px; height: auto; flex: none; border: 2px solid #DCE4EC; background: #FFFFFF">
+      <div style="display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; gap: 10px; align-items: flex-start"><span style="width: 28px; height: 28px; flex: none; border-radius: 50%; background: #0A4275; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px">a</span><p style="margin: 2px 0 0; font-size: 16px; line-height: 1.4">Menu <strong>Agenda → Ajouter</strong>. Le titre, tu peux le laisser vide.</p></div>
+        <div style="display: flex; gap: 10px; align-items: flex-start"><span style="width: 28px; height: 28px; flex: none; border-radius: 50%; background: #0A4275; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px">b</span><p style="margin: 2px 0 0; font-size: 16px; line-height: 1.4">À droite, dans <strong>Quand et où ?</strong> : ta <strong>section</strong> et la <strong>date</strong> (entourées : obligatoires).</p></div>
+        <div style="display: flex; gap: 10px; align-items: flex-start"><span style="width: 28px; height: 28px; flex: none; border-radius: 50%; background: #0A4275; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px">c</span><p style="margin: 2px 0 0; font-size: 16px; line-height: 1.4">Les heures, le lieu, et un mot pour les parents sous le titre si tu veux.</p></div>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; gap: 10px; align-items: flex-start"><span style="width: 28px; height: 28px; flex: none; border-radius: 50%; background: #0A4275; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px">d</span><p style="margin: 2px 0 0; font-size: 16px; line-height: 1.4"><strong>Publier</strong>, en haut à droite…</p></div>
+      <img src="/_blob/2253d598f3f364501b9f707efbb5c57f" alt="Le bouton Publier en haut à droite" style="width: 100%; height: auto; background: #FFFFFF; border: 2px solid #DCE4EC">
+      <p style="margin: 4px 0 0 38px; font-size: 16px; line-height: 1.4">… puis encore <strong>Publier</strong> pour confirmer :</p>
+      <img src="/_blob/aa59ea4dbddc91690f680921d01a94d3" alt="Le second bouton Publier, pour confirmer" style="width: 300px; height: auto; margin-left: 38px; background: #FFFFFF; border: 2px solid #DCE4EC">
+    </div>
+    <div style="margin-top: auto; background: #FFFFFF; border-top: 5px solid #95C11F; padding: 16px 18px; display: flex; flex-direction: column; gap: 4px">
+      <span style="font-family: 'Caveat Brush', cursive; font-size: 24px; color: #304A3C">Et hop, partout !</span>
+      <span style="font-size: 15px; line-height: 1.45">La réunion apparaît toute seule sur l’accueil, ta page, l’agenda, le programme frigo et le calendrier des parents.</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":540,"height":960}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

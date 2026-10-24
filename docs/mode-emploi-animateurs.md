@@ -1,6 +1,8 @@
 # Mode d'emploi du site – Animateurs
 
-Thème 2.10.0 · 24 octobre 2026
+Thème 2.10.1 · 24 octobre 2026
+
+> Plus rapide à lire : [le site en 7 fiches](fiches-animateurs/), avec les vrais écrans ([PDF](fiches-animateurs/fiches-animateurs.pdf)).
 
 Ce guide t’explique, pas à pas, comment tenir à jour le site de l’unité pour ta section : les réunions, les documents et la page de ta section. Pas besoin d’être doué en informatique : tout se fait dans l’administration du site, depuis un ordinateur.
 
