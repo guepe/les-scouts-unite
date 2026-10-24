@@ -2,7 +2,7 @@
 
 Les versions suivent le numéro `Version:` de `style.css`. Chaque version publiée a son zip dans les [Releases](https://github.com/guepe/les-scouts-unite/releases).
 
-## 2.9.0 – non publiée
+## 2.9.0 – 2026-10-24
 
 - **L’agenda dans le calendrier du téléphone** : « Ajouter à mon calendrier » abonne Google Agenda, Apple Calendrier ou Outlook à l’agenda d’une section (avec les activités de toute l’unité) ou de toute l’unité. Une réunion ajoutée, déplacée ou supprimée se met à jour d’elle-même. Sur la page d’une réunion, le même lien ajoute cette seule réunion.
 - **Réunion annulée** : une case « Réunion annulée » et un mot d’explication facultatif dans le panneau « Quand et où ? ». La réunion reste affichée jusqu’à sa date, barrée, avec une étiquette rouge « Annulée » : accueil, page de section (la prochaine réunion passe à la suivante, avec un rappel au-dessus), agenda, page de la réunion, À la une, temps forts, feuilles à imprimer et calendrier du téléphone.
