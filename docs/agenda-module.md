@@ -209,13 +209,35 @@ Les blocs :
 - Dans l'administration, ses listes de réunions et de pages sont filtrées sur ses sections ; sur une page, l'éditeur est verrouillé en `templateLock: 'contentOnly'` (filtre `block_editor_settings_all`).
 - Les rôles sont (ré)écrits quand `SCOUTSUNITE_DROITS_VERSION` change (option `scoutsunite_droits_version`).
 
+## Réunion annulée
+
+- Champs `su_annulee` (`'1'` ou `''`) et `su_annulee_pourquoi` (texte d'une ligne), dans le panneau « Quand et où ? ». Décocher vide aussi l'explication. Les copies d'une répétition hebdomadaire ne reprennent pas l'annulation.
+- `scoutsunite_agenda_annulee( $id )`, `scoutsunite_agenda_pourquoi( $id )`. `scoutsunite_agenda_etiquette()` ajoute `span.ligne__type--annulee` ; `scoutsunite_agenda_ligne()` reçoit `$annulee` et ajoute `ligne--annulee` (date, lieu et horaire barrés).
+- « Prochaine réunion d'une section » et « Prochaines réunions » : `scoutsunite_agenda_prochaine_maintenue()` saute les réunions annulées et les rappelle au-dessus (`scoutsunite_agenda_rappel_annulees()`). Dans « Ensuite », une réunion annulée est barrée.
+- Agenda complet et page de la réunion : seule l'explication remplace les notes. À la une et temps forts : étiquette et explication.
+- Feuilles à imprimer : ligne grisée et barrée, étiquette « Annulée » ; convocation avec un bandeau « Cette activité est annulée ». Calendrier : `STATUS:CANCELLED`, `SUMMARY` préfixé « ANNULÉ – », explication en tête de la description. Liste de l'administration : « ANNULÉE – » dans la colonne Quand.
+
+## Bon à savoir (`inc/unite.php`)
+
+- Champ `{section}_infos` (textarea, une info par ligne) dans le groupe « Bon à savoir » de Réglages → Unité, pour chaque section d'âge.
+- `scoutsunite_bon_a_savoir( $section, $exemple = true )` renvoie une liste `ul.bon-a-savoir__liste`. « Mot : texte » met le mot en gras. Un champ vide montre l'exemple surligné sur le site (`$exemple`), et rien sur les feuilles à imprimer.
+- Affiché dans le bloc « Prochaine réunion d'une section » (`div.bon-a-savoir`, avant les liens, état vide compris) et sur le programme et la convocation imprimés (`section.feuille__bon`, sur deux colonnes). Au-delà de 8 réunions, la liste du programme imprimé passe elle aussi sur deux colonnes (`feuille__reunions--colonnes`).
+
+## Calendrier iCalendar (`inc/calendrier.php`)
+
+- Sur `template_redirect`, `?ical` sert un flux `text/calendar` à la place de la page : `/agenda/?section={slug}&ical` (une section d'âge reçoit aussi `unite`), `/agenda/?ical` (tout l'agenda), `/agenda/{réunion}/?ical` (un seul événement, en pièce jointe `reunion-{date}.ics`).
+- Le flux contient les réunions publiées à venir et celles terminées depuis 30 jours. `UID` stable (`reunion-{ID}@{hôte}`), `LAST-MODIFIED` depuis `post_modified_gmt`, `REFRESH-INTERVAL` et `X-PUBLISHED-TTL` à 12 h.
+- Une réunion avec heure : `DTSTART`/`DTEND` en UTC depuis `wp_timezone()`. Sans heure, ou week-end/camp sur plusieurs jours : dates entières (`VALUE=DATE`, fin exclusive), l'horaire passe dans la description (« Départ … à 18 h, retour … à 16 h. »).
+- `SUMMARY` : « Section · titre » ; `LOCATION` : le lieu, suivi de l'adresse du local s'il contient « local » ; `DESCRIPTION` : les notes en texte brut et le lien de la réunion. Texte échappé (`\\ ; , \n`) et lignes pliées à 75 octets sans couper un caractère (`mb_strcut`).
+- `scoutsunite_liens_pratiques( $section, $post_id )` : les liens « à mettre sur le frigo » et « Ajouter à mon calendrier » (un `details` avec `webcal://`, Google Agenda via `calendar.google.com/calendar/render?cid=` et le lien à copier), sous les blocs « Prochaine réunion d'une section », « Agenda complet » et « Détails de la réunion », états vides compris.
+
 ## Feuilles à imprimer (`inc/imprimer.php`)
 
 - Sur `template_redirect`, une adresse portant `?imprimer` est servie par une page HTML autonome (sans en-tête ni pied du site, `noindex`), stylée par `assets/css/imprimer.css` (A4, `@page`, barre d'outils masquée à l'impression). Le PDF vient de la fenêtre d'impression du navigateur : aucune bibliothèque côté serveur.
 - `/agenda/?section={slug}&imprimer&mois={1|3|6|12}` : programme. Une section d'âge reçoit aussi les activités `unite`, comme dans « Temps forts ». Sans section valide : tout l'agenda. Durée par défaut : 3 mois.
 - `/agenda/{réunion}/?imprimer` : convocation d'une réunion (date en grand, horaire, lieu, notes complètes).
 - Le pied de chaque feuille liste le staff de la section, ses contacts et l'adresse du local ; un champ vide de Réglages → Unité est omis, sans exemple « à compléter ».
-- Liens `p.lien-imprimer` : bloc « Prochaine réunion d'une section », bloc « Agenda complet » (selon le filtre), bloc « Détails de la réunion » et action de ligne dans la liste des réunions (réunions publiées seulement).
+- Liens : voir `scoutsunite_liens_pratiques()` ci-dessus, plus l'action de ligne « Convocation à imprimer » dans la liste des réunions (réunions publiées seulement).
 
 ## Staff et groupes WhatsApp (`inc/unite.php`, `inc/whatsapp.php`)
 

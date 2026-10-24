@@ -83,7 +83,7 @@ function scoutsunite_agenda_register() {
 		)
 	);
 
-	foreach ( array( 'su_section', 'su_date', 'su_debut', 'su_fin', 'su_lieu', 'su_repeter', 'su_avant', 'su_type', 'su_jusqua' ) as $key ) {
+	foreach ( array( 'su_section', 'su_date', 'su_debut', 'su_fin', 'su_lieu', 'su_repeter', 'su_avant', 'su_type', 'su_jusqua', 'su_annulee', 'su_annulee_pourquoi' ) as $key ) {
 		register_post_meta(
 			'reunion',
 			$key,
@@ -262,7 +262,7 @@ function scoutsunite_agenda_column( $column, $post_id ) {
 	switch ( $column ) {
 		case 'su_quand':
 			$date = get_post_meta( $post_id, 'su_date', true );
-			echo esc_html( $date ? trim( scoutsunite_agenda_type( $post_id ) . ' ' . scoutsunite_agenda_quand( $post_id ) . ' ' . scoutsunite_agenda_horaire( $post_id ) ) : '—' );
+			echo esc_html( $date ? trim( ( scoutsunite_agenda_annulee( $post_id ) ? 'ANNULÉE – ' : '' ) . scoutsunite_agenda_type( $post_id ) . ' ' . scoutsunite_agenda_quand( $post_id ) . ' ' . scoutsunite_agenda_horaire( $post_id ) ) : '—' );
 			break;
 		case 'su_section':
 			$s = get_post_meta( $post_id, 'su_section', true );
@@ -423,7 +423,63 @@ function scoutsunite_agenda_type( $post_id ) {
  */
 function scoutsunite_agenda_etiquette( $post_id ) {
 	$type = scoutsunite_agenda_type( $post_id );
-	return $type ? '<span class="ligne__type">' . esc_html( $type ) . '</span> ' : '';
+	$html = scoutsunite_agenda_annulee( $post_id ) ? '<span class="ligne__type ligne__type--annulee">Annulée</span> ' : '';
+	return $html . ( $type ? '<span class="ligne__type">' . esc_html( $type ) . '</span> ' : '' );
+}
+
+/**
+ * La réunion est-elle annulée ? Elle reste affichée jusqu'à sa date, marquée « Annulée ».
+ *
+ * @param int $post_id Réunion.
+ * @return bool
+ */
+function scoutsunite_agenda_annulee( $post_id ) {
+	return '1' === get_post_meta( $post_id, 'su_annulee', true );
+}
+
+/**
+ * Le mot d'explication d'une annulation, '' s'il n'y en a pas.
+ *
+ * @param int $post_id Réunion.
+ * @return string Texte brut.
+ */
+function scoutsunite_agenda_pourquoi( $post_id ) {
+	return scoutsunite_agenda_annulee( $post_id ) ? trim( (string) get_post_meta( $post_id, 'su_annulee_pourquoi', true ) ) : '';
+}
+
+/**
+ * Répartit les réunions à venir : la première maintenue, et les annulées qui la précèdent.
+ *
+ * @param WP_Post[] $reunions Réunions à venir, dans l'ordre.
+ * @return array [ WP_Post|null prochaine maintenue, WP_Post[] annulées avant elle, WP_Post[] suivantes ].
+ */
+function scoutsunite_agenda_prochaine_maintenue( $reunions ) {
+	$annulees = array();
+	foreach ( $reunions as $i => $r ) {
+		if ( ! scoutsunite_agenda_annulee( $r->ID ) ) {
+			return array( $r, $annulees, array_slice( $reunions, $i + 1 ) );
+		}
+		$annulees[] = $r;
+	}
+	return array( null, $annulees, array() );
+}
+
+/**
+ * « Samedi 7 novembre : réunion annulée (local indisponible). », une ligne par réunion annulée.
+ *
+ * @param WP_Post[] $annulees Réunions annulées.
+ * @param bool      $date     Rappeler la date (inutile quand elle est affichée juste en dessous).
+ * @return string HTML.
+ */
+function scoutsunite_agenda_rappel_annulees( $annulees, $date = true ) {
+	$html = '';
+	foreach ( $annulees as $a ) {
+		$titre    = scoutsunite_agenda_titre( $a );
+		$pourquoi = scoutsunite_agenda_pourquoi( $a->ID );
+		$texte    = $date ? ucfirst( scoutsunite_agenda_quand( $a->ID ) ) . ( $titre ? ' (' . $titre . ')' : '' ) . ( $pourquoi ? ' : ' . $pourquoi : '' ) : $pourquoi;
+		$html    .= '<p class="annulee"><span class="ligne__type ligne__type--annulee">Annulée</span> ' . esc_html( $texte ) . '</p>';
+	}
+	return $html;
 }
 
 /**
@@ -571,15 +627,17 @@ add_action( 'init', 'scoutsunite_agenda_blocks' );
  * @param string $quoi    Colonne centrale (HTML).
  * @param string $horaire Dernière colonne (texte).
  * @param string $notes   Notes sous la ligne (HTML).
+ * @param bool   $annulee Réunion annulée : la ligne est barrée.
  */
-function scoutsunite_agenda_ligne( $section, $nom, $quoi, $horaire, $notes = '' ) {
+function scoutsunite_agenda_ligne( $section, $nom, $quoi, $horaire, $notes = '', $annulee = false ) {
 	return sprintf(
-		'<div class="wp-block-group is-style-ligne-%1$s"><p>%2$s</p><p>%3$s</p><p>%4$s</p>%5$s</div>',
+		'<div class="wp-block-group is-style-ligne-%1$s%6$s"><p>%2$s</p><p>%3$s</p><p>%4$s</p>%5$s</div>',
 		esc_attr( $section ),
 		$nom,
 		$quoi,
 		esc_html( $horaire ),
-		$notes ? '<div class="ligne__notes">' . $notes . '</div>' : ''
+		$notes ? '<div class="ligne__notes">' . $notes . '</div>' : '',
+		$annulee ? ' ligne--annulee' : ''
 	);
 }
 
@@ -591,11 +649,15 @@ function scoutsunite_bloc_prochaines_reunions() {
 	foreach ( scoutsunite_agenda_sections_age() as $slug => $nom ) {
 		$url   = scoutsunite_agenda_section_url( $slug );
 		$label = $url ? '<a href="' . esc_url( $url ) . '">' . esc_html( $nom ) . '</a>' : esc_html( $nom );
-		$next  = scoutsunite_agenda_a_venir( $slug, 1 );
-		if ( $next ) {
-			$r     = $next[0];
+		// Une réunion annulée cède la place à la suivante, avec un mot pour la signaler.
+		list( $r, $annulees ) = scoutsunite_agenda_prochaine_maintenue( scoutsunite_agenda_a_venir( $slug, 6 ) );
+		$avant                = '';
+		foreach ( $annulees as $a ) {
+			$avant .= '<span class="ligne__type ligne__type--annulee">Annulée</span> <s>' . esc_html( scoutsunite_agenda_quand( $a->ID, 'j F' ) ) . '</s> · ';
+		}
+		if ( $r ) {
 			$titre = scoutsunite_agenda_titre( $r );
-			$quoi  = scoutsunite_agenda_etiquette( $r->ID ) . esc_html( scoutsunite_agenda_quand( $r->ID ) );
+			$quoi  = $avant . scoutsunite_agenda_etiquette( $r->ID ) . esc_html( scoutsunite_agenda_quand( $r->ID ) );
 			$lieu  = get_post_meta( $r->ID, 'su_lieu', true );
 			if ( $titre ) {
 				$quoi .= ' · ' . esc_html( $titre );
@@ -605,7 +667,7 @@ function scoutsunite_bloc_prochaines_reunions() {
 			}
 			$html .= scoutsunite_agenda_ligne( $slug, $label, $quoi, scoutsunite_agenda_horaire( $r->ID ) );
 		} else {
-			$html .= scoutsunite_agenda_ligne( $slug, $label, '<span class="ligne__vide">pas de réunion prévue</span>', '' );
+			$html .= scoutsunite_agenda_ligne( $slug, $label, $avant . '<span class="ligne__vide">pas de réunion prévue</span>', '' );
 		}
 	}
 	$lien = get_post_type_archive_link( 'reunion' );
@@ -619,38 +681,52 @@ function scoutsunite_bloc_prochaines_reunions() {
  */
 function scoutsunite_bloc_prochaine_reunion( $attributes ) {
 	$section = sanitize_key( $attributes['section'] ?? 'baladins' );
-	$next    = scoutsunite_agenda_a_venir( $section, 1 );
 	$wrapper = get_block_wrapper_attributes( array( 'class' => 'agenda-prochaine' ) );
+	// Une réunion annulée cède la place à la suivante ; un rappel la signale au-dessus.
+	list( $r, $annulees, $suite ) = scoutsunite_agenda_prochaine_maintenue( scoutsunite_agenda_a_venir( $section, 8 ) );
+	$rappel                       = $annulees ? '<div class="agenda-prochaine__annulees">' . scoutsunite_agenda_rappel_annulees( $annulees ) . '</div>' : '';
 
-	if ( ! $next ) {
-		return '<div ' . $wrapper . '><h2 class="wp-block-heading affiche__titre has-x-large-font-size">Prochaine réunion</h2><p class="agenda-prochaine__date">Pas encore fixée</p><p>Le staff publiera bientôt la prochaine date dans l’agenda.</p></div>';
+	if ( ! $r ) {
+		return '<div ' . $wrapper . '><h2 class="wp-block-heading affiche__titre has-x-large-font-size">Prochaine réunion</h2>' . $rappel . '<p class="agenda-prochaine__date">Pas encore fixée</p><p>Le staff publiera bientôt la prochaine date dans l’agenda.</p>' . scoutsunite_agenda_bon_a_savoir( $section ) . scoutsunite_liens_pratiques( $section ) . '</div>';
 	}
 
-	$r     = $next[0];
 	$titre = scoutsunite_agenda_titre( $r );
 	$titre = $titre ? $titre : scoutsunite_agenda_type( $r->ID );
 	$lieu  = get_post_meta( $r->ID, 'su_lieu', true );
 	$infos = array_filter( array( scoutsunite_agenda_horaire( $r->ID ), $lieu ) );
 
-	$html  = '<h2 class="wp-block-heading affiche__titre has-x-large-font-size">Prochaine réunion</h2>';
+	$html  = '<h2 class="wp-block-heading affiche__titre has-x-large-font-size">Prochaine réunion</h2>' . $rappel;
 	$html .= '<p class="agenda-prochaine__date">' . esc_html( ucfirst( scoutsunite_agenda_quand( $r->ID ) ) ) . '</p>';
 	$html .= '<p class="has-large-font-size" style="font-weight:800">' . esc_html( implode( ' · ', array_filter( array( $titre, implode( ' · ', $infos ) ) ) ) ) . '</p>';
 	if ( '' !== trim( $r->post_content ) ) {
 		$html .= '<div class="agenda-prochaine__notes">' . apply_filters( 'the_content', $r->post_content ) . '</div>';
 	}
-	$suite = scoutsunite_agenda_a_venir( $section, 4 );
-	if ( count( $suite ) > 1 ) {
+	$suite = array_slice( $suite, 0, 3 );
+	if ( $suite ) {
 		$html .= '<p class="agenda-prochaine__suite"><strong>Ensuite :</strong> ';
 		$dates = array();
-		foreach ( array_slice( $suite, 1 ) as $s ) {
+		foreach ( $suite as $s ) {
 			$titre   = scoutsunite_agenda_titre( $s );
 			$titre   = $titre ? $titre : scoutsunite_agenda_type( $s->ID );
-			$dates[] = esc_html( scoutsunite_agenda_quand( $s->ID, 'j F' ) . ( $titre ? ' (' . $titre . ')' : '' ) );
+			$quand   = esc_html( scoutsunite_agenda_quand( $s->ID, 'j F' ) . ( $titre ? ' (' . $titre . ')' : '' ) );
+			$dates[] = scoutsunite_agenda_annulee( $s->ID ) ? '<s>' . $quand . '</s> (annulée)' : $quand;
 		}
 		$html .= implode( ', ', $dates ) . '. <a href="' . esc_url( add_query_arg( 'section', $section, get_post_type_archive_link( 'reunion' ) ) ) . '">Voir l’agenda</a></p>';
 	}
-	$html .= '<p class="lien-imprimer"><a href="' . esc_url( scoutsunite_imprimer_url( $section ) ) . '">Programme à imprimer</a></p>';
+	$html .= scoutsunite_agenda_bon_a_savoir( $section );
+	$html .= scoutsunite_liens_pratiques( $section );
 	return '<div ' . $wrapper . '>' . $html . '</div>';
+}
+
+/**
+ * Encadré « Bon à savoir » sous la prochaine réunion d'une section.
+ *
+ * @param string $section Identifiant de section.
+ * @return string HTML.
+ */
+function scoutsunite_agenda_bon_a_savoir( $section ) {
+	$liste = scoutsunite_bon_a_savoir( $section );
+	return $liste ? '<div class="bon-a-savoir"><h3 class="bon-a-savoir__titre">Bon à savoir</h3>' . $liste . '</div>' : '';
 }
 
 /**
@@ -673,7 +749,7 @@ function scoutsunite_bloc_agenda() {
 
 	$reunions = scoutsunite_agenda_a_venir( $filtre, 200 );
 	if ( ! $reunions ) {
-		return '<div ' . get_block_wrapper_attributes( array( 'class' => 'agenda' ) ) . '>' . $nav . '<p class="agenda__vide">Aucune réunion à venir pour l’instant. Le staff publie les dates ici dès qu’elles sont fixées.</p></div>';
+		return '<div ' . get_block_wrapper_attributes( array( 'class' => 'agenda' ) ) . '>' . $nav . '<p class="agenda__vide">Aucune réunion à venir pour l’instant. Le staff publie les dates ici dès qu’elles sont fixées.</p>' . scoutsunite_liens_pratiques( $filtre ) . '</div>';
 	}
 
 	$html = '';
@@ -695,11 +771,16 @@ function scoutsunite_bloc_agenda() {
 		if ( $lieu ) {
 			$quoi .= ' · ' . esc_html( $lieu );
 		}
-		$notes = '' !== trim( $r->post_content ) ? wp_kses_post( wp_trim_words( wp_strip_all_tags( $r->post_content ), 40 ) ) : '';
-		$html .= scoutsunite_agenda_ligne( isset( $sections[ $section ] ) ? $section : 'unite', esc_html( $sections[ $section ] ?? '' ), $quoi, scoutsunite_agenda_horaire( $r->ID ), $notes );
+		$notes    = '' !== trim( $r->post_content ) ? wp_kses_post( wp_trim_words( wp_strip_all_tags( $r->post_content ), 40 ) ) : '';
+		// Une réunion annulée ne garde que le mot d'explication : ses notes ne servent plus.
+		if ( scoutsunite_agenda_annulee( $r->ID ) ) {
+			$pourquoi = scoutsunite_agenda_pourquoi( $r->ID );
+			$notes    = $pourquoi ? '<strong>' . esc_html( $pourquoi ) . '</strong>' : '';
+		}
+		$html .= scoutsunite_agenda_ligne( isset( $sections[ $section ] ) ? $section : 'unite', esc_html( $sections[ $section ] ?? '' ), $quoi, scoutsunite_agenda_horaire( $r->ID ), $notes, scoutsunite_agenda_annulee( $r->ID ) );
 	}
 	$html .= '</div>';
-	$html .= '<p class="lien-imprimer"><a href="' . esc_url( scoutsunite_imprimer_url( $filtre ) ) . '">' . esc_html( $filtre ? 'Programme ' . ( array( 'unite' => 'de toute l’unité', 'iama' => 'du clan IAmA' )[ $filtre ] ?? 'des ' . $sections[ $filtre ] ) . ' à imprimer' : 'Agenda à imprimer' ) . '</a></p>';
+	$html .= scoutsunite_liens_pratiques( $filtre );
 
 	return '<div ' . get_block_wrapper_attributes( array( 'class' => 'agenda' ) ) . '>' . $nav . $html . '</div>';
 }
@@ -719,12 +800,15 @@ function scoutsunite_bloc_reunion( $attributes, $content, $block ) {
 	if ( $lieu ) {
 		$quoi .= ' · ' . esc_html( $lieu );
 	}
+	$pourquoi = scoutsunite_agenda_pourquoi( $post_id );
 	return '<div ' . get_block_wrapper_attributes( array( 'class' => 'agenda-reunion' ) ) . '>' . scoutsunite_agenda_ligne(
 		isset( $sections[ $section ] ) ? $section : 'unite',
 		esc_html( $sections[ $section ] ?? '' ),
 		$quoi,
-		scoutsunite_agenda_horaire( $post_id )
-	) . '<p class="lien-imprimer"><a href="' . esc_url( scoutsunite_imprimer_url( '', $post_id ) ) . '">Convocation à imprimer</a></p></div>';
+		scoutsunite_agenda_horaire( $post_id ),
+		$pourquoi ? '<strong>' . esc_html( $pourquoi ) . '</strong>' : '',
+		scoutsunite_agenda_annulee( $post_id )
+	) . scoutsunite_liens_pratiques( '', $post_id ) . '</div>';
 }
 
 /**
@@ -762,6 +846,9 @@ function scoutsunite_bloc_a_la_une() {
 	$infos = array_filter( array( scoutsunite_agenda_horaire( $r->ID ), get_post_meta( $r->ID, 'su_lieu', true ) ) );
 
 	$html  = '<p class="affiche__etiquette">' . esc_html( implode( ' · ', array_filter( array( $nom, scoutsunite_agenda_type( $r->ID ) ) ) ) ) . '</p>';
+	if ( scoutsunite_agenda_annulee( $r->ID ) ) {
+		$html .= scoutsunite_agenda_rappel_annulees( array( $r ), false );
+	}
 	$html .= '<h2 class="wp-block-heading affiche__titre has-x-large-font-size"><a href="' . esc_url( get_permalink( $r ) ) . '">' . esc_html( $titre ) . '</a></h2>';
 	$html .= '<p class="a-la-une__quand">' . esc_html( ucfirst( scoutsunite_agenda_quand( $r->ID ) ) ) . ( $infos ? '<br>' . esc_html( implode( ' · ', $infos ) ) : '' ) . '</p>';
 	if ( '' !== trim( $r->post_content ) ) {
@@ -797,6 +884,9 @@ function scoutsunite_agenda_fiches( $activites ) {
 
 		$html .= '<article class="camp">';
 		$html .= '<p class="camp__type">' . esc_html( $etiquette ) . '</p>';
+		if ( scoutsunite_agenda_annulee( $a->ID ) ) {
+			$html .= scoutsunite_agenda_rappel_annulees( array( $a ), false );
+		}
 		$html .= '<h4 class="wp-block-heading camp__titre"><a href="' . esc_url( get_permalink( $a ) ) . '">' . esc_html( $titre ? $titre : ( $type ? $type : 'Activité' ) ) . '</a></h4>';
 		$html .= '<p class="camp__quand">' . esc_html( ucfirst( scoutsunite_agenda_quand( $a->ID ) ) ) . ( $infos ? '<br>' . esc_html( implode( ' · ', $infos ) ) : '' ) . '</p>';
 		if ( '' !== trim( $a->post_content ) ) {

@@ -244,6 +244,7 @@ add_filter( 'render_block_core/paragraph', 'scoutsunite_lien_fleche' );
 require get_template_directory() . '/inc/section.php';
 require get_template_directory() . '/inc/agenda.php';
 require get_template_directory() . '/inc/imprimer.php';
+require get_template_directory() . '/inc/calendrier.php';
 require get_template_directory() . '/inc/unite.php';
 require get_template_directory() . '/inc/whatsapp.php';
 require get_template_directory() . '/inc/droits.php';

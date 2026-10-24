@@ -32,6 +32,7 @@ function scoutsunite_unite_champs() {
 		),
 		'Les staffs de section' => array(),
 		'Les groupes WhatsApp'  => array(),
+		'Bon à savoir'          => array(),
 		'Le clan IAmA'      => array(
 			'iama_chef'  => array( 'Responsable IAmA de l’unité', 'text', 'Prénom Nom' ),
 			'iama_email' => array( 'E-mail du clan IAmA', 'email', 'iama@example.org' ),
@@ -50,6 +51,7 @@ function scoutsunite_unite_champs() {
 		$champs['Les staffs de section'][ $slug . '_chef' ]  = array( $nom . ' : chef ou cheffe de section', 'text', 'Totem – Prénom (fonction) 0470 00 00 00' );
 		$champs['Les staffs de section'][ $slug . '_staff' ] = array( $nom . ' : animateurs (un par ligne)', 'textarea', "Totem – Prénom (santé) 0470 00 00 00\nTotem – Prénom (communication)" );
 		$champs['Les staffs de section'][ $slug . '_email' ] = array( $nom . ' : e-mail', 'email', $slug . '@example.org' );
+		$champs['Bon à savoir'][ $slug . '_infos' ]          = array( $nom . ' (une info par ligne)', 'textarea', "Réunions : le samedi de 14 h à 17 h, au local\nUniforme : pull de la section, foulard, short ou jupe bleu marine\nÀ emporter : une gourde et un goûter" );
 	}
 	foreach ( scoutsunite_agenda_sections() as $slug => $nom ) {
 		$champs['Les groupes WhatsApp'][ 'whatsapp_' . $slug ] = array( 'unite' === $slug ? 'Groupe de toute l’unité' : 'Groupe ' . scoutsunite_whatsapp_de( $slug ), 'url', 'https://chat.whatsapp.com/…' );
@@ -207,6 +209,35 @@ function scoutsunite_unite_personne( $ligne ) {
 	return 2 === count( $parts )
 		? array( trim( $parts[0] ), trim( $parts[1] ), $fonction, $gsm )
 		: array( '', trim( $parts[0] ), $fonction, $gsm );
+}
+
+/**
+ * « Bon à savoir » d'une section : ce qui ne change pas d'une semaine à l'autre, une info par ligne.
+ * « Uniforme : pull, foulard » met « Uniforme » en gras.
+ *
+ * @param string $section Section d'âge.
+ * @param bool   $exemple Sans info encodée, montrer l'exemple surligné « à compléter » (sur le site, pas sur papier).
+ * @return string HTML de la liste, '' si rien à montrer.
+ */
+function scoutsunite_bon_a_savoir( $section, $exemple = true ) {
+	if ( ! isset( scoutsunite_sections()[ $section ] ) ) {
+		return '';
+	}
+	$lignes = array_filter( array_map( 'trim', explode( "\n", scoutsunite_unite( $section . '_infos' ) ) ) );
+	$vide   = ! $lignes;
+	if ( $vide ) {
+		if ( ! $exemple ) {
+			return '';
+		}
+		$lignes = explode( "\n", scoutsunite_unite_champs()['Bon à savoir'][ $section . '_infos' ][2] );
+	}
+	$html = '';
+	foreach ( $lignes as $ligne ) {
+		$parts = preg_split( '/\s*:\s*/u', $ligne, 2 );
+		$texte = 2 === count( $parts ) && '' !== $parts[0] ? '<strong>' . esc_html( $parts[0] ) . '</strong> ' . esc_html( $parts[1] ) : esc_html( $ligne );
+		$html .= '<li>' . ( $vide ? '<mark class="a-completer">' . $texte . '</mark>' : $texte ) . '</li>';
+	}
+	return '<ul class="bon-a-savoir__liste">' . $html . '</ul>';
 }
 
 /**
@@ -482,6 +513,7 @@ function scoutsunite_unite_page() {
 		<p>Encode ces informations une seule fois : elles s’affichent d’elles-mêmes dans le pied de page, les infos pratiques de l’accueil, la page Contact et la page Inscription. Les liens des formulaires (Google Forms, extension de formulaire…) deviennent des boutons sur ces deux pages.
 			Un champ laissé vide garde son exemple surligné en orange sur le site, pour qu’on voie ce qu’il reste à compléter.</p>
 		<p>Pour les staffs, écris une personne par ligne sous la forme « Totem – Prénom » (un prénom seul si la personne n’a pas encore de totem). Tu peux ajouter sa fonction entre parenthèses et son GSM : « Castor – Marie (santé, communication) 0470 12 34 56 ». Le chef ou la cheffe de section s’affiche en premier sur la page de la section. Les GSM sont visibles par tout le monde sur le site et sur les feuilles à imprimer.</p>
+		<p>« Bon à savoir » : ce qui ne change pas d’une semaine à l’autre (horaire habituel, lieu, uniforme, à emporter), une info par ligne. Commence une ligne par un mot suivi de deux-points pour le mettre en gras : « Uniforme : pull de la section, foulard ». Les infos s’affichent sous la prochaine réunion, sur la page de la section, et sur les feuilles à imprimer.</p>
 		<p>Pour un groupe WhatsApp, colle son lien d’invitation (dans WhatsApp : infos du groupe → Inviter via un lien). Le site en fait un QR code, affiché sur la page Contact, la page de la section et les feuilles à imprimer. Toute personne qui a le lien peut rejoindre le groupe : garde l’approbation des nouveaux membres activée dans WhatsApp.</p>
 		<p>Le nom de l’unité se règle dans <a href="<?php echo esc_url( admin_url( 'options-general.php' ) ); ?>">Réglages → Général</a> (titre et slogan du site).</p>
 		<form method="post" action="options.php">

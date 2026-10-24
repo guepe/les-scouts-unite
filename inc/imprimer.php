@@ -206,7 +206,8 @@ function scoutsunite_imprimer_programme( $section, $mois ) {
 		return array( 'Programme', '', '<p class="feuille__vide">Pas encore de réunion annoncée pour cette période. Le staff publie les dates sur le site dès qu’elles sont fixées.</p>' );
 	}
 
-	$html = '<ol class="feuille__reunions">';
+	// Au-delà de 8 réunions, deux colonnes : le programme de trois mois tient sur une feuille.
+	$html = '<ol class="feuille__reunions' . ( count( $reunions ) > 8 ? ' feuille__reunions--colonnes' : '' ) . '">';
 	foreach ( $reunions as $r ) {
 		$s     = get_post_meta( $r->ID, 'su_section', true );
 		$titre = scoutsunite_agenda_titre( $r );
@@ -221,10 +222,11 @@ function scoutsunite_imprimer_programme( $section, $mois ) {
 		}
 		$infos = array_filter( array( scoutsunite_agenda_horaire( $r->ID ), get_post_meta( $r->ID, 'su_lieu', true ) ) );
 
-		$html .= '<li class="feuille__reunion feuille--' . esc_attr( isset( $noms[ $s ] ) ? $s : 'unite' ) . '">';
+		$annulee = scoutsunite_agenda_annulee( $r->ID );
+		$html   .= '<li class="feuille__reunion feuille--' . esc_attr( isset( $noms[ $s ] ) ? $s : 'unite' ) . ( $annulee ? ' feuille__reunion--annulee' : '' ) . '">';
 		$html .= scoutsunite_imprimer_pastille( $r->ID );
 		$html .= '<div class="feuille__details">';
-		$html .= '<p class="feuille__quoi">' . esc_html( $quoi );
+		$html .= '<p class="feuille__quoi">' . ( $annulee ? '<span class="feuille__annulee">Annulée</span> ' : '' ) . esc_html( $quoi );
 		foreach ( $tags as $tag ) {
 			$html .= ' <span class="feuille__tag">' . esc_html( $tag ) . '</span>';
 		}
@@ -232,7 +234,10 @@ function scoutsunite_imprimer_programme( $section, $mois ) {
 		if ( $infos ) {
 			$html .= '<p class="feuille__infos">' . esc_html( implode( ' · ', $infos ) ) . '</p>';
 		}
-		$html .= scoutsunite_imprimer_notes( $r ) . '</div></li>';
+		if ( scoutsunite_agenda_pourquoi( $r->ID ) ) {
+			$html .= '<p class="feuille__infos">' . esc_html( scoutsunite_agenda_pourquoi( $r->ID ) ) . '</p>';
+		}
+		$html .= ( $annulee ? '' : scoutsunite_imprimer_notes( $r ) ) . '</div></li>';
 	}
 	$html .= '</ol>';
 
@@ -259,7 +264,11 @@ function scoutsunite_imprimer_convocation( $post ) {
 	$type  = scoutsunite_agenda_type( $post->ID );
 	$lieu  = get_post_meta( $post->ID, 'su_lieu', true );
 
-	$html  = '<div class="feuille__convocation">';
+	$html = '<div class="feuille__convocation">';
+	if ( scoutsunite_agenda_annulee( $post->ID ) ) {
+		$pourquoi = scoutsunite_agenda_pourquoi( $post->ID );
+		$html    .= '<p class="feuille__bandeau-annulee"><strong>Cette activité est annulée</strong>' . ( $pourquoi ? esc_html( $pourquoi ) : '' ) . '</p>';
+	}
 	$html .= '<p class="feuille__quand">' . esc_html( ucfirst( scoutsunite_agenda_quand( $post->ID ) ) ) . '</p>';
 	$html .= '<dl class="feuille__pratique">';
 	if ( scoutsunite_agenda_horaire( $post->ID ) ) {
@@ -350,6 +359,10 @@ function scoutsunite_imprimer() {
 		</div>
 	</header>
 	<?php echo $corps; // phpcs:ignore WordPress.Security.EscapeOutput -- échappé à la construction. ?>
+	<?php $bon = scoutsunite_bon_a_savoir( $section, false ); ?>
+	<?php if ( $bon ) : ?>
+		<section class="feuille__bon"><h2>Bon à savoir</h2><?php echo $bon; // phpcs:ignore WordPress.Security.EscapeOutput ?></section>
+	<?php endif; ?>
 	<?php echo scoutsunite_imprimer_staff( $section ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 	<footer class="feuille__pied">
 		À jour au <?php echo esc_html( wp_date( 'j F Y' ) ); ?>. Toujours à jour sur <strong><?php echo esc_html( untrailingslashit( $site ) ); ?></strong>

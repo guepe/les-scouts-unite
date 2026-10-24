@@ -3,7 +3,7 @@ Theme Name: Les Scouts – Unité
 Theme URI: https://github.com/guepe/les-scouts-unite
 Author: Pierre-Henri Delaval
 Description: Thème de bloc pour le site d’une unité Les Scouts asbl, construit sur la charte graphique de la fédération : bleu de la fédération, toppings, couleurs de section et police Muli. Le nom de l’unité vient du titre du site ; tout se modifie dans l’éditeur de site.
-Version: 2.8.0
+Version: 2.9.0
 Requires at least: 6.5
 Tested up to: 6.8
 Requires PHP: 7.4
@@ -955,16 +955,150 @@ a.lien-fleche:hover::after {
 	font-size: var(--wp--preset--font-size--small);
 }
 
-/* « Programme à imprimer », « Convocation à imprimer » : vers les feuilles d'inc/imprimer.php. */
-.lien-imprimer {
-	margin-top: var(--wp--preset--spacing--30);
+/* Réunion annulée : étiquette rouge, ligne barrée, rappel au-dessus de la prochaine réunion. */
+.ligne__type.ligne__type--annulee {
+	border-color: var(--su-rouge);
+	background: var(--su-rouge);
+	color: #fff;
+}
+
+.ligne--annulee > p:nth-child(2),
+.ligne--annulee > p:nth-child(3) {
+	text-decoration: line-through;
+	text-decoration-thickness: 2px;
+}
+
+.ligne--annulee .ligne__type {
+	display: inline-block;
+}
+
+.ligne--annulee .ligne__notes {
+	text-decoration: none;
+}
+
+.annulee {
+	margin: 0 0 0.5rem;
+	font-weight: 700;
+}
+
+.agenda-prochaine__annulees {
+	margin: 0.5rem 0 1rem;
+}
+
+/* « Bon à savoir » d'une section, sous la prochaine réunion (Réglages → Unité). */
+.bon-a-savoir {
+	margin-top: var(--wp--preset--spacing--40);
+	padding: 0.9rem 1rem;
+	border-left: 0.4rem solid var(--su-orange);
+	background: var(--su-fond);
+}
+
+.bon-a-savoir__titre {
+	margin: 0 0 0.4rem;
+	font-size: var(--wp--preset--font-size--medium);
+	font-weight: 900;
+}
+
+.bon-a-savoir__liste {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	font-size: var(--wp--preset--font-size--small);
+	line-height: 1.5;
+}
+
+.bon-a-savoir__liste li + li {
+	margin-top: 0.3rem;
+}
+
+/* « À mettre sur le frigo » et « Ajouter à mon calendrier » (inc/calendrier.php). */
+.liens-pratiques {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem 1.5rem;
+	margin-top: var(--wp--preset--spacing--40);
 	font-size: var(--wp--preset--font-size--small);
 	font-weight: 800;
 }
 
-.lien-imprimer a {
+.liens-pratiques > a,
+.liens-pratiques summary {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45rem;
 	color: inherit;
-	text-underline-offset: 0.2em;
+	text-decoration: underline;
+	text-decoration-thickness: 2px;
+	text-underline-offset: 0.25em;
+	cursor: pointer;
+}
+
+.liens-pratiques summary {
+	list-style: none;
+}
+
+.liens-pratiques summary::-webkit-details-marker {
+	display: none;
+}
+
+.liens-pratiques__icone {
+	flex: none;
+	width: 1.75rem;
+	height: 1.75rem;
+	transition: transform 0.25s var(--su-ease);
+}
+
+.liens-pratiques a:hover .liens-pratiques__icone,
+.liens-pratiques summary:hover .liens-pratiques__icone {
+	transform: rotate(-6deg);
+}
+
+.liens-pratiques__feuille {
+	fill: #fff;
+}
+
+.liens-pratiques__punaise {
+	fill: var(--su-orange);
+	stroke: none;
+}
+
+.liens-pratiques__calendrier[open] {
+	flex-basis: 100%;
+}
+
+.liens-pratiques__calendrier > div {
+	margin-top: 0.75rem;
+	padding: 0.9rem 1rem;
+	border-left: 0.4rem solid var(--su-vert);
+	background: var(--su-fond);
+	font-weight: 400;
+}
+
+.liens-pratiques__calendrier p {
+	margin: 0 0 0.5rem;
+}
+
+.liens-pratiques__calendrier p:last-child {
+	margin-bottom: 0;
+}
+
+.liens-pratiques__calendrier a {
+	font-weight: 800;
+	color: inherit;
+}
+
+.liens-pratiques__calendrier input {
+	display: block;
+	width: 100%;
+	margin-top: 0.35rem;
+	padding: 0.45rem 0.6rem;
+	border: 2px solid var(--su-trait);
+	border-radius: 0;
+	background: #fff;
+	color: inherit;
+	font: inherit;
+	font-size: 0.8125rem;
 }
 
 /* Week-ends et camps : une étiquette dans les lignes d'agenda… */

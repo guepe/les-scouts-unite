@@ -169,10 +169,20 @@ body {
 	list-style: none;
 }
 
+.feuille__reunions--colonnes {
+	columns: 2;
+	column-gap: 7mm;
+}
+
+.feuille__reunions--colonnes .feuille__notes {
+	font-size: 8.5pt;
+}
+
 .feuille__reunion {
 	display: flex;
-	gap: 5mm;
-	padding: 2.5mm 0;
+	align-items: flex-start;
+	gap: 4mm;
+	padding: 1.6mm 0;
 	border-bottom: 0.3mm solid var(--trait);
 	break-inside: avoid;
 }
@@ -183,9 +193,9 @@ body {
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	width: 22mm;
-	padding: 1.5mm 1mm;
-	border-radius: 2.5mm;
+	width: 19mm;
+	padding: 0.8mm 1mm;
+	border-radius: 2mm;
 	background: var(--section);
 	color: #fff;
 	line-height: 1.1;
@@ -199,14 +209,14 @@ body {
 
 .feuille__pastille span {
 	font-weight: 800;
-	font-size: 8.5pt;
+	font-size: 7.5pt;
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
 }
 
 .feuille__pastille strong {
 	font-weight: 900;
-	font-size: 17pt;
+	font-size: 14pt;
 	white-space: nowrap;
 }
 
@@ -217,7 +227,7 @@ body {
 
 .feuille__quoi {
 	font-weight: 900;
-	font-size: 12.5pt;
+	font-size: 11.5pt;
 	line-height: 1.2;
 }
 
@@ -300,12 +310,85 @@ body {
 	margin-bottom: 2.5mm;
 }
 
+/* Réunion annulée */
+
+.feuille__reunion--annulee .feuille__pastille {
+	background: #9AA5B1;
+}
+
+.feuille__reunion--annulee .feuille__quoi {
+	text-decoration: line-through;
+}
+
+/* L'étiquette « Annulée » n'est pas barrée. */
+.feuille__annulee {
+	text-decoration: none;
+}
+
+.feuille__annulee {
+	display: inline-block;
+	padding: 0.3mm 2mm;
+	background: #D51317;
+	color: #fff;
+	font-weight: 900;
+	font-size: 8pt;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	vertical-align: 0.15em;
+}
+
+.feuille__bandeau-annulee {
+	margin-bottom: 5mm !important;
+	padding: 4mm 5mm;
+	background: #D51317;
+	color: #fff;
+	font-size: 12pt;
+}
+
+.feuille__bandeau-annulee strong {
+	display: block;
+	font-weight: 900;
+	font-size: 20pt;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+}
+
+/* Bon à savoir */
+
+.feuille__bon {
+	margin-top: 5mm;
+	padding: 3mm 5mm;
+	border-left: 1.5mm solid var(--section);
+	break-inside: avoid;
+}
+
+.feuille__bon h2 {
+	margin-bottom: 1.5mm;
+	font-weight: 900;
+	font-size: 12pt;
+}
+
+.feuille__bon ul {
+	columns: 2;
+	column-gap: 8mm;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	font-size: 9.5pt;
+	line-height: 1.35;
+}
+
+.feuille__bon li {
+	margin-bottom: 1mm;
+	break-inside: avoid;
+}
+
 /* Staff et pied */
 
 .feuille__staff {
 	display: flex;
 	gap: 6mm;
-	margin-top: 7mm;
+	margin-top: 5mm;
 	padding: 5mm 6mm;
 	border-radius: 2.5mm;
 	background: var(--fond);

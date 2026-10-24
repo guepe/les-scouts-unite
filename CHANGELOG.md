@@ -2,6 +2,14 @@
 
 Les versions suivent le numéro `Version:` de `style.css`. Chaque version publiée a son zip dans les [Releases](https://github.com/guepe/les-scouts-unite/releases).
 
+## 2.9.0 – non publiée
+
+- **L’agenda dans le calendrier du téléphone** : « Ajouter à mon calendrier » abonne Google Agenda, Apple Calendrier ou Outlook à l’agenda d’une section (avec les activités de toute l’unité) ou de toute l’unité. Une réunion ajoutée, déplacée ou supprimée se met à jour d’elle-même. Sur la page d’une réunion, le même lien ajoute cette seule réunion.
+- **Réunion annulée** : une case « Réunion annulée » et un mot d’explication facultatif dans le panneau « Quand et où ? ». La réunion reste affichée jusqu’à sa date, barrée, avec une étiquette rouge « Annulée » : accueil, page de section (la prochaine réunion passe à la suivante, avec un rappel au-dessus), agenda, page de la réunion, À la une, temps forts, feuilles à imprimer et calendrier du téléphone.
+- **Bon à savoir** : par section, dans Réglages → Unité, ce qui ne change pas d’une semaine à l’autre (horaire habituel, lieu, uniforme, à emporter). Les infos s’affichent sous la prochaine réunion de la page de section et sur les feuilles à imprimer.
+- Le programme à imprimer passe sur deux colonnes au-delà de 8 réunions, pour que trois mois de réunions tiennent sur une feuille.
+- Les liens d’impression deviennent « Le programme à mettre sur le frigo » et « La convocation à mettre sur le frigo », avec une icône de frigo. Ils s’affichent aussi quand aucune réunion n’est encore prévue.
+
 ## 2.8.0 – 2026-10-24
 
 - **Feuilles à imprimer** pour le frigo, à imprimer ou à enregistrer en PDF : le programme d’une section (ou de toute l’unité) sur 1 à 12 mois, et la convocation d’une réunion avec ses notes. Chaque feuille porte le logo de la section, le staff et les contacts de Réglages → Unité. Les liens se trouvent sur les pages de section, sous l’agenda, sur la page d’une réunion et dans la liste des réunions de l’administration.

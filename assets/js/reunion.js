@@ -145,6 +145,23 @@
 				__nextHasNoMarginBottom: true,
 			} ),
 			el( C.CheckboxControl, {
+				label: 'Réunion annulée',
+				checked: meta.su_annulee === '1',
+				onChange: function ( coche ) {
+					editor.editPost( { meta: coche ? { su_annulee: '1' } : { su_annulee: '', su_annulee_pourquoi: '' } } );
+				},
+				help: 'Elle reste affichée jusqu’à sa date, marquée « Annulée », pour que les parents le voient.',
+				__nextHasNoMarginBottom: true,
+			} ),
+			meta.su_annulee === '1' &&
+				el( C.TextControl, {
+					label: 'Pourquoi ? (facultatif)',
+					value: meta.su_annulee_pourquoi || '',
+					onChange: set( 'su_annulee_pourquoi' ),
+					placeholder: 'Local indisponible, rendez-vous samedi prochain',
+					__nextHasNoMarginBottom: true,
+				} ),
+			el( C.CheckboxControl, {
 				label: 'Mettre en avant sur l’accueil',
 				checked: meta.su_avant === '1',
 				onChange: function ( coche ) {
