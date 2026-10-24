@@ -2,7 +2,7 @@
 
 Les versions suivent le numéro `Version:` de `style.css`. Chaque version publiée a son zip dans les [Releases](https://github.com/guepe/les-scouts-unite/releases).
 
-## 2.10.0 – non publiée
+## 2.10.0 – 2026-10-24
 
 - **Documents à télécharger** : nouveau menu **Documents** dans l’administration (titre, fichier de la médiathèque, section ou toute l’unité, une ligne d’explication, ordre). Ils s’affichent sous « Les documents » sur chaque page de section (avec ceux de toute l’unité) et sur une nouvelle page « Documents », rangés par section. Un animateur ne gère que les documents de ses sections. Les pages de section déjà créées reçoivent le bloc automatiquement.
 - **Questions fréquentes** : composition « Page Questions fréquentes », avec une question repliée par bloc Détails, rangée par thème (inscription, vie de la section, week-ends et camp, argent, santé et sécurité). Les questions sont des exemples à compléter.
