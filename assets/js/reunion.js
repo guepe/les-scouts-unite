@@ -40,10 +40,18 @@
 			return select( 'core/editor' ).isEditorPanelOpened( panneau );
 		}, [] );
 		var editPost = useDispatch( 'core/edit-post' );
+		var montage = wp.element.useRef( Date.now() );
+		// Les préférences de l'utilisateur arrivent après le premier affichage et peuvent refermer
+		// le panneau : on le rouvre pendant les premières secondes, puis on laisse faire l'utilisateur.
+		useEffect(
+			function () {
+				if ( ! ouvert && editor.toggleEditorPanelOpened && Date.now() - montage.current < 4000 ) {
+					editor.toggleEditorPanelOpened( panneau );
+				}
+			},
+			[ ouvert ]
+		);
 		useEffect( function () {
-			if ( ! ouvert && editor.toggleEditorPanelOpened ) {
-				editor.toggleEditorPanelOpened( panneau );
-			}
 			// Réunion encore vide : on montre le panneau latéral, même s'il avait été fermé.
 			if ( ( ! meta.su_section || ! meta.su_date ) && editPost && editPost.openGeneralSidebar ) {
 				editPost.openGeneralSidebar( 'edit-post/document' );

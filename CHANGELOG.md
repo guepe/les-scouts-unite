@@ -2,6 +2,11 @@
 
 Les versions suivent le numéro `Version:` de `style.css`. Chaque version publiée a son zip dans les [Releases](https://github.com/guepe/les-scouts-unite/releases).
 
+## 2.10.2 – 2026-10-24
+
+- Éditeur de réunion : le panneau « Quand et où ? » s’ouvre aussi sur une réunion déjà enregistrée. Les préférences de WordPress, chargées juste après l’ouverture, le refermaient. On peut toujours le replier soi-même ensuite.
+- Modes d’emploi illustrés : [le site en 8 fiches pour le staff d’unité](docs/fiches-chefs-unite/), à côté des [7 fiches des animateurs](docs/fiches-animateurs/), en images et en PDF.
+
 ## 2.10.1 – 2026-10-24
 
 - **Correction importante des droits des animateurs** : sur sa page de section, un animateur voyait « Soumettre à la relecture » au lieu d’« Enregistrer ». S’il cliquait, la page passait en attente de relecture et disparaissait du site. L’animateur peut désormais enregistrer la page de ses sections directement, et une page publiée qu’il modifie reste publiée. Il ne peut toujours pas créer de page, ni toucher à celles des autres sections. Les rôles sont réécrits automatiquement à la mise à jour.
