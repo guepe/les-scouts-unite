@@ -176,7 +176,7 @@ function scoutsunite_agenda_editor_assets() {
 		'scoutsunite-reunion',
 		get_theme_file_uri( 'assets/js/reunion.js' ),
 		array( 'wp-plugins', 'wp-editor', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-core-data' ),
-		wp_get_theme()->get( 'Version' ),
+		scoutsunite_version( 'assets/js/reunion.js' ),
 		true
 	);
 	wp_add_inline_script(
@@ -489,6 +489,9 @@ function scoutsunite_agenda_heure( $heure ) {
 	if ( ! preg_match( '/^(\d{1,2}):(\d{2})/', (string) $heure, $m ) ) {
 		return '';
 	}
+	if ( 0 === (int) $m[1] && '00' === $m[2] ) {
+		return 'minuit';
+	}
 	return (int) $m[1] . ' h' . ( '00' === $m[2] ? '' : ' ' . $m[2] );
 }
 
@@ -513,11 +516,19 @@ function scoutsunite_agenda_section_url( $section ) {
 }
 
 /**
- * Le titre ne s'affiche que s'il dit autre chose que « Réunion ».
+ * Le titre ne s'affiche que s'il dit autre chose que « Réunion » ou que le nom de la section
+ * (une réunion intitulée « Baladins » chez les Baladins).
  */
 function scoutsunite_agenda_titre( $post ) {
-	$titre = get_the_title( $post );
-	return 0 === strcasecmp( $titre, 'Réunion' ) ? '' : $titre;
+	$post    = get_post( $post );
+	$titre   = get_the_title( $post );
+	$section = scoutsunite_agenda_sections()[ get_post_meta( $post->ID, 'su_section', true ) ] ?? '';
+	foreach ( array( 'Réunion', $section, 'Réunion ' . $section ) as $evident ) {
+		if ( '' !== trim( $evident ) && 0 === strcasecmp( remove_accents( $titre ), remove_accents( $evident ) ) ) {
+			return '';
+		}
+	}
+	return $titre;
 }
 
 /* ---------------------------------------------------------------------------
@@ -529,7 +540,7 @@ function scoutsunite_agenda_blocks() {
 		'scoutsunite-blocs',
 		get_theme_file_uri( 'assets/js/blocs.js' ),
 		array( 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-server-side-render' ),
-		wp_get_theme()->get( 'Version' ),
+		scoutsunite_version( 'assets/js/blocs.js' ),
 		true
 	);
 

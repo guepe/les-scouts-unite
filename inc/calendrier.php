@@ -34,6 +34,8 @@ function scoutsunite_calendrier_url( $section = '' ) {
  * @return string
  */
 function scoutsunite_calendrier_texte( $texte ) {
+	// Les titres WordPress arrivent avec des entités (« d&rsquo;automne ») : le calendrier veut le texte.
+	$texte = html_entity_decode( $texte, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
 	$texte = str_replace( array( '\\', ';', ',' ), array( '\\\\', '\\;', '\\,' ), $texte );
 	return preg_replace( '/\R/u', '\\n', trim( $texte ) );
 }
@@ -57,16 +59,50 @@ function scoutsunite_calendrier_ligne( $ligne ) {
 }
 
 /**
+ * Fuseau des heures de réunion : celui du site, ou Bruxelles si le site est resté en UTC
+ * (le réglage par défaut de WordPress) : les heures encodées sont toujours belges.
+ *
+ * @return DateTimeZone
+ */
+function scoutsunite_calendrier_fuseau() {
+	return scoutsunite_calendrier_fuseau_utc() ? new DateTimeZone( 'Europe/Brussels' ) : wp_timezone();
+}
+
+/**
+ * Le site est-il resté sur UTC, sans fuseau choisi ?
+ *
+ * @return bool
+ */
+function scoutsunite_calendrier_fuseau_utc() {
+	return in_array( wp_timezone_string(), array( 'UTC', '+00:00' ), true );
+}
+
+/**
  * Date et heure locales d'une réunion en UTC : « 20261031T130000Z ».
  *
- * @param string $date  Jour, Y-m-d.
- * @param string $heure Heure, H:i.
+ * @param string $date     Jour, Y-m-d.
+ * @param string $heure    Heure, H:i.
+ * @param bool   $lendemain Le lendemain (une fin à minuit ou après minuit).
  * @return string
  */
-function scoutsunite_calendrier_utc( $date, $heure ) {
-	$moment = DateTimeImmutable::createFromFormat( 'Y-m-d H:i', $date . ' ' . substr( $heure, 0, 5 ), wp_timezone() );
+function scoutsunite_calendrier_utc( $date, $heure, $lendemain = false ) {
+	$moment = DateTimeImmutable::createFromFormat( 'Y-m-d H:i', $date . ' ' . substr( $heure, 0, 5 ), scoutsunite_calendrier_fuseau() );
+	if ( $moment && $lendemain ) {
+		$moment = $moment->modify( '+1 day' );
+	}
 	return $moment ? $moment->setTimezone( new DateTimeZone( 'UTC' ) )->format( 'Ymd\THis\Z' ) : '';
 }
+
+/**
+ * Un administrateur est prévenu si le site est resté en UTC : les dates de WordPress
+ * et le « aujourd'hui » de l'agenda seraient décalés.
+ */
+function scoutsunite_calendrier_avis_fuseau() {
+	if ( current_user_can( 'manage_options' ) && scoutsunite_calendrier_fuseau_utc() ) {
+		echo '<div class="notice notice-warning"><p>Le fuseau horaire du site est UTC. Choisis <strong>Bruxelles</strong> dans <a href="' . esc_url( admin_url( 'options-general.php' ) ) . '">Réglages → Général → Fuseau horaire</a>, pour que les heures et les dates soient justes partout.</p></div>';
+	}
+}
+add_action( 'admin_notices', 'scoutsunite_calendrier_avis_fuseau' );
 
 /**
  * Un événement par réunion. Un week-end ou un camp occupe ses jours entiers, l'horaire
@@ -104,8 +140,9 @@ function scoutsunite_calendrier_evenement( $r ) {
 		$lignes[] = 'DTEND;VALUE=DATE:' . ( new DateTimeImmutable( $dernier ) )->modify( '+1 day' )->format( 'Ymd' );
 	} else {
 		$lignes[] = 'DTSTART:' . scoutsunite_calendrier_utc( $date, $debut );
-		if ( preg_match( '/^\d{1,2}:\d{2}/', $fin ) && $fin > $debut ) {
-			$lignes[] = 'DTEND:' . scoutsunite_calendrier_utc( $date, $fin );
+		if ( preg_match( '/^\d{1,2}:\d{2}/', $fin ) ) {
+			// Une fin à minuit (ou plus tôt que le début) tombe le lendemain : « 20 h – minuit ».
+			$lignes[] = 'DTEND:' . scoutsunite_calendrier_utc( $date, $fin, $fin <= $debut );
 		}
 	}
 
@@ -225,7 +262,7 @@ function scoutsunite_calendrier() {
 		'CALSCALE:GREGORIAN',
 		'METHOD:PUBLISH',
 		'X-WR-CALNAME:' . scoutsunite_calendrier_texte( $nom ),
-		'X-WR-TIMEZONE:' . wp_timezone_string(),
+		'X-WR-TIMEZONE:' . scoutsunite_calendrier_fuseau()->getName(),
 		// Les clients qui le lisent reviennent chercher les changements deux fois par jour.
 		'REFRESH-INTERVAL;VALUE=DURATION:PT12H',
 		'X-PUBLISHED-TTL:PT12H',

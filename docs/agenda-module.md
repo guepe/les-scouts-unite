@@ -209,6 +209,18 @@ Les blocs :
 - Dans l'administration, ses listes de réunions et de pages sont filtrées sur ses sections ; sur une page, l'éditeur est verrouillé en `templateLock: 'contentOnly'` (filtre `block_editor_settings_all`).
 - Les rôles sont (ré)écrits quand `SCOUTSUNITE_DROITS_VERSION` change (option `scoutsunite_droits_version`).
 
+## Documents (`inc/documents.php`)
+
+- Type de contenu `document` : `public => false`, `show_ui`, `show_in_rest`, `capability_type => [ 'document', 'documents' ]`, `supports => [ 'title', 'page-attributes' ]` (l'« Ordre »). Écran classique, sans éditeur de blocs : une boîte « Le document » (section, fichier choisi avec `wp.media`, explication), enregistrée sur `save_post_document` avec un nonce.
+- Champs `su_section` (nettoyé par `scoutsunite_droits_section_permise`), `su_fichier` (ID d'une pièce jointe), `su_explication`. Un document sans fichier n'est affiché nulle part ; un avis le signale dans l'administration.
+- Droits : `scoutsunite_droits_documents()` (les droits `*_documents`), donnés aux mêmes rôles que les réunions (`SCOUTSUNITE_DROITS_VERSION` passe à 2). `map_meta_cap` et le filtre des listes traitent `document` comme `reunion` : un animateur ne voit et ne modifie que les documents de ses sections, jamais ceux de toute l'unité.
+- Bloc `scoutsunite/documents` (attribut `section`) : la section et `unite`, ou tous les documents rangés par section (`h2.documents__section`). Une ligne par document : type de fichier, titre lié au fichier, étiquette « toute l'unité », explication, type et taille.
+- Reprise : `scoutsunite_reprise_documents()` ajoute, une seule fois, « Les documents » et le bloc après `scoutsunite/camps` dans les pages de section déjà créées.
+
+## Questions fréquentes (`patterns/page-faq.php`)
+
+- Composition « Page Questions fréquentes » : un groupe `.faq`, un `h2.faq__theme` par thème et des blocs `core/details` (question dans `summary`, réponse dedans), en exemples surlignés « à compléter ». La flèche est dessinée en CSS (deux traits à 45 degrés, qui pivotent à l'ouverture).
+
 ## Réunion annulée
 
 - Champs `su_annulee` (`'1'` ou `''`) et `su_annulee_pourquoi` (texte d'une ligne), dans le panneau « Quand et où ? ». Décocher vide aussi l'explication. Les copies d'une répétition hebdomadaire ne reprennent pas l'annulation.

@@ -129,7 +129,13 @@ function scoutsunite_section_pattern( $slug ) {
 <h3 class="wp-block-heading">Les temps forts</h3>
 <!-- /wp:heading -->
 
-<!-- wp:scoutsunite/camps {"section":"<?php echo esc_attr( $slug ); ?>"} /--></div>
+<!-- wp:scoutsunite/camps {"section":"<?php echo esc_attr( $slug ); ?>"} /-->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Les documents</h3>
+<!-- /wp:heading -->
+
+<!-- wp:scoutsunite/documents {"section":"<?php echo esc_attr( $slug ); ?>"} /--></div>
 <!-- /wp:group -->
 	<?php
 }

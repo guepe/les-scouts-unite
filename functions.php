@@ -17,12 +17,24 @@ function scoutsunite_setup() {
 }
 add_action( 'after_setup_theme', 'scoutsunite_setup' );
 
+/**
+ * Version d'un fichier du thème pour le cache des navigateurs : la version du thème,
+ * suivie de la date du fichier, pour qu'une correction soit vue même sans changer de version.
+ *
+ * @param string $fichier Chemin relatif au thème.
+ * @return string
+ */
+function scoutsunite_version( $fichier ) {
+	$chemin = get_theme_file_path( $fichier );
+	return wp_get_theme()->get( 'Version' ) . ( is_readable( $chemin ) ? '.' . filemtime( $chemin ) : '' );
+}
+
 function scoutsunite_enqueue() {
 	wp_enqueue_style(
 		'scoutsunite',
 		get_stylesheet_uri(),
 		array(),
-		wp_get_theme()->get( 'Version' )
+		scoutsunite_version( 'style.css' )
 	);
 }
 add_action( 'wp_enqueue_scripts', 'scoutsunite_enqueue' );
@@ -190,6 +202,23 @@ function scoutsunite_page_iama() {
 }
 
 /**
+ * Pages « pour les parents » du menu (Documents, Questions fréquentes), seulement
+ * si l'unité les a créées et publiées : pas de lien vers une page qui n'existe pas.
+ *
+ * @return array Libellé => adresse.
+ */
+function scoutsunite_pages_parents() {
+	$liens = array();
+	foreach ( array( 'documents' => 'Documents', 'questions-frequentes' => 'Questions fréquentes' ) as $slug => $libelle ) {
+		$page = get_page_by_path( $slug );
+		if ( $page && 'publish' === $page->post_status ) {
+			$liens[ $libelle ] = get_permalink( $page );
+		}
+	}
+	return $liens;
+}
+
+/**
  * Sous la règle des âges : un mot pour les anciens, vers la page IAmA si elle
  * existe. Ajouté au rendu pour valoir aussi sur les pages déjà créées.
  *
@@ -245,6 +274,7 @@ require get_template_directory() . '/inc/section.php';
 require get_template_directory() . '/inc/agenda.php';
 require get_template_directory() . '/inc/imprimer.php';
 require get_template_directory() . '/inc/calendrier.php';
+require get_template_directory() . '/inc/documents.php';
 require get_template_directory() . '/inc/unite.php';
 require get_template_directory() . '/inc/whatsapp.php';
 require get_template_directory() . '/inc/droits.php';

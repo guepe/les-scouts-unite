@@ -16,6 +16,8 @@ $sections = $page( 'Les sections', 'sections', $p( 'page-sections' ) );
 foreach ( array( 'baladins' => 'Baladins', 'louveteaux' => 'Louveteaux', 'eclaireurs' => 'Éclaireurs', 'pionniers' => 'Pionniers' ) as $s => $n ) { $page( $n, $s, $p( 'page-section-' . $s ), $sections, 'page-pleine-largeur' ); }
 $page( 'Inscription', 'inscription', $p( 'page-inscription' ) );
 $page( 'Contact', 'contact', $p( 'page-contact' ) );
+$page( 'Documents', 'documents', $p( 'page-documents' ) );
+$page( 'Questions fréquentes', 'questions-frequentes', $p( 'page-faq' ) );
 $page( 'IAmA – Anciens et amis', 'iama', $p( 'page-iama' ) );
 update_option( 'show_on_front', 'page' );
 update_option( 'page_on_front', $accueil );

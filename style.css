@@ -3,7 +3,7 @@ Theme Name: Les Scouts – Unité
 Theme URI: https://github.com/guepe/les-scouts-unite
 Author: Pierre-Henri Delaval
 Description: Thème de bloc pour le site d’une unité Les Scouts asbl, construit sur la charte graphique de la fédération : bleu de la fédération, toppings, couleurs de section et police Muli. Le nom de l’unité vient du titre du site ; tout se modifie dans l’éditeur de site.
-Version: 2.9.0
+Version: 2.10.0
 Requires at least: 6.5
 Tested up to: 6.8
 Requires PHP: 7.4
@@ -985,6 +985,139 @@ a.lien-fleche:hover::after {
 	margin: 0.5rem 0 1rem;
 }
 
+/* Documents à télécharger (inc/documents.php). */
+.documents__liste {
+	display: grid;
+	gap: 0.75rem;
+	margin: var(--wp--preset--spacing--40) 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.documents__item {
+	display: grid;
+	grid-template-columns: 3.25rem 1fr;
+	align-items: start;
+	gap: 0.9rem;
+	padding: 0.75rem 0;
+	border-bottom: 2px solid var(--su-fond);
+}
+
+.documents__type {
+	display: grid;
+	place-items: center;
+	height: 3.75rem;
+	border: 2px solid var(--su-bleu);
+	background: #fff;
+	font-size: 0.75rem;
+	font-weight: 900;
+	letter-spacing: 0.04em;
+	box-shadow: 3px 3px 0 var(--su-trait);
+}
+
+.documents__texte {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+	min-width: 0;
+}
+
+.documents__lien {
+	font-weight: 900;
+	font-size: 1.0625rem;
+	color: inherit;
+	text-decoration-thickness: 2px;
+	text-underline-offset: 0.2em;
+	overflow-wrap: anywhere;
+}
+
+.documents__unite {
+	align-self: flex-start;
+	padding: 0 0.5rem;
+	border: 1.5px solid var(--su-vert);
+	border-radius: 999px;
+	font-size: 0.75rem;
+	font-weight: 800;
+}
+
+.documents__explication {
+	font-size: var(--wp--preset--font-size--small);
+}
+
+.documents__infos {
+	font-size: 0.8125rem;
+	color: var(--su-vert-fonce);
+}
+
+.documents__section {
+	margin-top: var(--wp--preset--spacing--60);
+	padding-left: 0.75rem;
+	border-left: 0.5rem solid var(--su-bleu);
+}
+
+.documents__section:first-child {
+	margin-top: 0;
+}
+
+.documents--baladins { border-left-color: var(--wp--preset--color--baladins); }
+.documents--louveteaux { border-left-color: var(--wp--preset--color--louveteaux); }
+.documents--eclaireurs { border-left-color: var(--wp--preset--color--eclaireurs); }
+.documents--pionniers { border-left-color: var(--wp--preset--color--pionniers); }
+.documents--unite { border-left-color: var(--su-vert); }
+.documents--iama { border-left-color: var(--su-vert-fonce); }
+
+.documents__vide {
+	color: var(--su-vert-fonce);
+}
+
+/* Questions fréquentes : une question repliée par bloc Détails, la réponse au clic. */
+.faq__theme {
+	margin-top: var(--wp--preset--spacing--60);
+}
+
+.faq__theme:first-child {
+	margin-top: 0;
+}
+
+.faq .wp-block-details {
+	border-bottom: 2px solid var(--su-trait);
+}
+
+.faq .wp-block-details summary {
+	position: relative;
+	padding: 0.9rem 2.5rem 0.9rem 0;
+	font-weight: 800;
+	font-size: 1.0625rem;
+	list-style: none;
+	cursor: pointer;
+}
+
+.faq .wp-block-details summary::-webkit-details-marker {
+	display: none;
+}
+
+/* La flèche : deux traits tournés à 45 degrés, qui pivotent à l'ouverture. */
+.faq .wp-block-details summary::after {
+	content: "";
+	position: absolute;
+	top: 50%;
+	right: 0.6rem;
+	width: 0.6rem;
+	height: 0.6rem;
+	border-right: 2.5px solid currentColor;
+	border-bottom: 2.5px solid currentColor;
+	transform: translateY(-70%) rotate(45deg);
+	transition: transform 0.25s var(--su-ease);
+}
+
+.faq .wp-block-details[open] summary::after {
+	transform: translateY(-30%) rotate(-135deg);
+}
+
+.faq .wp-block-details > :not(summary) {
+	margin: 0 0 1rem;
+}
+
 /* « Bon à savoir » d'une section, sous la prochaine réunion (Réglages → Unité). */
 .bon-a-savoir {
 	margin-top: var(--wp--preset--spacing--40);
@@ -1316,6 +1449,26 @@ a.lien-fleche:hover::after {
 	text-decoration-color: var(--section);
 	text-decoration-thickness: 2px;
 	text-underline-offset: 0.2em;
+}
+
+.staff__contact {
+	margin-top: var(--wp--preset--spacing--40) !important;
+	padding-top: 0.9rem;
+	border-top: 2px solid var(--su-fond);
+	font-weight: 800;
+	line-height: 1.6;
+}
+
+.staff__contact span {
+	display: block;
+	font-size: var(--wp--preset--font-size--small);
+	font-weight: 400;
+	color: var(--su-vert-fonce);
+}
+
+.staff__contact a {
+	color: inherit;
+	overflow-wrap: anywhere;
 }
 
 .staff__total {

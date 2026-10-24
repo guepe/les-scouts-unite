@@ -38,6 +38,12 @@
 <!-- wp:list-item -->
 <li><a href="/inscription/">Inscription</a></li>
 <!-- /wp:list-item -->
+<?php foreach ( scoutsunite_pages_parents() as $libelle => $url ) : ?>
+
+<!-- wp:list-item -->
+<li><a href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $libelle ); ?></a></li>
+<!-- /wp:list-item -->
+<?php endforeach; ?>
 
 <!-- wp:list-item -->
 <li><a href="/iama/">Anciens et amis (IAmA)</a></li>

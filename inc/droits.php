@@ -3,7 +3,7 @@
  * Droits d'accès : les rôles « Animateur » et « Staff d'unité ».
  *
  * Un animateur est rattaché à une ou plusieurs sections (dans son profil, par un
- * administrateur). Il gère les réunions de ses sections et modifie les textes et
+ * administrateur). Il gère les réunions et les documents de ses sections et modifie les textes et
  * images de leur page, rien d'autre. Le staff d'unité gère tout le contenu et
  * Réglages → Unité, sans les réglages techniques du site.
  *
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /** Version des rôles : l'augmenter pour réécrire les rôles au prochain chargement. */
-const SCOUTSUNITE_DROITS_VERSION = 1;
+const SCOUTSUNITE_DROITS_VERSION = 2;
 
 /**
  * Droits sur les réunions (type de contenu « reunion »).
@@ -40,11 +40,20 @@ function scoutsunite_droits_reunions() {
 	);
 }
 
+/**
+ * Droits sur les documents (type de contenu « document », inc/documents.php) : les mêmes que pour les réunions.
+ *
+ * @return array
+ */
+function scoutsunite_droits_documents() {
+	return str_replace( 'reunions', 'documents', scoutsunite_droits_reunions() );
+}
+
 function scoutsunite_droits_roles() {
 	if ( SCOUTSUNITE_DROITS_VERSION === (int) get_option( 'scoutsunite_droits_version' ) ) {
 		return;
 	}
-	$reunions = array_fill_keys( scoutsunite_droits_reunions(), true );
+	$reunions = array_fill_keys( array_merge( scoutsunite_droits_reunions(), scoutsunite_droits_documents() ), true );
 
 	remove_role( 'scoutsunite_animateur' );
 	add_role(
@@ -150,7 +159,7 @@ function scoutsunite_droits_section_permise( $valeur ) {
 }
 
 /**
- * Le cœur des droits : un animateur ne touche qu'aux réunions et aux pages de ses sections.
+ * Le cœur des droits : un animateur ne touche qu'aux réunions, aux documents et aux pages de ses sections.
  *
  * @param string[] $caps    Droits nécessaires.
  * @param string   $cap     Droit demandé.
@@ -168,9 +177,9 @@ function scoutsunite_droits_limites( $caps, $cap, $user_id, $args ) {
 	}
 	$miennes = scoutsunite_droits_sections( $user_id );
 
-	if ( 'reunion' === $post->post_type ) {
+	if ( in_array( $post->post_type, array( 'reunion', 'document' ), true ) ) {
 		$section = get_post_meta( $post->ID, 'su_section', true );
-		// Une réunion qu'il vient de créer n'a pas encore de section ; celle d'un autre, sans section, ne le regarde pas.
+		// Une réunion ou un document qu'il vient de créer n'a pas encore de section ; celle d'un autre, sans section, ne le regarde pas.
 		$sienne_sans_section = '' === $section && (int) $post->post_author === (int) $user_id;
 		if ( $sienne_sans_section || in_array( $section, $miennes, true ) ) {
 			return $caps;
@@ -199,7 +208,7 @@ function scoutsunite_droits_listes( $query ) {
 		return;
 	}
 	$miennes = scoutsunite_droits_sections();
-	if ( 'reunion' === $query->get( 'post_type' ) ) {
+	if ( in_array( $query->get( 'post_type' ), array( 'reunion', 'document' ), true ) ) {
 		$query->set(
 			'meta_query',
 			array(
@@ -270,7 +279,7 @@ function scoutsunite_droits_profil( $user ) {
 							<?php echo esc_html( $nom ); ?>
 						</label>
 					<?php endforeach; ?>
-					<p class="description">Avec le rôle « Animateur », cette personne gère les réunions de ces sections et les textes de leur page, rien d’autre.</p>
+					<p class="description">Avec le rôle « Animateur », cette personne gère les réunions et les documents de ces sections et les textes de leur page, rien d’autre.</p>
 				</fieldset>
 			</td>
 		</tr>

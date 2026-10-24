@@ -90,7 +90,7 @@ function scoutsunite_imprimer_staff( $section ) {
 		foreach ( array_filter( array_map( 'trim', explode( "\n", scoutsunite_unite( $section . '_staff' ) ) ) ) as $ligne ) {
 			$membres[] = array( $ligne, '' );
 		}
-		$contacts[] = scoutsunite_unite( $section . '_email' );
+		$contacts[] = implode( ' · ', array_filter( array( scoutsunite_unite( $section . '_email' ), scoutsunite_unite( $section . '_gsm' ) ) ) );
 	} elseif ( 'iama' === $section ) {
 		if ( '' !== scoutsunite_unite( 'iama_chef' ) ) {
 			$membres[] = array( scoutsunite_unite( 'iama_chef' ), 'responsable IAmA' );
@@ -313,7 +313,7 @@ function scoutsunite_imprimer() {
 
 	$infos = scoutsunite_imprimer_section( $section );
 	$nom   = '' === $section ? 'Agenda de l’unité' : $infos['nom'];
-	$theme = wp_get_theme()->get( 'Version' );
+	$theme = scoutsunite_version( 'assets/css/imprimer.css' );
 	$site  = preg_replace( '#^https?://(www\.)?#', '', get_post_type_archive_link( 'reunion' ) );
 
 	nocache_headers();

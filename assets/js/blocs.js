@@ -202,6 +202,42 @@
 		},
 	} ) );
 
+	wp.blocks.registerBlockType( 'scoutsunite/documents', Object.assign( {}, commun, {
+		title: 'Documents',
+		description: 'Les documents à télécharger, ajoutés dans Documents → Ajouter.',
+		icon: 'media-document',
+		attributes: { section: { type: 'string', default: '' } },
+		edit: function ( props ) {
+			var sections = window.scoutsuniteGroupes || {};
+			return el(
+				wp.element.Fragment,
+				null,
+				el(
+					InspectorControls,
+					null,
+					el(
+						PanelBody,
+						{ title: 'Documents' },
+						el( SelectControl, {
+							label: 'Documents affichés',
+							value: props.attributes.section,
+							options: [ { label: 'Tous, rangés par section', value: '' } ].concat(
+								Object.keys( sections ).map( function ( slug ) {
+									return { label: 'unite' === slug ? sections[ slug ] : sections[ slug ] + ' (et l’unité)', value: slug };
+								} )
+							),
+							help: 'Les documents s’ajoutent dans le menu Documents.',
+							onChange: function ( section ) {
+								props.setAttributes( { section: section } );
+							},
+						} )
+					)
+				),
+				apercu( 'scoutsunite/documents' )( props )
+			);
+		},
+	} ) );
+
 	// Coordonnées de l'unité (Réglages → Unité) : l'éditeur montre les vraies valeurs.
 	if ( wp.blocks.registerBlockBindingsSource ) {
 		wp.blocks.registerBlockBindingsSource( {

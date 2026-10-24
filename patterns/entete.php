@@ -43,6 +43,14 @@
 
 <!-- wp:navigation-link {"label":"IAmA · anciens et amis","url":"/iama/","kind":"custom"} /-->
 <!-- /wp:navigation-submenu -->
+<?php if ( scoutsunite_pages_parents() ) : ?>
+
+<!-- wp:navigation-submenu {"label":"Parents","kind":"custom"} -->
+	<?php foreach ( scoutsunite_pages_parents() as $libelle => $url ) : ?>
+<!-- wp:navigation-link <?php echo wp_json_encode( array( 'label' => $libelle, 'url' => $url, 'kind' => 'custom' ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); ?> /-->
+	<?php endforeach; ?>
+<!-- /wp:navigation-submenu -->
+<?php endif; ?>
 
 <!-- wp:navigation-link {"label":"Inscription","url":"/inscription/","kind":"custom"} /-->
 

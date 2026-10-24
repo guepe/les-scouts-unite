@@ -51,6 +51,7 @@ function scoutsunite_unite_champs() {
 		$champs['Les staffs de section'][ $slug . '_chef' ]  = array( $nom . ' : chef ou cheffe de section', 'text', 'Totem – Prénom (fonction) 0470 00 00 00' );
 		$champs['Les staffs de section'][ $slug . '_staff' ] = array( $nom . ' : animateurs (un par ligne)', 'textarea', "Totem – Prénom (santé) 0470 00 00 00\nTotem – Prénom (communication)" );
 		$champs['Les staffs de section'][ $slug . '_email' ] = array( $nom . ' : e-mail', 'email', $slug . '@example.org' );
+		$champs['Les staffs de section'][ $slug . '_gsm' ]   = array( $nom . ' : GSM de la section', 'tel', '0470 00 00 00' );
 		$champs['Bon à savoir'][ $slug . '_infos' ]          = array( $nom . ' (une info par ligne)', 'textarea', "Réunions : le samedi de 14 h à 17 h, au local\nUniforme : pull de la section, foulard, short ou jupe bleu marine\nÀ emporter : une gourde et un goûter" );
 	}
 	foreach ( scoutsunite_agenda_sections() as $slug => $nom ) {
@@ -108,6 +109,26 @@ function scoutsunite_unite_lien( $cle, $schema ) {
 }
 
 /**
+ * Contact d'une section : son e-mail, son GSM ou les deux, en liens. Sans l'un ni
+ * l'autre, l'exemple surligné « à compléter ».
+ *
+ * @param string $section Section d'âge.
+ * @return string HTML.
+ */
+function scoutsunite_unite_contact_section( $section ) {
+	$liens = array();
+	if ( '' !== scoutsunite_unite( $section . '_email' ) ) {
+		$liens[] = scoutsunite_unite_lien( $section . '_email', 'mailto' );
+	}
+	if ( '' !== scoutsunite_unite( $section . '_gsm' ) ) {
+		$liens[] = scoutsunite_unite_lien( $section . '_gsm', 'tel' );
+	}
+	// Seules les sections d'âge ont un GSM (le clan IAmA n'a qu'un e-mail).
+	$gsm = isset( scoutsunite_sections()[ $section ] ) ? ' ou 0470 00 00 00' : '';
+	return $liens ? implode( '<br>', $liens ) : '<mark class="a-completer">' . esc_html( $section . '@example.org' . $gsm ) . '</mark>';
+}
+
+/**
  * Contenu d'un bloc lié à une clé.
  *
  * @param string $cle Clé de liaison.
@@ -159,9 +180,9 @@ function scoutsunite_unite_html( $cle ) {
 			$texte = 'formulaire-inscription' === $cle ? 'Remplir le formulaire d’inscription' : 'Écrire via le formulaire de contact';
 			return '<a class="wp-block-button__link wp-element-button" href="' . esc_url( $lien ) . '">' . $texte . '</a>';
 	}
-	// Staffs de section : « baladins-chef », « baladins-email »…
+	// Staffs de section : « baladins-chef », « baladins-email » (l'e-mail et/ou le GSM de la section)…
 	if ( preg_match( '/^([a-z]+)-(chef|email)$/', $cle, $m ) ) {
-		return 'chef' === $m[2] ? scoutsunite_unite_texte( $m[1] . '_chef' ) : scoutsunite_unite_lien( $m[1] . '_email', 'mailto' );
+		return 'chef' === $m[2] ? scoutsunite_unite_texte( $m[1] . '_chef' ) : scoutsunite_unite_contact_section( $m[1] );
 	}
 	return '';
 }
@@ -310,6 +331,13 @@ function scoutsunite_bloc_staff( $attributes ) {
 			'style' => '--section: var(--wp--preset--color--' . $section . ');',
 		)
 	);
+	// Le contact de la section (e-mail et/ou GSM), s'il est rempli : sur la page Contact, il garde son exemple.
+	$contact = '';
+	if ( '' !== scoutsunite_unite( $section . '_email' ) || '' !== scoutsunite_unite( $section . '_gsm' ) ) {
+		$contact = '<p class="staff__contact"><span>Pour joindre la section :</span> ' . scoutsunite_unite_contact_section( $section ) . '</p>';
+	}
+	$total .= $contact;
+
 	$whatsapp = scoutsunite_whatsapp_cartes( array( $section ) );
 	if ( '' !== $whatsapp ) {
 		$whatsapp = '<div class="whatsapp">' . $whatsapp . '</div>';
@@ -512,7 +540,7 @@ function scoutsunite_unite_page() {
 		<h1>Coordonnées de l’unité</h1>
 		<p>Encode ces informations une seule fois : elles s’affichent d’elles-mêmes dans le pied de page, les infos pratiques de l’accueil, la page Contact et la page Inscription. Les liens des formulaires (Google Forms, extension de formulaire…) deviennent des boutons sur ces deux pages.
 			Un champ laissé vide garde son exemple surligné en orange sur le site, pour qu’on voie ce qu’il reste à compléter.</p>
-		<p>Pour les staffs, écris une personne par ligne sous la forme « Totem – Prénom » (un prénom seul si la personne n’a pas encore de totem). Tu peux ajouter sa fonction entre parenthèses et son GSM : « Castor – Marie (santé, communication) 0470 12 34 56 ». Le chef ou la cheffe de section s’affiche en premier sur la page de la section. Les GSM sont visibles par tout le monde sur le site et sur les feuilles à imprimer.</p>
+		<p>Pour les staffs, écris une personne par ligne sous la forme « Totem – Prénom » (un prénom seul si la personne n’a pas encore de totem). Tu peux ajouter sa fonction entre parenthèses et son GSM : « Castor – Marie (santé, communication) 0470 12 34 56 ». Le chef ou la cheffe de section s’affiche en premier sur la page de la section. Les GSM sont visibles par tout le monde sur le site et sur les feuilles à imprimer. Pour joindre une section, remplis son e-mail, son GSM ou les deux : la page Contact et les feuilles à imprimer montrent ce qui est rempli.</p>
 		<p>« Bon à savoir » : ce qui ne change pas d’une semaine à l’autre (horaire habituel, lieu, uniforme, à emporter), une info par ligne. Commence une ligne par un mot suivi de deux-points pour le mettre en gras : « Uniforme : pull de la section, foulard ». Les infos s’affichent sous la prochaine réunion, sur la page de la section, et sur les feuilles à imprimer.</p>
 		<p>Pour un groupe WhatsApp, colle son lien d’invitation (dans WhatsApp : infos du groupe → Inviter via un lien). Le site en fait un QR code, affiché sur la page Contact, la page de la section et les feuilles à imprimer. Toute personne qui a le lien peut rejoindre le groupe : garde l’approbation des nouveaux membres activée dans WhatsApp.</p>
 		<p>Le nom de l’unité se règle dans <a href="<?php echo esc_url( admin_url( 'options-general.php' ) ); ?>">Réglages → Général</a> (titre et slogan du site).</p>

@@ -2,6 +2,15 @@
 
 Les versions suivent le numéro `Version:` de `style.css`. Chaque version publiée a son zip dans les [Releases](https://github.com/guepe/les-scouts-unite/releases).
 
+## 2.10.0 – non publiée
+
+- **Documents à télécharger** : nouveau menu **Documents** dans l’administration (titre, fichier de la médiathèque, section ou toute l’unité, une ligne d’explication, ordre). Ils s’affichent sous « Les documents » sur chaque page de section (avec ceux de toute l’unité) et sur une nouvelle page « Documents », rangés par section. Un animateur ne gère que les documents de ses sections. Les pages de section déjà créées reçoivent le bloc automatiquement.
+- **Questions fréquentes** : composition « Page Questions fréquentes », avec une question repliée par bloc Détails, rangée par thème (inscription, vie de la section, week-ends et camp, argent, santé et sécurité). Les questions sont des exemples à compléter.
+- Calendrier du téléphone : si le site est resté sur le fuseau UTC, les heures sont lues comme belges (Bruxelles) ; un avis invite l’administrateur à choisir le fuseau. Les apostrophes des titres ne sortent plus en code HTML (« d&rsquo;automne »). Une fin à minuit tombe le lendemain.
+- « 0 h » s’écrit « minuit » (« 20 h – minuit »). Une réunion intitulée du nom de sa section (« Baladins ») est traitée comme « Réunion » : plus de « Baladins · Baladins ».
+- Contact d’une section : un champ **GSM de la section** à côté de son e-mail, dans Réglages → Unité. On remplit l’un, l’autre ou les deux ; la page Contact, l’affiche du staff de la page de section (« Pour joindre la section ») et les feuilles à imprimer montrent ce qui est rempli.
+- Menu : un sous-menu **Parents** (Documents, Questions fréquentes) dans l’en-tête, et les mêmes liens dans le pied de page. Chaque lien n’apparaît que si sa page existe et est publiée.
+
 ## 2.9.0 – 2026-10-24
 
 - **L’agenda dans le calendrier du téléphone** : « Ajouter à mon calendrier » abonne Google Agenda, Apple Calendrier ou Outlook à l’agenda d’une section (avec les activités de toute l’unité) ou de toute l’unité. Une réunion ajoutée, déplacée ou supprimée se met à jour d’elle-même. Sur la page d’une réunion, le même lien ajoute cette seule réunion.
