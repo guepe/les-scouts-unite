@@ -53,7 +53,7 @@ function scoutsunite_documents_register() {
 				'single'            => true,
 				'default'           => '',
 				'show_in_rest'      => true,
-				'sanitize_callback' => 'su_section' === $key ? 'scoutsunite_droits_section_permise' : 'sanitize_text_field',
+				'sanitize_callback' => 'su_section' === $key ? 'scoutsunite_droits_section_permise' : ( 'su_fichier' === $key ? 'scoutsunite_documents_fichier_permis' : 'sanitize_text_field' ),
 				'auth_callback'     => function ( $permis, $cle, $post_id, $user_id ) {
 					return user_can( $user_id, 'edit_post', $post_id );
 				},
@@ -62,6 +62,22 @@ function scoutsunite_documents_register() {
 	}
 }
 add_action( 'init', 'scoutsunite_documents_register' );
+
+/**
+ * Le fichier d'un document : un fichier de la médiathèque que la personne peut voir.
+ * Sinon, un document publié pourrait montrer le fichier joint d'un brouillon ou d'une page privée.
+ *
+ * @param mixed $valeur Identifiant du fichier reçu.
+ * @return string Identifiant retenu, '' s'il n'est pas permis.
+ */
+function scoutsunite_documents_fichier_permis( $valeur ) {
+	$fichier = absint( $valeur );
+	if ( ! $fichier || 'attachment' !== get_post_type( $fichier ) ) {
+		return '';
+	}
+	// Sans personne connectée (WP-CLI, tâche planifiée), seul le type est vérifié.
+	return ! is_user_logged_in() || current_user_can( 'read_post', $fichier ) ? (string) $fichier : '';
+}
 
 function scoutsunite_documents_title_placeholder( $text, $post ) {
 	return 'document' === $post->post_type ? 'Fiche médicale, autorisation parentale, liste du matériel…' : $text;
@@ -169,8 +185,7 @@ function scoutsunite_documents_enregistrer( $post_id ) {
 		update_post_meta( $post_id, 'su_section', scoutsunite_droits_section_permise( wp_unslash( $_POST['su_section'] ) ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- nettoyé par scoutsunite_droits_section_permise().
 	}
 	if ( isset( $_POST['su_fichier'] ) ) {
-		$fichier = absint( $_POST['su_fichier'] );
-		update_post_meta( $post_id, 'su_fichier', $fichier && 'attachment' === get_post_type( $fichier ) ? (string) $fichier : '' );
+		update_post_meta( $post_id, 'su_fichier', scoutsunite_documents_fichier_permis( absint( $_POST['su_fichier'] ) ) );
 	}
 	if ( isset( $_POST['su_explication'] ) ) {
 		update_post_meta( $post_id, 'su_explication', sanitize_text_field( wp_unslash( $_POST['su_explication'] ) ) );

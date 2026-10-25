@@ -114,10 +114,14 @@ add_action( 'admin_notices', 'scoutsunite_calendrier_avis_fuseau' );
 function scoutsunite_calendrier_evenement( $r ) {
 	$sections = scoutsunite_agenda_sections();
 	$section  = get_post_meta( $r->ID, 'su_section', true );
-	$date     = get_post_meta( $r->ID, 'su_date', true );
-	$fin_jour = get_post_meta( $r->ID, 'su_jusqua', true );
-	$debut    = get_post_meta( $r->ID, 'su_debut', true );
-	$fin      = get_post_meta( $r->ID, 'su_fin', true );
+	// Relues avec les mêmes contrôles qu'à l'enregistrement : une réunion encodée avant la 2.10.3 ne fait pas tomber le flux.
+	$date     = scoutsunite_agenda_date_valide( get_post_meta( $r->ID, 'su_date', true ) );
+	$fin_jour = scoutsunite_agenda_date_valide( get_post_meta( $r->ID, 'su_jusqua', true ) );
+	$debut    = scoutsunite_agenda_heure_valide( get_post_meta( $r->ID, 'su_debut', true ) );
+	$fin      = scoutsunite_agenda_heure_valide( get_post_meta( $r->ID, 'su_fin', true ) );
+	if ( '' === $date ) {
+		return '';
+	}
 	$titre    = scoutsunite_agenda_titre( $r );
 	$type     = scoutsunite_agenda_type( $r->ID );
 	$quoi     = $titre ? $titre : ( $type ? $type : 'Réunion' );
@@ -177,7 +181,7 @@ function scoutsunite_calendrier_evenement( $r ) {
 		array(
 			scoutsunite_agenda_annulee( $r->ID ) ? 'Réunion annulée' . ( $pourquoi ? ' : ' . $pourquoi : '.' ) : '',
 			$horaire,
-			trim( html_entity_decode( wp_strip_all_tags( $r->post_content ), ENT_QUOTES, 'UTF-8' ) ),
+			scoutsunite_agenda_notes_visibles( $r ) ? trim( html_entity_decode( wp_strip_all_tags( $r->post_content ), ENT_QUOTES, 'UTF-8' ) ) : '',
 			'Plus d’infos : ' . get_permalink( $r ),
 		)
 	);

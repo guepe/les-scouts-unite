@@ -3,11 +3,11 @@
  * Une page A4 à l'impression ; à l'écran, la même page posée sur un fond gris.
  */
 
-@font-face { font-family: Muli; font-weight: 400; font-display: swap; src: url(../fonts/Muli-Regular.ttf); }
-@font-face { font-family: Muli; font-weight: 400; font-style: italic; font-display: swap; src: url(../fonts/Muli-Italic.ttf); }
-@font-face { font-family: Muli; font-weight: 700; font-display: swap; src: url(../fonts/Muli-Bold.ttf); }
-@font-face { font-family: Muli; font-weight: 800; font-display: swap; src: url(../fonts/Muli-ExtraBold.ttf); }
-@font-face { font-family: Muli; font-weight: 900; font-display: swap; src: url(../fonts/Muli-Black.ttf); }
+@font-face { font-family: Muli; font-weight: 400; font-display: swap; src: url(../fonts/Muli-Regular.woff2) format('woff2'), url(../fonts/Muli-Regular.ttf) format('truetype'); }
+@font-face { font-family: Muli; font-weight: 400; font-style: italic; font-display: swap; src: url(../fonts/Muli-Italic.woff2) format('woff2'), url(../fonts/Muli-Italic.ttf) format('truetype'); }
+@font-face { font-family: Muli; font-weight: 700; font-display: swap; src: url(../fonts/Muli-Bold.woff2) format('woff2'), url(../fonts/Muli-Bold.ttf) format('truetype'); }
+@font-face { font-family: Muli; font-weight: 800; font-display: swap; src: url(../fonts/Muli-ExtraBold.woff2) format('woff2'), url(../fonts/Muli-ExtraBold.ttf) format('truetype'); }
+@font-face { font-family: Muli; font-weight: 900; font-display: swap; src: url(../fonts/Muli-Black.woff2) format('woff2'), url(../fonts/Muli-Black.ttf) format('truetype'); }
 
 :root {
 	--bleu: #0A4275;

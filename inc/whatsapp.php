@@ -14,14 +14,30 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 require_once __DIR__ . '/lib/qrcode.php';
 
+/** La bibliothèque ne dessine que les QR codes des versions 1 à 10. */
+const SCOUTSUNITE_QR_VERSION_MAX = 10;
+
+/**
+ * Longueur maximale d'un lien pour qu'il tienne dans un QR code (environ 210 caractères).
+ *
+ * @return int
+ */
+function scoutsunite_qr_longueur_max() {
+	return SU_QRUtil::getMaxLength( SCOUTSUNITE_QR_VERSION_MAX, SU_QR_MODE_8BIT_BYTE, SU_QR_ERROR_CORRECT_LEVEL_M );
+}
+
 /**
  * QR code d'un texte, en SVG : un seul tracé, marge de 4 modules, mis à l'échelle par le CSS.
  *
  * @param string $texte Texte à encoder (un lien).
  * @param string $label Description pour les lecteurs d'écran.
- * @return string SVG.
+ * @return string SVG, vide si le texte est trop long pour un QR code.
  */
 function scoutsunite_qr_svg( $texte, $label ) {
+	// Au-delà, la bibliothèque s'arrête sur une erreur fatale : pas de QR code, le lien reste.
+	if ( strlen( $texte ) > scoutsunite_qr_longueur_max() ) {
+		return '';
+	}
 	$cle = 'qr_' . md5( $texte );
 	$d   = wp_cache_get( $cle, 'scoutsunite' );
 	if ( false === $d ) {
@@ -29,7 +45,7 @@ function scoutsunite_qr_svg( $texte, $label ) {
 		$qr->setErrorCorrectLevel( SU_QR_ERROR_CORRECT_LEVEL_M );
 		$qr->addData( $texte, SU_QR_MODE_8BIT_BYTE );
 		$longueur = $qr->getData( 0 )->getLength();
-		for ( $version = 1; $version <= 40; $version++ ) {
+		for ( $version = 1; $version <= SCOUTSUNITE_QR_VERSION_MAX; $version++ ) {
 			if ( $longueur <= SU_QRUtil::getMaxLength( $version, SU_QR_MODE_8BIT_BYTE, SU_QR_ERROR_CORRECT_LEVEL_M ) ) {
 				$qr->setTypeNumber( $version );
 				break;

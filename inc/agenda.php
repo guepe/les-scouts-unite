@@ -92,7 +92,7 @@ function scoutsunite_agenda_register() {
 				'single'            => true,
 				'default'           => 'su_lieu' === $key ? 'au local' : '',
 				'show_in_rest'      => true,
-				'sanitize_callback' => 'su_section' === $key ? 'scoutsunite_droits_section_permise' : 'sanitize_text_field',
+				'sanitize_callback' => scoutsunite_agenda_nettoyage( $key ),
 				'auth_callback'     => function ( $permis, $cle, $post_id, $user_id ) {
 					return user_can( $user_id, 'edit_post', $post_id );
 				},
@@ -101,6 +101,25 @@ function scoutsunite_agenda_register() {
 	}
 }
 add_action( 'init', 'scoutsunite_agenda_register' );
+
+/**
+ * Nettoyage d'un champ de réunion : les dates et les heures sont vérifiées, la section limitée à celles de l'animateur.
+ *
+ * @param string $key Champ.
+ * @return string Fonction de nettoyage.
+ */
+function scoutsunite_agenda_nettoyage( $key ) {
+	if ( 'su_section' === $key ) {
+		return 'scoutsunite_droits_section_permise';
+	}
+	if ( in_array( $key, array( 'su_date', 'su_jusqua', 'su_repeter' ), true ) ) {
+		return 'scoutsunite_agenda_date_valide';
+	}
+	if ( in_array( $key, array( 'su_debut', 'su_fin' ), true ) ) {
+		return 'scoutsunite_agenda_heure_valide';
+	}
+	return 'sanitize_text_field';
+}
 
 /**
  * Les adresses /agenda/ doivent exister dès l'activation du thème.
@@ -189,42 +208,49 @@ add_action( 'enqueue_block_editor_assets', 'scoutsunite_agenda_editor_assets' );
 
 /**
  * « Répéter chaque semaine jusqu'au » : crée une copie par semaine après l'enregistrement.
- * Le champ garde sa valeur ; on retient jusqu'où les copies ont été faites pour ne jamais les refaire.
+ * Le champ garde sa valeur ; on retient jusqu'où les copies ont été faites pour ne jamais les refaire :
+ * prolonger la répétition ne crée que les semaines qui manquent, la raccourcir ne fait rien.
+ * Au plus 60 semaines après la réunion d'origine.
  *
  * @param WP_Post $post Réunion enregistrée.
  */
 function scoutsunite_agenda_repeter( $post ) {
-	$jusqua = get_post_meta( $post->ID, 'su_repeter', true );
-	$date   = get_post_meta( $post->ID, 'su_date', true );
-	if ( ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $jusqua ) || ! $date || $jusqua <= $date ) {
+	$jusqua = scoutsunite_agenda_date_valide( get_post_meta( $post->ID, 'su_repeter', true ) );
+	$date   = scoutsunite_agenda_date_valide( get_post_meta( $post->ID, 'su_date', true ) );
+	if ( ! $jusqua || ! $date || $jusqua <= $date || 'publish' !== $post->post_status ) {
 		return;
 	}
-	if ( get_post_meta( $post->ID, '_su_repete_jusqua', true ) === $jusqua || 'publish' !== $post->post_status ) {
+	$deja = scoutsunite_agenda_date_valide( get_post_meta( $post->ID, '_su_repete_jusqua', true ) );
+	if ( $deja && $jusqua <= $deja ) {
 		return;
 	}
-	update_post_meta( $post->ID, '_su_repete_jusqua', $jusqua );
 
 	$meta = array();
 	foreach ( array( 'su_section', 'su_debut', 'su_fin', 'su_lieu', 'su_avant', 'su_type' ) as $key ) {
 		$meta[ $key ] = get_post_meta( $post->ID, $key, true );
 	}
 	// Un week-end ou un camp répété garde sa durée : la date de fin avance avec la copie.
-	$dernier = get_post_meta( $post->ID, 'su_jusqua', true );
-	$dernier = preg_match( '/^\d{4}-\d{2}-\d{2}$/', $dernier ) && $dernier > $date ? new DateTimeImmutable( $dernier, wp_timezone() ) : null;
+	$dernier = scoutsunite_agenda_date_valide( get_post_meta( $post->ID, 'su_jusqua', true ) );
+	$dernier = $dernier && $dernier > $date ? new DateTimeImmutable( $dernier, wp_timezone() ) : null;
 
-	$jour = new DateTimeImmutable( $date, wp_timezone() );
-	$fin  = new DateTimeImmutable( $jusqua, wp_timezone() );
+	$jour    = new DateTimeImmutable( $date, wp_timezone() );
+	$fin     = new DateTimeImmutable( $jusqua, wp_timezone() );
+	$atteint = $jusqua;
 	for ( $i = 1; $i <= 60; $i++ ) {
 		$decalage = '+' . ( 7 * $i ) . ' days';
 		$suivant  = $jour->modify( $decalage );
 		if ( $suivant > $fin ) {
 			break;
 		}
+		// Cette semaine-là a déjà sa copie.
+		if ( $deja && $suivant->format( 'Y-m-d' ) <= $deja ) {
+			continue;
+		}
 		$dates = array( 'su_date' => $suivant->format( 'Y-m-d' ) );
 		if ( $dernier ) {
 			$dates['su_jusqua'] = $dernier->modify( $decalage )->format( 'Y-m-d' );
 		}
-		wp_insert_post(
+		$copie = wp_insert_post(
 			array(
 				'post_type'    => 'reunion',
 				'post_status'  => 'publish',
@@ -234,6 +260,15 @@ function scoutsunite_agenda_repeter( $post ) {
 				'meta_input'   => array_merge( $meta, $dates ),
 			)
 		);
+		// Une copie ratée : on retient la dernière semaine réussie, le prochain enregistrement reprendra là.
+		if ( ! $copie ) {
+			$atteint = $jour->modify( '+' . ( 7 * ( $i - 1 ) ) . ' days' )->format( 'Y-m-d' );
+			break;
+		}
+	}
+	// Retenu après les copies, et jamais en arrière : une date raccourcie puis rallongée ne refait rien.
+	if ( ! $deja || $atteint > $deja ) {
+		update_post_meta( $post->ID, '_su_repete_jusqua', $atteint );
 	}
 }
 add_action(
@@ -445,6 +480,59 @@ function scoutsunite_agenda_annulee( $post_id ) {
  */
 function scoutsunite_agenda_pourquoi( $post_id ) {
 	return scoutsunite_agenda_annulee( $post_id ) ? trim( (string) get_post_meta( $post_id, 'su_annulee_pourquoi', true ) ) : '';
+}
+
+/**
+ * Les notes d'une réunion peuvent-elles sortir ? Pas si elles sont vides ou protégées par un mot de passe.
+ *
+ * @param WP_Post $post Réunion.
+ * @return bool
+ */
+function scoutsunite_agenda_notes_visibles( $post ) {
+	return '' !== trim( $post->post_content ) && ! post_password_required( $post );
+}
+
+/**
+ * Les notes d'une réunion mises en forme, '' si elles ne peuvent pas sortir.
+ * Une réunion déjà en cours d'affichage ne l'est pas une seconde fois : un bloc « Prochaine réunion »
+ * glissé dans ses propres notes tournerait sinon en boucle et ferait tomber la page.
+ *
+ * @param WP_Post $post Réunion.
+ * @return string HTML.
+ */
+function scoutsunite_agenda_notes( $post ) {
+	static $en_cours = array();
+	if ( ! scoutsunite_agenda_notes_visibles( $post ) || isset( $en_cours[ $post->ID ] ) ) {
+		return '';
+	}
+	$en_cours[ $post->ID ] = true;
+	$html                  = apply_filters( 'the_content', $post->post_content );
+	unset( $en_cours[ $post->ID ] );
+	return $html;
+}
+
+/**
+ * Une date « 2026-11-07 » valide, sinon ''. Le navigateur la contrôle déjà, mais une date
+ * envoyée autrement (l'API, une application) ne doit pas faire tomber le calendrier.
+ *
+ * @param mixed $valeur Date reçue.
+ * @return string
+ */
+function scoutsunite_agenda_date_valide( $valeur ) {
+	$valeur = trim( (string) $valeur );
+	$date   = DateTimeImmutable::createFromFormat( '!Y-m-d', $valeur );
+	return $date && $date->format( 'Y-m-d' ) === $valeur ? $valeur : '';
+}
+
+/**
+ * Une heure « 14:00 » valide, sinon ''.
+ *
+ * @param mixed $valeur Heure reçue.
+ * @return string
+ */
+function scoutsunite_agenda_heure_valide( $valeur ) {
+	$valeur = trim( (string) $valeur );
+	return preg_match( '/^(\d{1,2}):([0-5]\d)(:[0-5]\d)?$/', $valeur, $m ) && (int) $m[1] < 24 ? sprintf( '%02d:%s', $m[1], $m[2] ) : '';
 }
 
 /**
@@ -709,8 +797,9 @@ function scoutsunite_bloc_prochaine_reunion( $attributes ) {
 	$html  = '<h2 class="wp-block-heading affiche__titre has-x-large-font-size">Prochaine réunion</h2>' . $rappel;
 	$html .= '<p class="agenda-prochaine__date">' . esc_html( ucfirst( scoutsunite_agenda_quand( $r->ID ) ) ) . '</p>';
 	$html .= '<p class="has-large-font-size" style="font-weight:800">' . esc_html( implode( ' · ', array_filter( array( $titre, implode( ' · ', $infos ) ) ) ) ) . '</p>';
-	if ( '' !== trim( $r->post_content ) ) {
-		$html .= '<div class="agenda-prochaine__notes">' . apply_filters( 'the_content', $r->post_content ) . '</div>';
+	$notes = scoutsunite_agenda_notes( $r );
+	if ( '' !== trim( $notes ) ) {
+		$html .= '<div class="agenda-prochaine__notes">' . $notes . '</div>';
 	}
 	$suite = array_slice( $suite, 0, 3 );
 	if ( $suite ) {
@@ -782,7 +871,7 @@ function scoutsunite_bloc_agenda() {
 		if ( $lieu ) {
 			$quoi .= ' · ' . esc_html( $lieu );
 		}
-		$notes    = '' !== trim( $r->post_content ) ? wp_kses_post( wp_trim_words( wp_strip_all_tags( $r->post_content ), 40 ) ) : '';
+		$notes    = scoutsunite_agenda_notes_visibles( $r ) ? wp_kses_post( wp_trim_words( wp_strip_all_tags( $r->post_content ), 40 ) ) : '';
 		// Une réunion annulée ne garde que le mot d'explication : ses notes ne servent plus.
 		if ( scoutsunite_agenda_annulee( $r->ID ) ) {
 			$pourquoi = scoutsunite_agenda_pourquoi( $r->ID );
@@ -862,7 +951,7 @@ function scoutsunite_bloc_a_la_une() {
 	}
 	$html .= '<h2 class="wp-block-heading affiche__titre has-x-large-font-size"><a href="' . esc_url( get_permalink( $r ) ) . '">' . esc_html( $titre ) . '</a></h2>';
 	$html .= '<p class="a-la-une__quand">' . esc_html( ucfirst( scoutsunite_agenda_quand( $r->ID ) ) ) . ( $infos ? '<br>' . esc_html( implode( ' · ', $infos ) ) : '' ) . '</p>';
-	if ( '' !== trim( $r->post_content ) ) {
+	if ( scoutsunite_agenda_notes_visibles( $r ) ) {
 		$html .= '<p>' . esc_html( wp_trim_words( wp_strip_all_tags( $r->post_content ), 24 ) ) . '</p>';
 	}
 	if ( count( $reunions ) > 1 ) {
@@ -900,8 +989,9 @@ function scoutsunite_agenda_fiches( $activites ) {
 		}
 		$html .= '<h4 class="wp-block-heading camp__titre"><a href="' . esc_url( get_permalink( $a ) ) . '">' . esc_html( $titre ? $titre : ( $type ? $type : 'Activité' ) ) . '</a></h4>';
 		$html .= '<p class="camp__quand">' . esc_html( ucfirst( scoutsunite_agenda_quand( $a->ID ) ) ) . ( $infos ? '<br>' . esc_html( implode( ' · ', $infos ) ) : '' ) . '</p>';
-		if ( '' !== trim( $a->post_content ) ) {
-			$html .= '<div class="camp__notes">' . apply_filters( 'the_content', $a->post_content ) . '</div>';
+		$notes = scoutsunite_agenda_notes( $a );
+		if ( '' !== trim( $notes ) ) {
+			$html .= '<div class="camp__notes">' . $notes . '</div>';
 		}
 		$html .= '</article>';
 	}

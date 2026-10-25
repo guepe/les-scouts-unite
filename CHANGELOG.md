@@ -2,6 +2,20 @@
 
 Les versions suivent le numéro `Version:` de `style.css`. Chaque version publiée a son zip dans les [Releases](https://github.com/guepe/les-scouts-unite/releases).
 
+## 2.10.3 – 2026-10-25
+
+Correctifs de sécurité, après une relecture complète du thème, et des pages plus légères. Les rôles sont réécrits automatiquement à la mise à jour.
+
+- **Une page ne peut plus tomber en boucle** : un bloc « Prochaine réunion » ou « Temps forts » glissé dans les notes d’une réunion affichait cette même réunion à l’infini, et la page de la section, la réunion et la feuille à imprimer tombaient en erreur. Une réunion n’est plus affichée dans ses propres notes.
+- **Un animateur ne crée plus de page par aucune voie** : la création était bloquée dans l’éditeur et l’API, mais restait possible par XML-RPC (applications). Sur la page de sa section, il ne change que le contenu : l’état, l’adresse, la page parente, le mot de passe, l’auteur et le modèle restent ceux d’avant.
+- **Le Staff d’unité n’a plus le droit au HTML libre** (`unfiltered_html`) : un script glissé dans une page aurait pu s’exécuter chez un administrateur.
+- **Une réunion protégée par un mot de passe** garde ses notes pour elle : elles ne sortent plus dans l’agenda, la prochaine réunion, les temps forts, la une, le calendrier du téléphone ni les feuilles à imprimer.
+- **Dates et heures vérifiées par le serveur** : une date invalide envoyée par l’API ne fait plus tomber le calendrier des parents ; les réunions déjà enregistrées sont relues avec les mêmes contrôles.
+- **Répétition chaque semaine** : prolonger la date de fin ne crée plus que les semaines qui manquent (plus de doublons) ; la raccourcir ne fait rien ; au plus 60 semaines après la réunion d’origine. Une copie ratée reprend au prochain enregistrement.
+- Un animateur ne lit plus les réunions et documents privés des autres sections, et le fichier d’un document doit être un fichier de la médiathèque qu’il peut voir.
+- Un lien WhatsApp trop long pour un QR code (au-delà d’environ 210 caractères) ne fait plus tomber les pages : le lien s’affiche sans QR code, et Réglages → Unité le signale.
+- **Pages plus légères** : une première visite télécharge environ 1 Mo de moins. Les polices passent en WOFF2, limitées aux caractères du français (743 Ko → 200 Ko) ; les deux principales sont préchargées. Les logos et la photo sont redimensionnés à leur taille d’affichage et recompressés, sans différence visible (565 Ko → 125 Ko). Les noms des fichiers ne changent pas : les pages déjà créées en profitent aussi.
+
 ## 2.10.2 – 2026-10-24
 
 - Éditeur de réunion : le panneau « Quand et où ? » s’ouvre aussi sur une réunion déjà enregistrée. Les préférences de WordPress, chargées juste après l’ouverture, le refermaient. On peut toujours le replier soi-même ensuite.

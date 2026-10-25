@@ -40,6 +40,17 @@ function scoutsunite_enqueue() {
 add_action( 'wp_enqueue_scripts', 'scoutsunite_enqueue' );
 
 /**
+ * Les deux polices de chaque page (le texte et les titres) partent tout de suite,
+ * sans attendre que le navigateur les découvre dans le CSS.
+ */
+function scoutsunite_precharger_polices() {
+	foreach ( array( 'Muli-Regular', 'Muli-Black' ) as $police ) {
+		printf( '<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin>' . "\n", esc_url( get_theme_file_uri( 'assets/fonts/' . $police . '.woff2' ) ) );
+	}
+}
+add_action( 'wp_head', 'scoutsunite_precharger_polices', 1 );
+
+/**
  * Styles de blocs : le panneau, les affiches et les lignes de section.
  */
 function scoutsunite_block_styles() {

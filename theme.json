@@ -51,11 +51,11 @@
 					"name": "Muli",
 					"fontFamily": "Muli, \"Segoe UI\", Helvetica, Arial, sans-serif",
 					"fontFace": [
-						{ "fontFamily": "Muli", "fontWeight": "400", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/Muli-Regular.ttf"] },
-						{ "fontFamily": "Muli", "fontWeight": "400", "fontStyle": "italic", "fontDisplay": "swap", "src": ["file:./assets/fonts/Muli-Italic.ttf"] },
-						{ "fontFamily": "Muli", "fontWeight": "700", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/Muli-Bold.ttf"] },
-						{ "fontFamily": "Muli", "fontWeight": "800", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/Muli-ExtraBold.ttf"] },
-						{ "fontFamily": "Muli", "fontWeight": "900", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/Muli-Black.ttf"] }
+						{ "fontFamily": "Muli", "fontWeight": "400", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/Muli-Regular.woff2", "file:./assets/fonts/Muli-Regular.ttf"] },
+						{ "fontFamily": "Muli", "fontWeight": "400", "fontStyle": "italic", "fontDisplay": "swap", "src": ["file:./assets/fonts/Muli-Italic.woff2", "file:./assets/fonts/Muli-Italic.ttf"] },
+						{ "fontFamily": "Muli", "fontWeight": "700", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/Muli-Bold.woff2", "file:./assets/fonts/Muli-Bold.ttf"] },
+						{ "fontFamily": "Muli", "fontWeight": "800", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/Muli-ExtraBold.woff2", "file:./assets/fonts/Muli-ExtraBold.ttf"] },
+						{ "fontFamily": "Muli", "fontWeight": "900", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/Muli-Black.woff2", "file:./assets/fonts/Muli-Black.ttf"] }
 					]
 				},
 				{
@@ -63,7 +63,7 @@
 					"name": "Caveat Brush (manuscrit)",
 					"fontFamily": "\"Caveat Brush\", cursive",
 					"fontFace": [
-						{ "fontFamily": "Caveat Brush", "fontWeight": "400", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/CaveatBrush-Regular.ttf"] }
+						{ "fontFamily": "Caveat Brush", "fontWeight": "400", "fontStyle": "normal", "fontDisplay": "swap", "src": ["file:./assets/fonts/CaveatBrush-Regular.woff2", "file:./assets/fonts/CaveatBrush-Regular.ttf"] }
 					]
 				}
 			],

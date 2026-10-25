@@ -505,6 +505,9 @@ function scoutsunite_unite_reglages() {
 							$propre[ $cle ] = sanitize_email( $v );
 						} elseif ( 'url' === $champ[1] ) {
 							$propre[ $cle ] = esc_url_raw( $v );
+							if ( 0 === strpos( $cle, 'whatsapp_' ) && strlen( $propre[ $cle ] ) > scoutsunite_qr_longueur_max() ) {
+								add_settings_error( 'scoutsunite_unite', $cle, $champ[0] . ' : ce lien est trop long pour un QR code. Le lien s’affiche, sans QR code.', 'warning' );
+							}
 						} elseif ( 'textarea' === $champ[1] ) {
 							$propre[ $cle ] = sanitize_textarea_field( $v );
 						} else {

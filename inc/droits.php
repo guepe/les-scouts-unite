@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /** Version des rôles : l'augmenter pour réécrire les rôles au prochain chargement. */
-const SCOUTSUNITE_DROITS_VERSION = 3;
+const SCOUTSUNITE_DROITS_VERSION = 4;
 
 /**
  * Droits sur les réunions (type de contenu « reunion »).
@@ -77,11 +77,14 @@ function scoutsunite_droits_roles() {
 	);
 
 	$editeur = get_role( 'editor' );
+	$staff   = $editeur ? $editeur->capabilities : array( 'read' => true );
+	// Sans HTML libre : un script glissé dans une page s'exécuterait chez l'administrateur qui l'ouvre.
+	unset( $staff['unfiltered_html'] );
 	remove_role( 'scoutsunite_staff' );
 	add_role(
 		'scoutsunite_staff',
 		'Staff d’unité',
-		array_merge( $editeur ? $editeur->capabilities : array( 'read' => true ), $reunions, array( 'manage_unite' => true ) )
+		array_merge( $staff, $reunions, array( 'manage_unite' => true ) )
 	);
 
 	foreach ( array( 'administrator', 'editor' ) as $nom ) {
@@ -171,11 +174,15 @@ function scoutsunite_droits_section_permise( $valeur ) {
  * @return string[]
  */
 function scoutsunite_droits_limites( $caps, $cap, $user_id, $args ) {
-	if ( ! in_array( $cap, array( 'edit_post', 'delete_post', 'publish_post' ), true ) || ! scoutsunite_droits_est_limite( $user_id ) ) {
+	if ( ! in_array( $cap, array( 'edit_post', 'delete_post', 'publish_post', 'read_post' ), true ) || ! scoutsunite_droits_est_limite( $user_id ) ) {
 		return $caps;
 	}
 	$post = get_post( $args[0] ?? 0 );
 	if ( ! $post ) {
+		return $caps;
+	}
+	// Lire : tout ce qui est publié, mais les réunions et documents privés de ses sections seulement.
+	if ( 'read_post' === $cap && ( 'publish' === $post->post_status || ! in_array( $post->post_type, array( 'reunion', 'document' ), true ) ) ) {
 		return $caps;
 	}
 	$miennes = scoutsunite_droits_sections( $user_id );
@@ -285,22 +292,62 @@ function scoutsunite_droits_menu() {
 add_action( 'admin_menu', 'scoutsunite_droits_menu', 99 );
 
 /**
- * Filet de sécurité : une page publiée modifiée par un animateur reste publiée,
- * même si l'éditeur demande « en attente de relecture ».
+ * Quelle que soit la voie (éditeur, API, XML-RPC, application), un animateur ne crée jamais de page.
+ * WordPress abandonne l'enregistrement quand ce filtre répond « vide ».
+ *
+ * @param bool  $vide    Le contenu est-il considéré comme vide ?
+ * @param array $postarr Données reçues.
+ * @return bool
+ */
+function scoutsunite_droits_aucune_page_creee( $vide, $postarr ) {
+	if ( empty( $postarr['ID'] ) && 'page' === ( $postarr['post_type'] ?? '' ) && scoutsunite_droits_est_limite() ) {
+		return true;
+	}
+	return $vide;
+}
+add_filter( 'wp_insert_post_empty_content', 'scoutsunite_droits_aucune_page_creee', 10, 2 );
+
+/**
+ * Sur la page de sa section, un animateur change le contenu, rien d'autre : l'état, l'adresse,
+ * la page parente, le mot de passe et l'auteur restent ceux d'avant, par toutes les voies.
+ * Ainsi « Soumettre à la relecture », un brouillon ou un déplacement ne la font plus disparaître.
  *
  * @param array $data    Données de la page.
  * @param array $postarr Données reçues, avec l'ID.
  * @return array
  */
 function scoutsunite_droits_garde_publiee( $data, $postarr ) {
-	if ( 'page' === $data['post_type'] && 'pending' === $data['post_status'] && ! empty( $postarr['ID'] ) && scoutsunite_droits_est_limite()
-		&& 'publish' === get_post_status( $postarr['ID'] ) ) {
-		$data['post_status'] = 'publish';
-		$data['post_name']   = get_post_field( 'post_name', $postarr['ID'] );
+	if ( 'page' !== $data['post_type'] || empty( $postarr['ID'] ) || ! scoutsunite_droits_est_limite() ) {
+		return $data;
+	}
+	$avant = get_post( $postarr['ID'] );
+	if ( ! $avant || 'page' !== $avant->post_type ) {
+		return $data;
+	}
+	foreach ( array( 'post_status', 'post_name', 'post_parent', 'post_password', 'post_author' ) as $champ ) {
+		$data[ $champ ] = $avant->$champ;
 	}
 	return $data;
 }
 add_filter( 'wp_insert_post_data', 'scoutsunite_droits_garde_publiee', 10, 2 );
+
+/**
+ * Le modèle de page non plus : il ne change pas sous la main d'un animateur.
+ *
+ * @param null|bool $court     Null pour laisser faire WordPress.
+ * @param int       $object_id Contenu.
+ * @param string    $meta_key  Champ.
+ * @return null|bool
+ */
+function scoutsunite_droits_garde_modele( $court, $object_id, $meta_key ) {
+	if ( '_wp_page_template' === $meta_key && 'page' === get_post_type( $object_id ) && scoutsunite_droits_est_limite() ) {
+		return false;
+	}
+	return $court;
+}
+add_filter( 'add_post_metadata', 'scoutsunite_droits_garde_modele', 10, 3 );
+add_filter( 'update_post_metadata', 'scoutsunite_droits_garde_modele', 10, 3 );
+add_filter( 'delete_post_metadata', 'scoutsunite_droits_garde_modele', 10, 3 );
 
 /* ---------------------------------------------------------------------------
    Profil : les sections de l'animateur

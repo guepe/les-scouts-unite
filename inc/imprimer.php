@@ -140,11 +140,13 @@ function scoutsunite_imprimer_whatsapp( $section ) {
 	$html = '';
 	foreach ( array_unique( array_filter( array( $section, 'unite' ) ) ) as $groupe ) {
 		$lien = scoutsunite_whatsapp_lien( $groupe );
-		if ( '' === $lien ) {
+		$nom  = 'Groupe WhatsApp ' . scoutsunite_whatsapp_de( $groupe );
+		$qr   = '' === $lien ? '' : scoutsunite_qr_svg( $lien, 'QR code du ' . $nom );
+		// Sur papier, un groupe sans QR code ne sert à rien.
+		if ( '' === $qr ) {
 			continue;
 		}
-		$nom   = 'Groupe WhatsApp ' . scoutsunite_whatsapp_de( $groupe );
-		$html .= '<div class="feuille__groupe">' . scoutsunite_qr_svg( $lien, 'QR code du ' . $nom );
+		$html .= '<div class="feuille__groupe">' . $qr;
 		$html .= '<p>' . esc_html( $nom ) . '</p></div>';
 	}
 	return $html ? '<div class="feuille__whatsapp">' . $html . '<p class="feuille__scanne">Scanne avec ton téléphone pour rejoindre</p></div>' : '';
@@ -180,7 +182,8 @@ function scoutsunite_imprimer_notes( $post ) {
 	if ( '' === trim( wp_strip_all_tags( $post->post_content ) ) ) {
 		return '';
 	}
-	return '<div class="feuille__notes">' . apply_filters( 'the_content', $post->post_content ) . '</div>';
+	$notes = scoutsunite_agenda_notes( $post );
+	return '' === trim( $notes ) ? '' : '<div class="feuille__notes">' . $notes . '</div>';
 }
 
 /**

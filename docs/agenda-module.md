@@ -56,8 +56,8 @@ Le **contenu** de la réunion sert de notes pour les parents. Le **titre** est f
 
 Tous sont enregistrés avec `register_post_meta( 'reunion', … )` :
 - type `string`, `single => true`, `show_in_rest => true` ;
-- `sanitize_callback => 'sanitize_text_field'` ;
-- `auth_callback` : `current_user_can( 'edit_posts' )`.
+- `sanitize_callback` : les dates (`su_date`, `su_jusqua`, `su_repeter`) ne gardent qu'une date `Y-m-d` valide, les heures (`su_debut`, `su_fin`) une heure `H:i` valide, `su_section` une section permise (voir « Droits ») ; les autres champs passent par `sanitize_text_field` ;
+- `auth_callback` : `user_can( $user_id, 'edit_post', $post_id )`.
 
 | Clé | Format | Défaut | Rôle |
 |---|---|---|---|
@@ -101,13 +101,14 @@ Garde-fous :
 Fonction `scoutsunite_agenda_repeter( $post )`, branchée sur `rest_after_insert_reunion` :
 
 1. Elle s'arrête si `su_repeter` n'est pas une date `Y-m-d`, si `su_date` est vide, ou si `su_repeter <= su_date`.
-2. Elle s'arrête si la réunion n'est pas publiée, ou si `_su_repete_jusqua === su_repeter` : les copies jusqu'à cette date existent déjà, ce qui rend l'opération idempotente.
-3. Sinon, elle enregistre `_su_repete_jusqua = su_repeter`, puis crée une copie publiée par semaine (+7 jours), au maximum 60. Chaque copie reprend le titre, le contenu, l'auteur, la section, les heures, le lieu et la mise en avant, avec la nouvelle date.
+2. Elle s'arrête si la réunion n'est pas publiée, ou si `su_repeter <= _su_repete_jusqua` : les copies jusqu'à cette date existent déjà, ce qui rend l'opération idempotente.
+3. Sinon, elle crée une copie publiée par semaine (+7 jours) après `_su_repete_jusqua`, au maximum 60 semaines après la réunion d'origine, puis enregistre `_su_repete_jusqua`. Chaque copie reprend le titre, le contenu, l'auteur, la section, les heures, le lieu et la mise en avant, avec la nouvelle date.
 4. Les copies sont des réunions indépendantes et ne portent pas `su_repeter`. On supprime les semaines de congé à la main.
 
 Limites à connaître :
 - La répétition ne se déclenche qu'à un enregistrement via REST, donc depuis l'éditeur de blocs, pas depuis la modification rapide.
-- Repousser la date de fin plus tard crée de nouveau des copies à partir de la date d'origine, donc des doublons pour les semaines déjà faites. À corriger si possible : ne créer que les semaines situées après l'ancienne valeur de `_su_repete_jusqua`.
+- Repousser la date de fin ne crée que les semaines situées après `_su_repete_jusqua` ; la raccourcir ne fait rien, et `_su_repete_jusqua` ne recule jamais. Il est enregistré après les copies : si l'une échoue, il retient la dernière semaine réussie et le prochain enregistrement reprend là.
+- Les notes d'une réunion sont rendues par `scoutsunite_agenda_notes()` : rien si la réunion est protégée par un mot de passe, et jamais une réunion déjà en cours d'affichage (un bloc de l'agenda glissé dans ses propres notes tournerait en boucle).
 
 ## Liste dans l'administration
 
