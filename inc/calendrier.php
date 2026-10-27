@@ -50,7 +50,16 @@ function scoutsunite_calendrier_ligne( $ligne ) {
 	$plie   = '';
 	$limite = 75;
 	while ( strlen( $ligne ) > $limite ) {
-		$morceau = mb_strcut( $ligne, 0, $limite, 'UTF-8' );
+		if ( function_exists( 'mb_strcut' ) ) {
+			$morceau = mb_strcut( $ligne, 0, $limite, 'UTF-8' );
+		} else {
+			// Sans mbstring : on recule jusqu'au début d'un caractère, pour ne pas couper un « é » en deux.
+			$n = $limite;
+			while ( $n > 0 && 0x80 === ( ord( $ligne[ $n ] ) & 0xC0 ) ) {
+				--$n;
+			}
+			$morceau = substr( $ligne, 0, $n );
+		}
 		$plie   .= $morceau . "\r\n ";
 		$ligne   = substr( $ligne, strlen( $morceau ) );
 		$limite  = 74; // La suite commence par une espace.

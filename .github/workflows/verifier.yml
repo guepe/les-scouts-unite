@@ -1,0 +1,78 @@
+# Vérifie le thème à chaque envoi, et avant chaque publication (appelé par release.yml) :
+# syntaxe PHP et JS, theme.json, règles de sécurité WordPress, et les tests dans un WordPress neuf.
+name: verifier
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  syntaxe:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['7.4', '8.3']
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+      - name: Syntaxe PHP
+        run: find . -name '*.php' -not -path './.git/*' -print0 | xargs -0 -n1 php -l
+      - name: Syntaxe JavaScript
+        run: for f in assets/js/*.js; do node --check "$f"; done
+
+  theme-json:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: theme.json contre le schéma de WordPress 6.6
+        run: |
+          pip install --quiet check-jsonschema
+          check-jsonschema --schemafile https://schemas.wp.org/wp/6.6/theme.json theme.json
+
+  securite:
+    runs-on: ubuntu-latest
+    # Pour information tant que le premier passage n'a pas été relu : ne bloque pas encore la publication.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          tools: composer
+      - name: Règles de sécurité WordPress (PHPCS)
+        run: |
+          composer global config allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
+          composer global require --quiet --no-interaction "wp-coding-standards/wpcs:^3"
+          "$(composer global config bin-dir --absolute)/phpcs" --standard=WordPress --extensions=php \
+            --sniffs=WordPress.Security.EscapeOutput,WordPress.Security.NonceVerification,WordPress.Security.ValidatedSanitizedInput,WordPress.DB.PreparedSQL,WordPress.DB.PreparedSQLPlaceholders \
+            --ignore='inc/lib/*' functions.php inc patterns
+
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - php: '7.4'
+            wp: '6.6'
+          - php: '8.3'
+            wp: 'latest'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Tests dans WordPress ${{ matrix.wp }}, PHP ${{ matrix.php }}
+        run: tests/lancer.sh ${{ matrix.php }} ${{ matrix.wp }}

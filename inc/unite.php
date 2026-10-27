@@ -283,7 +283,8 @@ function scoutsunite_bloc_staff( $attributes ) {
 	$autres  = array_filter( array_map( 'trim', explode( "\n", scoutsunite_unite( $section . '_staff' ) ) ) );
 
 	$membre = function ( $totem, $prenom, $est_chef, $exemple = false, $fonction = '', $gsm = '' ) {
-		$initiale = mb_strtoupper( mb_substr( '' !== $totem ? $totem : $prenom, 0, 1 ) );
+		$initiale = mb_substr( '' !== $totem ? $totem : $prenom, 0, 1 );
+		$initiale = function_exists( 'mb_strtoupper' ) ? mb_strtoupper( $initiale ) : strtoupper( $initiale );
 		$texte    = function ( $t ) use ( $exemple ) {
 			return $exemple ? '<mark class="a-completer">' . esc_html( $t ) . '</mark>' : esc_html( $t );
 		};

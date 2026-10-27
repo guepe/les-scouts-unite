@@ -5,6 +5,14 @@ Les versions suivent le numéro `Version:` de `style.css`. Chaque version publi�
 ## 2.11.0 – non publiée
 
 - **Les camps toujours sur le frigo** : le programme et la convocation à imprimer commencent par un encadré « À retenir » avec les camps à venir de la section et de toute l’unité, même au-delà de la période imprimée (« Camp d’été du mardi 20 juillet au mardi 3 août 2027 »). Un camp annulé n’y figure pas ; la convocation d’un camp ne se rappelle pas elle-même.
+- **Une date déjà passée est signalée** dans le panneau « Quand et où ? » : « Cette date est déjà passée : la réunion n’apparaîtra pas sur le site. Vérifie l’année. » (un camp encodé en 2026 au lieu de 2027 n’apparaissait nulle part).
+- **Agenda** : des notes coupées après 40 mots se terminent par « Lire la suite », vers la page de la réunion.
+- **Un site installé dans un sous-dossier** (exemple.be/scouts/) garde des liens justes : les liens des compositions (« /contact/ », « /sections/… »), recopiés dans les pages, reçoivent le sous-dossier à l’affichage, y compris dans les pages déjà créées. Rien ne change pour un site à la racine.
+- **WordPress 6.6 minimum** (le `theme.json` version 3 l’exige ; testé de 6.6 à 7.1, PHP 7.4 à 8.4).
+- **Licence des polices jointe au zip** (`assets/fonts/OFL.txt`) et image d’aperçu du thème dans Apparence → Thèmes.
+- Accessibilité : un lecteur d’écran n’annonce plus deux fois le nom d’un groupe WhatsApp ; les fiches des temps forts et de l’IAmA sont des titres de niveau 3 sous le titre de leur bloc.
+- Le flux iCal et les initiales du staff fonctionnent aussi sans l’extension PHP mbstring.
+- **Tests et vérifications automatiques** : 35 tests dans un WordPress neuf (droits, répétition, annulation, notes protégées, frigo, QR codes, liens), lancés avec PHP 7.4 et WordPress 6.6 puis PHP 8.3 et la dernière version, avec la syntaxe PHP et JavaScript, `theme.json` et les règles de sécurité de WordPress, à chaque envoi et avant chaque publication. Les notes de version sur GitHub ont des liens qui fonctionnent.
 
 ## 2.10.3 – 2026-10-25
 

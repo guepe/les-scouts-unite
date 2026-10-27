@@ -7,7 +7,7 @@ Spécification d'un module existant (thème `les-scouts-unite`), à reproduire d
 Les animateurs encodent chaque réunion une seule fois dans l'administration. L'accueil, les pages de section et une page `/agenda/` se mettent ensuite à jour seuls. Les réunions passées disparaissent du site et la suivante prend leur place. Aucune date n'est écrite à la main dans les pages.
 
 Contraintes :
-- WordPress 6.5 ou plus, thème de bloc (FSE), PHP 7.4 ou plus ;
+- WordPress 6.6 ou plus (theme.json version 3), thème de bloc (FSE), PHP 7.4 ou plus ;
 - sans build : le JS de l'éditeur est en ES5 avec `wp.element.createElement` ;
 - interface en français, à destination de bénévoles non techniques.
 
@@ -15,9 +15,9 @@ Contraintes :
 
 | Fichier | Rôle |
 |---|---|
-| `inc/agenda.php` (≈ 560 lignes, chargé par `functions.php` via `require`) | type de contenu, champs, répétition, colonnes d'administration, requêtes, 6 blocs dynamiques |
+| `inc/agenda.php` (≈ 1 040 lignes, chargé par `functions.php` via `require`) | type de contenu, champs, répétition, colonnes d'administration, requêtes, 7 blocs dynamiques |
 | `assets/js/reunion.js` | panneau « Quand et où ? » dans l'éditeur d'une réunion |
-| `assets/js/blocs.js` | déclaration des 6 blocs dans l'éditeur, avec un aperçu rendu par le serveur |
+| `assets/js/blocs.js` | déclaration des blocs dans l'éditeur (ceux de l'agenda, et ceux du staff, de WhatsApp et des documents), avec un aperçu rendu par le serveur |
 | `templates/archive-reunion.html` | page `/agenda/` |
 | `templates/single-reunion.html` | page d'une réunion |
 | `style.css` | styles des lignes, des filtres et de l'affiche (voir « Classes CSS ») |
@@ -30,8 +30,10 @@ Préfixe utilisé : `scoutsunite_` pour les fonctions PHP, `scoutsunite/` pour l
 
 ```php
 'baladins' => 'Baladins', 'louveteaux' => 'Louveteaux', 'eclaireurs' => 'Éclaireurs',
-'pionniers' => 'Pionniers', 'unite' => 'Toute l’unité'
+'pionniers' => 'Pionniers', 'unite' => 'Toute l’unité', 'iama' => 'IAmA'
 ```
+
+- `iama` : le clan des anciens et amis, avec sa page et son bloc « Activités IAmA » (`scoutsunite/iama`).
 
 - `unite` sert aux activités communes. Il est exclu du bloc « Prochaines réunions ».
 - La liste est envoyée au JS de l'éditeur par `wp_add_inline_script( …, 'window.scoutsuniteSections = ' . wp_json_encode( … ), 'before' )`.
@@ -94,6 +96,7 @@ Chaque modification appelle `editPost( { meta: { clé: valeur } } )`.
 Garde-fous :
 - **Ouverture automatique** : au montage, le panneau s'ouvre de lui-même (`toggleEditorPanelOpened` s'il est fermé). Si la section ou la date manque, la barre latérale du document s'ouvre aussi (`openGeneralSidebar( 'edit-post/document' )`).
 - **Publication bloquée** : tant que la section ou la date manque, `lockPostSaving( 'scoutsunite-reunion' )` bloque la publication et un `Notice` d'avertissement non masquable affiche « Choisis la section et la date pour pouvoir publier. ».
+- **Date déjà passée** : si la date (ou, pour un week-end ou un camp, le dernier jour) est avant aujourd'hui, un `Notice` prévient « Cette date est déjà passée : la réunion n’apparaîtra pas sur le site. Vérifie l’année. » La publication reste possible.
 - **Titre par défaut** : dès que les deux sont remplis, `unlockPostSaving` débloque la publication. Si le titre est vide, il devient « Réunion », car l'éditeur refuse de publier un contenu sans titre.
 
 ## Répétition hebdomadaire
@@ -118,13 +121,17 @@ Limites à connaître :
 
 ## Lecture des réunions
 
-`scoutsunite_agenda_a_venir( $section = '', $nombre = 100, $avant = false )` :
+`scoutsunite_agenda_a_venir( $section = '', $nombre = 100, $avant = false, $types = array() )` :
 - `get_posts` sur `reunion` publiées, avec `posts_per_page => 300` ;
 - `meta_query` : `su_date >= aujourd'hui` OU `su_jusqua >= aujourd'hui` (type `DATE`, dans le fuseau du site : un week-end en cours reste visible), `su_section` égal ou `IN` si on passe un tableau, `su_type IN $types` si on filtre par type, plus `su_section = $section` si on filtre, et `su_avant = '1'` si `$avant` ;
 - tri en PHP par `su_date . su_debut` (`usort` + `strcmp`), donc une réunion sans heure passe en premier dans sa journée ;
 - renvoie les `$nombre` premières.
 
 Une réunion reste donc visible toute la journée où elle a lieu.
+
+Les notes d'une réunion passent toujours par `scoutsunite_agenda_notes( $post )` (mise en forme) ou `scoutsunite_agenda_notes_visibles( $post )` (texte brut) : rien pour une réunion protégée par un mot de passe.
+
+Feuilles pour le frigo : `scoutsunite_imprimer_camps( $section, $sauf )` (`inc/imprimer.php`) met en tête du programme et de la convocation un encadré « À retenir » avec les camps à venir de la section et de `unite` (`a_venir( …, 10, false, [ 'camp' ] )`), sans les camps annulés ni le camp `$sauf` de la convocation, quelle que soit la période imprimée.
 
 Fonctions de mise en forme :
 - `agenda_jour( 'Y-m-d', $format = 'l j F' )` renvoie « samedi 24 octobre ». Elle construit la date à 12:00 dans `wp_timezone()` puis appelle `wp_date`, ce qui évite les décalages de jour.
@@ -136,7 +143,7 @@ Fonctions de mise en forme :
 
 ## Blocs dynamiques
 
-Les six blocs de l’agenda sont déclarés en PHP avec `register_block_type` :
+Les sept blocs de l’agenda sont déclarés en PHP avec `register_block_type` :
 - `api_version => 3`, catégorie `widgets` ;
 - `editor_script => 'scoutsunite-blocs'` ;
 - un `render_callback`, avec `save: () => null` côté JS.
@@ -168,7 +175,7 @@ Les blocs :
    - Navigation `nav.agenda__filtres` avec `aria-label="Filtrer par section"` : « Toutes » puis un lien par section, chacun avec la classe `agenda__filtre-{slug}`.
    - Le filtre est le paramètre `?section=` : `sanitize_key`, validé contre la liste des sections, en lecture seule. Le lien actif porte `aria-current="page"`.
    - Les réunions sont groupées par mois : `h2.agenda__mois` (« Octobre 2026 ») suivi de `div.agenda__liste`, au maximum 200 réunions.
-   - Chaque ligne affiche « **samedi 24 octobre** · titre · lieu », l'horaire, et les notes réduites à 40 mots en texte brut.
+   - Chaque ligne affiche « **samedi 24 octobre** · titre · lieu », l'horaire, et les notes réduites à 40 mots en texte brut, suivies d'un lien « Lire la suite » (`.agenda__suite`) vers la réunion quand elles sont coupées.
    - Liste vide : `p.agenda__vide` « Aucune réunion à venir pour l'instant. Le staff publie les dates ici dès qu'elles sont fixées. ».
 
 4. **`scoutsunite/a-la-une`** : « À la une », pour l'affiche blanche du panneau d'accueil. Classe `a-la-une`.
@@ -183,6 +190,7 @@ Les blocs :
    - Sans activité : `p.camps__vide` qui explique comment en ajouter.
 
 6. **`scoutsunite/reunion`** : « Détails de la réunion », pour la page d'une réunion. Classe `agenda-reunion`.
+7. **`scoutsunite/iama`** : « Activités IAmA », pour la page IAmA : les fiches des activités à venir du clan, comme les temps forts.
    - `uses_context => [ 'postId' ]`.
    - Affiche une seule ligne : la section, « date · lieu » et l'horaire.
 

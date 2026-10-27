@@ -871,7 +871,15 @@ function scoutsunite_bloc_agenda() {
 		if ( $lieu ) {
 			$quoi .= ' · ' . esc_html( $lieu );
 		}
-		$notes    = scoutsunite_agenda_notes_visibles( $r ) ? wp_kses_post( wp_trim_words( wp_strip_all_tags( $r->post_content ), 40 ) ) : '';
+		$notes = '';
+		if ( scoutsunite_agenda_notes_visibles( $r ) ) {
+			$brut  = trim( wp_strip_all_tags( $r->post_content ) );
+			$notes = wp_kses_post( wp_trim_words( $brut, 40 ) );
+			// Des notes coupées : la suite est sur la page de la réunion.
+			if ( count( preg_split( '/\s+/u', $brut ) ) > 40 ) {
+				$notes .= ' <a class="agenda__suite" href="' . esc_url( get_permalink( $r ) ) . '">Lire la suite</a>';
+			}
+		}
 		// Une réunion annulée ne garde que le mot d'explication : ses notes ne servent plus.
 		if ( scoutsunite_agenda_annulee( $r->ID ) ) {
 			$pourquoi = scoutsunite_agenda_pourquoi( $r->ID );
@@ -987,7 +995,7 @@ function scoutsunite_agenda_fiches( $activites ) {
 		if ( scoutsunite_agenda_annulee( $a->ID ) ) {
 			$html .= scoutsunite_agenda_rappel_annulees( array( $a ), false );
 		}
-		$html .= '<h4 class="wp-block-heading camp__titre"><a href="' . esc_url( get_permalink( $a ) ) . '">' . esc_html( $titre ? $titre : ( $type ? $type : 'Activité' ) ) . '</a></h4>';
+		$html .= '<h3 class="wp-block-heading camp__titre"><a href="' . esc_url( get_permalink( $a ) ) . '">' . esc_html( $titre ? $titre : ( $type ? $type : 'Activité' ) ) . '</a></h3>';
 		$html .= '<p class="camp__quand">' . esc_html( ucfirst( scoutsunite_agenda_quand( $a->ID ) ) ) . ( $infos ? '<br>' . esc_html( implode( ' · ', $infos ) ) : '' ) . '</p>';
 		$notes = scoutsunite_agenda_notes( $a );
 		if ( '' !== trim( $notes ) ) {

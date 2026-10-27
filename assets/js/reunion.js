@@ -62,6 +62,12 @@
 
 		// Pas de publication sans section ni date : la réunion n'apparaîtrait nulle part.
 		var incomplet = ! meta.su_section || ! meta.su_date;
+
+		// Une date déjà passée (souvent la bonne date, mais la mauvaise année) : le site ne la montrera pas.
+		var jour = new Date();
+		var aujourdhui = jour.getFullYear() + '-' + ( '0' + ( jour.getMonth() + 1 ) ).slice( -2 ) + '-' + ( '0' + jour.getDate() ).slice( -2 );
+		var dernierJour = plusieursJours && meta.su_jusqua ? meta.su_jusqua : meta.su_date;
+		var passee = !! meta.su_date && dernierJour < aujourdhui;
 		useEffect(
 			function () {
 				if ( incomplet ) {
@@ -88,6 +94,12 @@
 					C.Notice,
 					{ status: 'warning', isDismissible: false },
 					'Choisis la section et la date pour pouvoir publier.'
+				),
+			passee &&
+				el(
+					C.Notice,
+					{ status: 'warning', isDismissible: false },
+					'Cette date est déjà passée : la réunion n’apparaîtra pas sur le site. Vérifie l’année.'
 				),
 			el( C.SelectControl, {
 				label: 'Section',

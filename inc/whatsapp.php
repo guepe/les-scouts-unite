@@ -30,7 +30,7 @@ function scoutsunite_qr_longueur_max() {
  * QR code d'un texte, en SVG : un seul tracé, marge de 4 modules, mis à l'échelle par le CSS.
  *
  * @param string $texte Texte à encoder (un lien).
- * @param string $label Description pour les lecteurs d'écran.
+ * @param string $label Description pour les lecteurs d'écran, '' pour un QR code dans un lien qui porte déjà le nom.
  * @return string SVG, vide si le texte est trop long pour un QR code.
  */
 function scoutsunite_qr_svg( $texte, $label ) {
@@ -64,7 +64,7 @@ function scoutsunite_qr_svg( $texte, $label ) {
 		wp_cache_set( $cle, $d, 'scoutsunite' );
 	}
 	$taille = $d[0] + 8;
-	return '<svg class="qr" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' . $taille . ' ' . $taille . '" shape-rendering="crispEdges" role="img" aria-label="' . esc_attr( $label ) . '"><rect width="' . $taille . '" height="' . $taille . '" fill="#fff"/><path d="' . $d[1] . '" fill="#000"/></svg>';
+	return '<svg class="qr" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' . $taille . ' ' . $taille . '" shape-rendering="crispEdges" ' . ( '' === $label ? 'aria-hidden="true"' : 'role="img" aria-label="' . esc_attr( $label ) . '"' ) . '><rect width="' . $taille . '" height="' . $taille . '" fill="#fff"/><path d="' . $d[1] . '" fill="#000"/></svg>';
 }
 
 /**
@@ -107,7 +107,8 @@ function scoutsunite_whatsapp_cartes( $sections ) {
 		}
 		$nom   = 'Groupe WhatsApp ' . scoutsunite_whatsapp_de( $section );
 		$html .= '<a class="whatsapp__groupe whatsapp--' . esc_attr( $section ) . '" href="' . esc_url( $lien ) . '">';
-		$html .= scoutsunite_qr_svg( $lien, 'QR code du ' . $nom );
+		// Le lien porte déjà le nom du groupe : le lecteur d'écran ne l'annonce pas deux fois.
+		$html .= scoutsunite_qr_svg( $lien, '' );
 		$html .= '<span class="whatsapp__texte"><strong>' . esc_html( $nom ) . '</strong><span>Scanne le code ou clique pour rejoindre le groupe.</span></span></a>';
 	}
 	return $html;

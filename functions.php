@@ -124,14 +124,25 @@ function scoutsunite_pattern_categories() {
 add_action( 'init', 'scoutsunite_pattern_categories' );
 
 /**
- * Adresse d'une page de l'unité, pour les liens des compositions.
+ * Les compositions écrivent leurs liens depuis la racine (« /contact/ ») : ils sont recopiés tels quels
+ * dans les pages créées. Sur un site installé dans un sous-dossier (exemple.be/scouts/), on y ajoute
+ * le sous-dossier à l'affichage, pour les pages déjà créées comme pour les nouvelles.
  *
- * @param string $slug Identifiant de la page.
- * @return string URL échappée.
+ * @param string $html Rendu d'un bloc.
+ * @return string
  */
-function scoutsunite_page_url( $slug ) {
-	return esc_url( home_url( '/' . $slug . '/' ) );
+function scoutsunite_liens_racine( $html ) {
+	if ( false === strpos( $html, 'href="/' ) ) {
+		return $html;
+	}
+	$dossier = untrailingslashit( (string) wp_parse_url( home_url(), PHP_URL_PATH ) );
+	if ( '' === $dossier ) {
+		return $html;
+	}
+	// Ni un lien « //autre-site », ni un lien qui porte déjà le sous-dossier.
+	return preg_replace( '#href="/(?!/|' . preg_quote( ltrim( $dossier, '/' ), '#' ) . '(/|"))#', 'href="' . $dossier . '/', $html );
 }
+add_filter( 'render_block', 'scoutsunite_liens_racine' );
 
 /**
  * Adresse d'une image du thème.

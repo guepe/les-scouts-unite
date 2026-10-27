@@ -25,7 +25,7 @@ Des guides pas à pas, à envoyer aux personnes qui tiennent le site :
 4. **Réglages → Unité** : les coordonnées de l’unité, encodées une seule fois (voir ci-dessous).
 5. **Réglages → Permaliens** : « Titre de la publication ».
 
-Il faut WordPress 6.5 ou plus récent.
+Il faut WordPress 6.6 ou plus récent, avec PHP 7.4 ou plus.
 
 ## Créer les pages
 
@@ -117,16 +117,27 @@ npx @wp-playground/cli@latest server --port=9400 \
 
 Puis ouvre http://127.0.0.1:9400 (identifiant `admin`, mot de passe `password`). Le contenu d’exemple (pages, articles, réunions) vient de `playground/contenu-demo.php`, partagé avec la démo en ligne (`playground/demo.json`, qui installe le thème depuis GitHub).
 
+### Tester
+
+```sh
+tests/lancer.sh            # PHP 8.3, dernière version de WordPress
+tests/lancer.sh 7.4 6.6    # les versions minimales annoncées
+```
+
+Chaque lancement installe un WordPress neuf (Playground), y crée le contenu d’exemple puis lance [`tests/tests.php`](tests/tests.php) : droits des animateurs et du staff (y compris par l’API et XML-RPC), champs des réunions, répétition, annulation, notes protégées, feuilles pour le frigo, QR codes et liens. Le résultat s’affiche et reste dans `tests/resultats.txt`.
+
+À chaque envoi sur GitHub, l’action [`verifier`](.github/workflows/verifier.yml) contrôle la syntaxe PHP (7.4 et 8.3) et JavaScript, `theme.json` contre le schéma de WordPress 6.6, les règles de sécurité de WordPress (PHPCS, pour information) et lance les tests dans les deux configurations.
+
 ### Publier une version
 
-1. Monte `Version:` dans `style.css` (par ex. `2.8.0`) et note les changements dans `CHANGELOG.md`.
+1. Monte `Version:` dans `style.css` (par ex. `2.8.0`) et note les changements dans `CHANGELOG.md`, sous un titre `## 2.8.0 – AAAA-MM-JJ`.
 2. Commite, puis crée et pousse le tag correspondant :
    ```sh
    git tag v2.8.0 && git push origin main v2.8.0
    ```
-3. L’action GitHub [`release`](.github/workflows/release.yml) vérifie que le tag et `style.css` portent la même version, construit `les-scouts-unite.zip` (sans la doc ni les fichiers de développement, voir `.gitattributes`) et publie la version avec le zip.
+3. L’action GitHub [`release`](.github/workflows/release.yml) lance d’abord les vérifications et les tests, vérifie que le tag et `style.css` portent la même version et que le CHANGELOG la date, construit `les-scouts-unite.zip` (sans la doc ni les fichiers de développement, voir `.gitattributes`) et publie la version avec le zip.
 
-Pour fabriquer le zip à la main : `git archive --format=zip --prefix=les-scouts-unite/ -o les-scouts-unite.zip HEAD`.
+Pour fabriquer le zip à la main : `git archive --format=zip --prefix=les-scouts-unite/ -o les-scouts-unite.zip HEAD` (les fichiers ajoutés doivent être commités).
 
 ### Documentation technique
 
@@ -140,4 +151,4 @@ La charte recommande Housepaint, mais elle n’a pas de lettres accentuées : le
 
 ## Origine et licences
 
-Ce thème est né dans un fork du [template des sites d’unité](https://github.com/lesscouts/template-unite) de Les Scouts asbl, dont il reprend la charte graphique ; il vit désormais dans son propre dépôt. Le code est sous licence MIT (voir [`LICENSE`](LICENSE)). Les logos, toppings et éléments de la charte restent la propriété de Les Scouts asbl. Muli et Caveat Brush sont sous licence SIL Open Font License. Les QR codes sont dessinés par [QR Code for PHP](https://github.com/kazuhikoarase/qrcode-generator) de Kazuhiko Arase (licence MIT), copié dans `inc/lib/qrcode.php`.
+Ce thème est né dans un fork du [template des sites d’unité](https://github.com/lesscouts/template-unite) de Les Scouts asbl, dont il reprend la charte graphique ; il vit désormais dans son propre dépôt. Le code est sous licence MIT (voir [`LICENSE`](LICENSE)). Les logos, toppings et éléments de la charte restent la propriété de Les Scouts asbl. Muli et Caveat Brush sont sous licence SIL Open Font License (texte et mentions dans [`assets/fonts/OFL.txt`](assets/fonts/OFL.txt), joint au zip) ; le thème les sert en WOFF2, limitées aux caractères du français. Les QR codes sont dessinés par [QR Code for PHP](https://github.com/kazuhikoarase/qrcode-generator) de Kazuhiko Arase (licence MIT), copié dans `inc/lib/qrcode.php`.

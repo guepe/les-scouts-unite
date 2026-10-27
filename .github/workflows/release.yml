@@ -1,5 +1,5 @@
-# Publie une version du thème quand un tag vX.Y.Z est poussé :
-# vérifie la version de style.css, construit le zip et l'attache à la Release.
+# Publie une version du thème quand un tag vX.Y.Z est poussé : lance les vérifications et les tests
+# (verifier.yml), vérifie la version de style.css et le CHANGELOG, construit le zip et l'attache à la Release.
 name: release
 
 on:
@@ -10,7 +10,11 @@ permissions:
   contents: write
 
 jobs:
+  verifier:
+    uses: ./.github/workflows/verifier.yml
+
   zip:
+    needs: verifier
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -20,6 +24,14 @@ jobs:
           version=$(sed -n 's/^Version: *//p' style.css | tr -d '\r')
           if [ "v$version" != "$GITHUB_REF_NAME" ]; then
             echo "::error::style.css est en $version, le tag est $GITHUB_REF_NAME"
+            exit 1
+          fi
+
+      - name: Vérifier que le CHANGELOG date cette version
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          if ! grep -q "^## $version – [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}$" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md n'a pas de rubrique « ## $version – AAAA-MM-JJ »"
             exit 1
           fi
 
@@ -33,6 +45,8 @@ jobs:
           version="${GITHUB_REF_NAME#v}"
           # Notes : la rubrique de cette version dans CHANGELOG.md.
           awk -v v="$version" '/^## /{p = (index($0, "## " v " ") == 1); next} p' CHANGELOG.md > notes.md
+          # Les liens relatifs du CHANGELOG (docs/…) mènent au dépôt, à la version publiée.
+          sed -i -E "s#\]\(((docs|tests|assets)/[^)]*)\)#](https://github.com/$GITHUB_REPOSITORY/blob/$GITHUB_REF_NAME/\1)#g" notes.md
           prerelease=""
           case "$version" in *-*) prerelease="--prerelease" ;; esac
           gh release create "$GITHUB_REF_NAME" les-scouts-unite.zip \
