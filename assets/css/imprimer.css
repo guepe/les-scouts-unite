@@ -355,6 +355,34 @@ body {
 
 /* Bon à savoir */
 
+/* À retenir : les camps à venir, en haut de chaque feuille */
+
+.feuille__rappel {
+	margin: 0 0 5mm;
+	padding: 2.5mm 5mm;
+	border: 0.6mm solid var(--section);
+	border-radius: 2mm;
+	break-inside: avoid;
+}
+
+.feuille__rappel h2 {
+	margin: 0 0 1mm;
+	font-weight: 900;
+	font-size: 12pt;
+}
+
+.feuille__rappel ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	font-size: 11pt;
+	line-height: 1.35;
+}
+
+.feuille__rappel li + li {
+	margin-top: 1mm;
+}
+
 .feuille__bon {
 	margin-top: 5mm;
 	padding: 3mm 5mm;

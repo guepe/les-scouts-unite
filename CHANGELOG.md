@@ -2,6 +2,10 @@
 
 Les versions suivent le numéro `Version:` de `style.css`. Chaque version publiée a son zip dans les [Releases](https://github.com/guepe/les-scouts-unite/releases).
 
+## 2.11.0 – non publiée
+
+- **Les camps toujours sur le frigo** : le programme et la convocation à imprimer commencent par un encadré « À retenir » avec les camps à venir de la section et de toute l’unité, même au-delà de la période imprimée (« Camp d’été du mardi 20 juillet au mardi 3 août 2027 »). Un camp annulé n’y figure pas ; la convocation d’un camp ne se rappelle pas elle-même.
+
 ## 2.10.3 – 2026-10-25
 
 Correctifs de sécurité, après une relecture complète du thème, et des pages plus légères. Les rôles sont réécrits automatiquement à la mise à jour.

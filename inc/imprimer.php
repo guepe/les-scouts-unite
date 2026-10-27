@@ -257,6 +257,34 @@ function scoutsunite_imprimer_programme( $section, $mois ) {
 }
 
 /**
+ * « À retenir » : les camps à venir de la section et de toute l'unité, même au-delà de la période
+ * imprimée, pour que la date du camp soit sur le frigo dès le premier programme de l'année.
+ *
+ * @param string $section Identifiant de section, '' ou 'unite' pour toute l'unité.
+ * @param int    $sauf    Réunion à ne pas rappeler (la convocation de ce camp lui-même).
+ * @return string HTML, vide s'il n'y a pas de camp à venir.
+ */
+function scoutsunite_imprimer_camps( $section, $sauf = 0 ) {
+	$noms   = scoutsunite_agenda_sections();
+	$unite  = '' === $section || 'unite' === $section;
+	$camps  = scoutsunite_agenda_a_venir( $unite ? '' : array( $section, 'unite' ), 10, false, array( 'camp' ) );
+	$lignes = '';
+	foreach ( $camps as $c ) {
+		if ( (int) $c->ID === (int) $sauf || scoutsunite_agenda_annulee( $c->ID ) ) {
+			continue;
+		}
+		$s     = get_post_meta( $c->ID, 'su_section', true );
+		$titre = scoutsunite_agenda_titre( $c );
+		$fin   = get_post_meta( $c->ID, 'su_jusqua', true );
+		$annee = substr( $fin ? $fin : get_post_meta( $c->ID, 'su_date', true ), 0, 4 );
+		$qui   = $s !== $section && isset( $noms[ $s ] ) ? ' <span class="feuille__tag">' . esc_html( $noms[ $s ] ) . '</span>' : '';
+
+		$lignes .= '<li><strong>' . esc_html( $titre ? $titre : 'Camp' ) . '</strong> ' . esc_html( scoutsunite_agenda_quand( $c->ID ) . ' ' . $annee ) . $qui . '</li>';
+	}
+	return $lignes ? '<section class="feuille__rappel"><h2>À retenir</h2><ul>' . $lignes . '</ul></section>' : '';
+}
+
+/**
  * Convocation : une réunion en grand, avec toutes ses notes.
  *
  * @param WP_Post $post Réunion.
@@ -361,6 +389,7 @@ function scoutsunite_imprimer() {
 			<p class="feuille__titre"><?php echo esc_html( $titre ); ?><?php echo $sous_titre ? ' <span>' . esc_html( $sous_titre ) . '</span>' : ''; ?></p>
 		</div>
 	</header>
+	<?php echo scoutsunite_imprimer_camps( $section, isset( $post ) ? $post->ID : 0 ); // phpcs:ignore WordPress.Security.EscapeOutput -- échappé à la construction. ?>
 	<?php echo $corps; // phpcs:ignore WordPress.Security.EscapeOutput -- échappé à la construction. ?>
 	<?php $bon = scoutsunite_bon_a_savoir( $section, false ); ?>
 	<?php if ( $bon ) : ?>
