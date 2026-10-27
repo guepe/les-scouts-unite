@@ -59,14 +59,14 @@ function scoutsunite_sections() {
 function scoutsunite_section_pattern( $slug ) {
 	$sections = scoutsunite_sections();
 	$s        = $sections[ $slug ];
-	$nom      = esc_html( $s['nom'] );
-	$groupe   = esc_html( $s['groupe'] );
+	$nom      = $s['nom'];
+	$groupe   = $s['groupe'];
 	?>
 <!-- wp:group {"align":"full","className":"is-style-bandeau-<?php echo esc_attr( $slug ); ?>","style":{"spacing":{"padding":{"top":"var:preset|spacing|70","bottom":"var:preset|spacing|70"},"margin":{"top":"0","bottom":"0"}}},"layout":{"type":"constrained","contentSize":"78rem"}} -->
 <div class="wp-block-group alignfull is-style-bandeau-<?php echo esc_attr( $slug ); ?>" style="margin-top:0;margin-bottom:0;padding-top:var(--wp--preset--spacing--70);padding-bottom:var(--wp--preset--spacing--70)"><!-- wp:columns {"verticalAlignment":"center","style":{"spacing":{"blockGap":{"left":"var:preset|spacing|60"}}}} -->
 <div class="wp-block-columns are-vertically-aligned-center"><!-- wp:column {"verticalAlignment":"center"} -->
 <div class="wp-block-column is-vertically-aligned-center"><!-- wp:heading {"level":1,"className":"panneau__titre"} -->
-<h1 class="wp-block-heading panneau__titre"><?php echo $nom; ?></h1>
+<h1 class="wp-block-heading panneau__titre"><?php echo esc_html( $nom ); ?></h1>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph {"style":{"typography":{"fontWeight":"900","fontSize":"1.375rem"},"spacing":{"margin":{"top":"0.5rem"}}}} -->
@@ -86,7 +86,7 @@ function scoutsunite_section_pattern( $slug ) {
 
 <!-- wp:column {"verticalAlignment":"center","width":"14rem"} -->
 <div class="wp-block-column is-vertically-aligned-center" style="flex-basis:14rem"><!-- wp:image {"sizeSlug":"full","linkDestination":"none","className":"bandeau__logo"} -->
-<figure class="wp-block-image size-full bandeau__logo"><img src="<?php echo scoutsunite_image( 'logos/' . $s['logo'] ); ?>" alt="Logo des <?php echo $nom; ?>"/></figure>
+<figure class="wp-block-image size-full bandeau__logo"><img src="<?php echo scoutsunite_image( 'logos/' . $s['logo'] ); ?>" alt="Logo des <?php echo esc_attr( $nom ); ?>"/></figure>
 <!-- /wp:image --></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns --></div>
@@ -109,7 +109,7 @@ function scoutsunite_section_pattern( $slug ) {
 <!-- wp:scoutsunite/staff {"section":"<?php echo esc_attr( $slug ); ?>"} /-->
 
 <!-- wp:paragraph {"className":"lien-fleche","style":{"spacing":{"margin":{"top":"var:preset|spacing|40"}}}} -->
-<p class="lien-fleche" style="margin-top:var(--wp--preset--spacing--40)"><a href="/contact/">Écrire au staff des <?php echo $nom; ?></a></p>
+<p class="lien-fleche" style="margin-top:var(--wp--preset--spacing--40)"><a href="/contact/">Écrire au staff des <?php echo esc_html( $nom ); ?></a></p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group --></div>
 <!-- /wp:column --></div>
@@ -118,11 +118,11 @@ function scoutsunite_section_pattern( $slug ) {
 
 <!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"var:preset|spacing|70","bottom":"var:preset|spacing|70"},"margin":{"top":"0","bottom":"0"}}},"backgroundColor":"blanc","layout":{"type":"constrained"}} -->
 <div class="wp-block-group alignfull has-blanc-background-color has-background" style="margin-top:0;margin-bottom:0;padding-top:var(--wp--preset--spacing--70);padding-bottom:var(--wp--preset--spacing--70)"><!-- wp:heading -->
-<h2 class="wp-block-heading">L’année chez les <?php echo $nom; ?></h2>
+<h2 class="wp-block-heading">L’année chez les <?php echo esc_html( $nom ); ?></h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Raconte ici comment vit <?php echo $groupe; ?> : les réunions du samedi, les week-ends, les traditions de la section et ce que les enfants y apprennent.</p>
+<p>Raconte ici comment vit <?php echo esc_html( $groupe ); ?> : les réunions du samedi, les week-ends, les traditions de la section et ce que les enfants y apprennent.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":3} -->

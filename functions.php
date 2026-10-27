@@ -283,7 +283,7 @@ function scoutsunite_lien_fleche( $html ) {
 		return $html;
 	}
 
-	$ici = wp_parse_url( isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '', PHP_URL_PATH );
+	$ici = wp_parse_url( isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '', PHP_URL_PATH );
 	if ( trailingslashit( $lien['path'] ?? '' ) === trailingslashit( (string) $ici ) ) {
 		return '';
 	}

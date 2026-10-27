@@ -42,8 +42,6 @@ jobs:
 
   securite:
     runs-on: ubuntu-latest
-    # Pour information tant que le premier passage n'a pas été relu : ne bloque pas encore la publication.
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v5
       - uses: shivammathur/setup-php@v2
@@ -55,9 +53,8 @@ jobs:
         run: |
           composer global config allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
           composer global require --quiet --no-interaction "wp-coding-standards/wpcs:^3"
-          "$(composer global config bin-dir --absolute)/phpcs" --standard=WordPress --extensions=php \
-            --sniffs=WordPress.Security.EscapeOutput,WordPress.Security.NonceVerification,WordPress.Security.ValidatedSanitizedInput,WordPress.DB.PreparedSQL,WordPress.DB.PreparedSQLPlaceholders \
-            --ignore='inc/lib/*' functions.php inc patterns
+          # Les règles et les fichiers sont dans .phpcs.xml.dist.
+          "$(composer global config bin-dir --absolute)/phpcs"
 
   tests:
     runs-on: ubuntu-latest
@@ -73,6 +70,6 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
       - name: Tests dans WordPress ${{ matrix.wp }}, PHP ${{ matrix.php }}
         run: tests/lancer.sh ${{ matrix.php }} ${{ matrix.wp }}

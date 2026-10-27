@@ -5,7 +5,7 @@
 cd "$(dirname "$0")/.." || exit 1
 rm -f tests/resultats.txt
 # Le Playground ne lit les versions que dans le blueprint : on en écrit une copie avec celles demandées.
-plan=$(mktemp -t blueprint).json
+plan="${TMPDIR:-/tmp}/les-scouts-unite-tests-$$.json"
 node -e '
 	const b = require( process.argv[1] );
 	b.preferredVersions = { php: process.argv[2], wp: process.argv[3] };
