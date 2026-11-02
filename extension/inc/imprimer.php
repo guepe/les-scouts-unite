@@ -54,13 +54,18 @@ function scoutsunite_imprimer_url( $section = '', $post = null ) {
  * @return array
  */
 function scoutsunite_imprimer_section( $section ) {
-	$sections = scoutsunite_sections();
+	$sections = array(
+		'baladins'   => array( 'logo_Baladins.png', 'de la Ronde' ),
+		'louveteaux' => array( 'logo_Louveteaux.png', 'de la Meute' ),
+		'eclaireurs' => array( 'logo_Eclaireurs.png', 'de la Troupe' ),
+		'pionniers'  => array( 'logo_Pionniers.png', 'du Poste' ),
+	);
 	$noms     = scoutsunite_agenda_sections();
 	if ( isset( $sections[ $section ] ) ) {
 		return array(
-			'nom'   => $sections[ $section ]['nom'],
-			'logo'  => 'logos/' . $sections[ $section ]['logo'],
-			'staff' => 'Le staff ' . $sections[ $section ]['staff'],
+			'nom'   => $noms[ $section ],
+			'logo'  => 'logos/' . $sections[ $section ][0],
+			'staff' => 'Le staff ' . $sections[ $section ][1],
 		);
 	}
 	return array(
@@ -82,7 +87,7 @@ function scoutsunite_imprimer_staff( $section ) {
 	$membres  = array();
 	$contacts = array();
 
-	if ( isset( scoutsunite_sections()[ $section ] ) ) {
+	if ( isset( scoutsunite_agenda_sections_age()[ $section ] ) ) {
 		$chef = scoutsunite_unite( $section . '_chef' );
 		if ( '' !== $chef ) {
 			$membres[] = array( $chef, 'chef de section' );
@@ -197,7 +202,7 @@ function scoutsunite_imprimer_programme( $section, $mois ) {
 	$noms   = scoutsunite_agenda_sections();
 	$limite = wp_date( 'Y-m-d', ( new DateTimeImmutable( 'now', wp_timezone() ) )->modify( '+' . $mois . ' months' )->getTimestamp() );
 	// Une section voit aussi les activités de toute l'unité, comme sur sa page.
-	$qui      = isset( scoutsunite_sections()[ $section ] ) ? array( $section, 'unite' ) : $section;
+	$qui      = isset( scoutsunite_agenda_sections_age()[ $section ] ) ? array( $section, 'unite' ) : $section;
 	$reunions = array_filter(
 		scoutsunite_agenda_a_venir( $qui, 200 ),
 		function ( $r ) use ( $limite ) {
@@ -344,7 +349,8 @@ function scoutsunite_imprimer() {
 
 	$infos = scoutsunite_imprimer_section( $section );
 	$nom   = '' === $section ? 'Agenda de l’unité' : $infos['nom'];
-	$theme = scoutsunite_version( 'assets/css/imprimer.css' );
+	$css   = scoutsunite_extension_theme_url( 'assets/css/imprimer.css' );
+	$logo  = scoutsunite_extension_theme_url( 'assets/images/' . $infos['logo'] );
 	$site  = preg_replace( '#^https?://(www\.)?#', '', get_post_type_archive_link( 'reunion' ) );
 
 	nocache_headers();
@@ -356,7 +362,9 @@ function scoutsunite_imprimer() {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title><?php echo esc_html( $titre . ' · ' . $nom . ' · ' . get_bloginfo( 'name' ) ); ?></title>
-<link rel="stylesheet" href="<?php echo esc_url( add_query_arg( 'ver', $theme, get_theme_file_uri( 'assets/css/imprimer.css' ) ) ); ?>">
+<?php if ( $css ) : ?>
+<link rel="stylesheet" href="<?php echo esc_url( add_query_arg( 'ver', wp_get_theme()->get( 'Version' ) . '.' . filemtime( get_theme_file_path( 'assets/css/imprimer.css' ) ), $css ) ); ?>">
+<?php endif; ?>
 </head>
 <body>
 <nav class="barre" aria-label="Impression">
@@ -382,7 +390,9 @@ function scoutsunite_imprimer() {
 </nav>
 <main class="feuille feuille--<?php echo esc_attr( $section ? $section : 'unite' ); ?>">
 	<header class="feuille__entete">
-		<img class="feuille__logo" src="<?php echo scoutsunite_image( $infos['logo'] ); ?>" alt="">
+		<?php if ( $logo ) : ?>
+			<img class="feuille__logo" src="<?php echo esc_url( $logo ); ?>" alt="">
+		<?php endif; ?>
 		<div>
 			<p class="feuille__unite"><?php echo esc_html( get_bloginfo( 'name' ) ); ?></p>
 			<h1><?php echo esc_html( $nom ); ?></h1>

@@ -292,11 +292,17 @@ function scoutsunite_lien_fleche( $html ) {
 }
 add_filter( 'render_block_core/paragraph', 'scoutsunite_lien_fleche' );
 
+/**
+ * L'agenda, les documents, les droits et Réglages → Unité vivent dans l'extension
+ * « Les Scouts – Unité (extension) » ; le thème n'en fait que l'apparence. Sans elle,
+ * ses blocs n'affichent rien : on prévient l'administrateur.
+ */
+function scoutsunite_avis_extension() {
+	if ( function_exists( 'scoutsunite_agenda_sections' ) || ! current_user_can( 'activate_plugins' ) ) {
+		return;
+	}
+	echo '<div class="notice notice-warning"><p><strong>Le thème Les Scouts – Unité a besoin de son extension.</strong> Installe et active « Les Scouts – Unité (extension) » (le fichier <code>les-scouts-unite-extension.zip</code>, publié avec le thème) : sans elle, l’agenda, les documents et les coordonnées de l’unité ne s’affichent pas.</p></div>';
+}
+add_action( 'admin_notices', 'scoutsunite_avis_extension' );
+
 require get_template_directory() . '/inc/section.php';
-require get_template_directory() . '/inc/agenda.php';
-require get_template_directory() . '/inc/imprimer.php';
-require get_template_directory() . '/inc/calendrier.php';
-require get_template_directory() . '/inc/documents.php';
-require get_template_directory() . '/inc/unite.php';
-require get_template_directory() . '/inc/whatsapp.php';
-require get_template_directory() . '/inc/droits.php';

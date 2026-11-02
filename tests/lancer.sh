@@ -1,5 +1,5 @@
 #!/bin/sh
-# Lance les tests du thème dans un WordPress neuf (WordPress Playground, Node.js nécessaire).
+# Lance les tests du thème et de son extension dans un WordPress neuf (WordPress Playground, Node.js nécessaire).
 # Usage : tests/lancer.sh [version de PHP] [version de WordPress]   (par défaut : 8.3 et latest)
 # Exemple, les versions minimales annoncées : tests/lancer.sh 7.4 6.6
 cd "$(dirname "$0")/.." || exit 1
@@ -13,7 +13,8 @@ node -e '
 ' "$PWD/tests/blueprint.json" "${1:-8.3}" "${2:-latest}" "$plan" || exit 1
 statut=0
 npx -y @wp-playground/cli@latest run-blueprint --blueprint="$plan" \
-	--mount=.:/wordpress/wp-content/themes/les-scouts-unite || statut=$?
+	--mount=.:/wordpress/wp-content/themes/les-scouts-unite \
+	--mount=./extension:/wordpress/wp-content/plugins/les-scouts-unite-extension || statut=$?
 rm -f "$plan"
 cat tests/resultats.txt 2>/dev/null || echo "Pas de résultats : le WordPress de test s'est arrêté avant les tests."
 exit $statut

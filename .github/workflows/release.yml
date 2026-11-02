@@ -1,5 +1,5 @@
-# Publie une version du thème quand un tag vX.Y.Z est poussé : lance les vérifications et les tests
-# (verifier.yml), vérifie la version de style.css et le CHANGELOG, construit le zip et l'attache à la Release.
+# Publie une version du thème et de son extension quand un tag vX.Y.Z est poussé : lance les vérifications
+# et les tests (verifier.yml), vérifie les versions et le CHANGELOG, construit les deux zips et les attache à la Release.
 name: release
 
 on:
@@ -19,13 +19,15 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Vérifier que style.css porte la version du tag
+      - name: Vérifier que le thème et l'extension portent la version du tag
         run: |
-          version=$(sed -n 's/^Version: *//p' style.css | tr -d '\r')
-          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
-            echo "::error::style.css est en $version, le tag est $GITHUB_REF_NAME"
-            exit 1
-          fi
+          for fichier in style.css extension/les-scouts-unite-extension.php; do
+            version=$(sed -n 's/^\( \* \)\{0,1\}Version: *//p' "$fichier" | tr -d '\r')
+            if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+              echo "::error::$fichier est en $version, le tag est $GITHUB_REF_NAME"
+              exit 1
+            fi
+          done
 
       - name: Vérifier que le CHANGELOG date cette version
         run: |
@@ -35,8 +37,10 @@ jobs:
             exit 1
           fi
 
-      - name: Construire le zip (sans la doc ni les outils, voir .gitattributes)
-        run: git archive --format=zip --prefix=les-scouts-unite/ -o les-scouts-unite.zip "$GITHUB_REF_NAME"
+      - name: Construire les zips (le thème sans la doc, les outils ni l'extension, voir .gitattributes)
+        run: |
+          git archive --format=zip --prefix=les-scouts-unite/ -o les-scouts-unite.zip "$GITHUB_REF_NAME"
+          git archive --format=zip --prefix=les-scouts-unite-extension/ -o les-scouts-unite-extension.zip "$GITHUB_REF_NAME:extension"
 
       - name: Publier la version
         env:
@@ -49,5 +53,5 @@ jobs:
           sed -i -E "s#\]\(((docs|tests|assets)/[^)]*)\)#](https://github.com/$GITHUB_REPOSITORY/blob/$GITHUB_REF_NAME/\1)#g" notes.md
           prerelease=""
           case "$version" in *-*) prerelease="--prerelease" ;; esac
-          gh release create "$GITHUB_REF_NAME" les-scouts-unite.zip \
+          gh release create "$GITHUB_REF_NAME" les-scouts-unite.zip les-scouts-unite-extension.zip \
             --title "Les Scouts – Unité $version" --notes-file notes.md $prerelease

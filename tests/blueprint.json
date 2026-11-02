@@ -15,6 +15,10 @@
 			"themeFolderName": "les-scouts-unite"
 		},
 		{
+			"step": "activatePlugin",
+			"pluginPath": "les-scouts-unite-extension/les-scouts-unite-extension.php"
+		},
+		{
 			"step": "setSiteOptions",
 			"options": {
 				"blogname": "Mon unité",

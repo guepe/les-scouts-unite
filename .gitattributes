@@ -12,3 +12,6 @@
 /README.md        export-ignore
 /tests            export-ignore
 /.phpcs.xml.dist  export-ignore
+/CLAUDE.md        export-ignore
+# L'extension a son propre zip (git archive HEAD:extension, action « release »).
+/extension        export-ignore

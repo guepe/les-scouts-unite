@@ -28,6 +28,19 @@
 			}
 		},
 		{
+			"step": "installPlugin",
+			"pluginData": {
+				"resource": "git:directory",
+				"url": "https://github.com/guepe/les-scouts-unite",
+				"ref": "main",
+				"path": "extension"
+			},
+			"options": {
+				"activate": true,
+				"targetFolderName": "les-scouts-unite-extension"
+			}
+		},
+		{
 			"step": "setSiteOptions",
 			"options": {
 				"blogname": "Mon unité",

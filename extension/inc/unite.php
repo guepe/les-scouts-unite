@@ -124,7 +124,7 @@ function scoutsunite_unite_contact_section( $section ) {
 		$liens[] = scoutsunite_unite_lien( $section . '_gsm', 'tel' );
 	}
 	// Seules les sections d'âge ont un GSM (le clan IAmA n'a qu'un e-mail).
-	$gsm = isset( scoutsunite_sections()[ $section ] ) ? ' ou 0470 00 00 00' : '';
+	$gsm = isset( scoutsunite_agenda_sections_age()[ $section ] ) ? ' ou 0470 00 00 00' : '';
 	return $liens ? implode( '<br>', $liens ) : '<mark class="a-completer">' . esc_html( $section . '@example.org' . $gsm ) . '</mark>';
 }
 
@@ -241,7 +241,7 @@ function scoutsunite_unite_personne( $ligne ) {
  * @return string HTML de la liste, '' si rien à montrer.
  */
 function scoutsunite_bon_a_savoir( $section, $exemple = true ) {
-	if ( ! isset( scoutsunite_sections()[ $section ] ) ) {
+	if ( ! isset( scoutsunite_agenda_sections_age()[ $section ] ) ) {
 		return '';
 	}
 	$lignes = array_filter( array_map( 'trim', explode( "\n", scoutsunite_unite( $section . '_infos' ) ) ) );
@@ -357,7 +357,7 @@ function scoutsunite_reprise_staff() {
 	}
 	global $wpdb;
 
-	$sections = array_keys( scoutsunite_sections() );
+	$sections = array_keys( scoutsunite_agenda_sections_age() );
 	$pages    = $wpdb->get_results( "SELECT ID, post_name, post_content FROM {$wpdb->posts} WHERE post_type = 'page' AND post_content LIKE '%chef de section</li>%'" );
 	foreach ( $pages as $page ) {
 		$section = in_array( $page->post_name, $sections, true ) ? $page->post_name : '';
@@ -395,7 +395,7 @@ function scoutsunite_reprise_camps() {
 	}
 	global $wpdb;
 
-	$sections = array_keys( scoutsunite_sections() );
+	$sections = array_keys( scoutsunite_agenda_sections_age() );
 	$pages    = $wpdb->get_results( "SELECT ID, post_name, post_content FROM {$wpdb->posts} WHERE post_type = 'page' AND post_content LIKE '%Dates, lieu, prix et liste du matériel%'" );
 	foreach ( $pages as $page ) {
 		$section = in_array( $page->post_name, $sections, true ) ? $page->post_name : '';

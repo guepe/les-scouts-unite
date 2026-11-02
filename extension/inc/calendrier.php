@@ -230,7 +230,7 @@ function scoutsunite_calendrier_reunions( $section ) {
 	if ( $section ) {
 		$meta_query[] = array(
 			'key'     => 'su_section',
-			'value'   => isset( scoutsunite_sections()[ $section ] ) ? array( $section, 'unite' ) : array( $section ),
+			'value'   => isset( scoutsunite_agenda_sections_age()[ $section ] ) ? array( $section, 'unite' ) : array( $section ),
 			'compare' => 'IN',
 		);
 	}
@@ -271,7 +271,7 @@ function scoutsunite_calendrier() {
 	$entete = array(
 		'BEGIN:VCALENDAR',
 		'VERSION:2.0',
-		'PRODID:-//Les Scouts – Unité//les-scouts-unite ' . wp_get_theme()->get( 'Version' ) . '//FR',
+		'PRODID:-//Les Scouts – Unité//les-scouts-unite ' . scoutsunite_extension_numero() . '//FR',
 		'CALSCALE:GREGORIAN',
 		'METHOD:PUBLISH',
 		'X-WR-CALNAME:' . scoutsunite_calendrier_texte( $nom ),

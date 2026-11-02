@@ -19,11 +19,14 @@ Des guides pas à pas, à envoyer aux personnes qui tiennent le site :
 
 ## Installer le thème
 
-1. Télécharge `les-scouts-unite.zip` depuis la [dernière version publiée](https://github.com/guepe/les-scouts-unite/releases/latest).
-2. Dans WordPress : **Apparence → Thèmes → Ajouter → Téléverser un thème**, choisis le zip, puis **Activer**.
-3. **Réglages → Général** : le **titre du site** est le nom de ton unité (par ex. `Unité 12XY Localité`) et le **slogan** sa ligne de présentation (par ex. `Unité scoute de Localité`). Le thème les affiche dans l’en-tête, le panneau d’accueil et le pied de page.
-4. **Réglages → Unité** : les coordonnées de l’unité, encodées une seule fois (voir ci-dessous).
-5. **Réglages → Permaliens** : « Titre de la publication ».
+Depuis la version 3.0, le site tient en deux morceaux, publiés ensemble : le **thème** (l’apparence : couleurs, pages, compositions) et son **extension** (l’agenda, les documents, les droits des animateurs, Réglages → Unité, le calendrier du téléphone, les feuilles à imprimer et WhatsApp). Il faut les deux.
+
+1. Télécharge `les-scouts-unite.zip` et `les-scouts-unite-extension.zip` depuis la [dernière version publiée](https://github.com/guepe/les-scouts-unite/releases/latest).
+2. Dans WordPress : **Extensions → Ajouter → Téléverser une extension**, choisis `les-scouts-unite-extension.zip`, puis **Activer**.
+3. **Apparence → Thèmes → Ajouter → Téléverser un thème**, choisis `les-scouts-unite.zip`, puis **Activer**.
+4. **Réglages → Général** : le **titre du site** est le nom de ton unité (par ex. `Unité 12XY Localité`) et le **slogan** sa ligne de présentation (par ex. `Unité scoute de Localité`). Le thème les affiche dans l’en-tête, le panneau d’accueil et le pied de page.
+5. **Réglages → Unité** : les coordonnées de l’unité, encodées une seule fois (voir ci-dessous).
+6. **Réglages → Permaliens** : « Titre de la publication ».
 
 Il faut WordPress 6.6 ou plus récent, avec PHP 7.4 ou plus.
 
@@ -82,7 +85,18 @@ Les réunions s’encodent dans **Agenda → Ajouter** (menu de gauche de l’ad
 
 ### Mettre à jour un site déjà installé
 
-1. Téléverse le nouveau zip (**Apparence → Thèmes → Ajouter → Téléverser**, puis **Remplacer la version installée**).
+**Passer d’une version 2.x à la 3.0** (une seule fois) : installe d’abord l’extension, puis le thème.
+
+1. **Extensions → Ajouter → Téléverser une extension** : `les-scouts-unite-extension.zip`, puis **Activer**. Tant que le thème est en 2.x, l’extension attend sans rien changer (un message le rappelle en haut de l’administration).
+2. **Apparence → Thèmes → Ajouter → Téléverser** : `les-scouts-unite.zip`, puis **Remplacer la version installée**. L’extension prend le relais : les réunions, les documents, les comptes des animateurs et Réglages → Unité restent tels quels.
+
+Dans l’autre ordre, rien ne casse non plus : entre les deux, l’agenda disparaît du site et un message demande d’installer l’extension.
+
+**Les versions suivantes** : remplace les deux zips de la même version (l’extension dans **Extensions → Ajouter → Téléverser**, le thème dans **Apparence → Thèmes → Ajouter → Téléverser**, chaque fois **Remplacer la version installée**).
+
+Pour un site qui vient de l’ancien thème `scouts-11om-magnee` (versions 1.x), en plus :
+
+1. Installe l’extension et le thème comme ci-dessus.
 2. **Réglages → Permaliens → Enregistrer** (sans rien changer) pour que l’adresse /agenda/ existe.
 3. Si tu as déjà modifié la page d’accueil dans l’éditeur, elle garde les anciennes lignes écrites à la main : remplace-les par le bloc **Prochaines réunions**, ou fais **⋮ → Réinitialiser** sur le modèle **Page d’accueil**.
 4. Les pages de section déjà créées gardent leur ancienne affiche : remplace la date écrite à la main par le bloc **Prochaine réunion d’une section** (choisis la section dans le panneau de droite).
@@ -112,10 +126,11 @@ Avec [WordPress Playground](https://wordpress.github.io/wordpress-playground/), 
 ```sh
 npx @wp-playground/cli@latest server --port=9400 \
   --mount=.:/wordpress/wp-content/themes/les-scouts-unite \
+  --mount=./extension:/wordpress/wp-content/plugins/les-scouts-unite-extension \
   --blueprint=./blueprint.json
 ```
 
-Puis ouvre http://127.0.0.1:9400 (identifiant `admin`, mot de passe `password`). Le contenu d’exemple (pages, articles, réunions) vient de `playground/contenu-demo.php`, partagé avec la démo en ligne (`playground/demo.json`, qui installe le thème depuis GitHub).
+Le thème est à la racine du dépôt, l’extension dans [`extension/`](extension/). Puis ouvre http://127.0.0.1:9400 (identifiant `admin`, mot de passe `password`). Le contenu d’exemple (pages, articles, réunions) vient de `playground/contenu-demo.php`, partagé avec la démo en ligne (`playground/demo.json`, qui installe le thème depuis GitHub).
 
 ### Tester
 
@@ -124,20 +139,25 @@ tests/lancer.sh            # PHP 8.3, dernière version de WordPress
 tests/lancer.sh 7.4 6.6    # les versions minimales annoncées
 ```
 
-Chaque lancement installe un WordPress neuf (Playground), y crée le contenu d’exemple puis lance [`tests/tests.php`](tests/tests.php) : droits des animateurs et du staff (y compris par l’API et XML-RPC), champs des réunions, répétition, annulation, notes protégées, feuilles pour le frigo, QR codes et liens. Le résultat s’affiche et reste dans `tests/resultats.txt`.
+Chaque lancement installe un WordPress neuf (Playground) avec le thème et l’extension, y crée le contenu d’exemple puis lance [`tests/tests.php`](tests/tests.php) : droits des animateurs et du staff (y compris par l’API et XML-RPC), champs des réunions, répétition, annulation, notes protégées, feuilles pour le frigo, QR codes, liens, et ce que le thème et l’extension attendent l’un de l’autre. Le résultat s’affiche et reste dans `tests/resultats.txt`.
 
-À chaque envoi sur GitHub, l’action [`verifier`](.github/workflows/verifier.yml) contrôle la syntaxe PHP (7.4 et 8.3) et JavaScript, `theme.json` contre le schéma de WordPress 6.6, les règles de sécurité de WordPress (PHPCS, pour information) et lance les tests dans les deux configurations.
+À chaque envoi sur GitHub, l’action [`verifier`](.github/workflows/verifier.yml) contrôle la syntaxe PHP (7.4 et 8.3) et JavaScript, `theme.json` contre le schéma de WordPress 6.6, les règles de sécurité de WordPress (PHPCS, règles dans [`.phpcs.xml.dist`](.phpcs.xml.dist)) et lance les tests dans les deux configurations.
 
 ### Publier une version
 
-1. Monte `Version:` dans `style.css` (par ex. `2.8.0`) et note les changements dans `CHANGELOG.md`, sous un titre `## 2.8.0 – AAAA-MM-JJ`.
+1. Monte `Version:` dans `style.css` et dans `extension/les-scouts-unite-extension.php` (la même, par ex. `3.1.0`) et note les changements dans `CHANGELOG.md`, sous un titre `## 3.1.0 – AAAA-MM-JJ`.
 2. Commite, puis crée et pousse le tag correspondant :
    ```sh
-   git tag v2.8.0 && git push origin main v2.8.0
+   git tag v3.1.0 && git push origin main v3.1.0
    ```
-3. L’action GitHub [`release`](.github/workflows/release.yml) lance d’abord les vérifications et les tests, vérifie que le tag et `style.css` portent la même version et que le CHANGELOG la date, construit `les-scouts-unite.zip` (sans la doc ni les fichiers de développement, voir `.gitattributes`) et publie la version avec le zip.
+3. L’action GitHub [`release`](.github/workflows/release.yml) lance d’abord les vérifications et les tests, vérifie que le tag, `style.css` et l’extension portent la même version et que le CHANGELOG la date, construit `les-scouts-unite.zip` (sans la doc, les fichiers de développement ni l’extension, voir `.gitattributes`) et `les-scouts-unite-extension.zip` (le dossier `extension/`), et publie la version avec les deux zips.
 
-Pour fabriquer le zip à la main : `git archive --format=zip --prefix=les-scouts-unite/ -o les-scouts-unite.zip HEAD` (les fichiers ajoutés doivent être commités).
+Pour fabriquer les zips à la main (les fichiers ajoutés doivent être commités) :
+
+```sh
+git archive --format=zip --prefix=les-scouts-unite/ -o les-scouts-unite.zip HEAD
+git archive --format=zip --prefix=les-scouts-unite-extension/ -o les-scouts-unite-extension.zip HEAD:extension
+```
 
 ### Documentation technique
 
@@ -151,4 +171,4 @@ La charte recommande Housepaint, mais elle n’a pas de lettres accentuées : le
 
 ## Origine et licences
 
-Ce thème est né dans un fork du [template des sites d’unité](https://github.com/lesscouts/template-unite) de Les Scouts asbl, dont il reprend la charte graphique ; il vit désormais dans son propre dépôt. Le code est sous licence MIT (voir [`LICENSE`](LICENSE)). Les logos, toppings et éléments de la charte restent la propriété de Les Scouts asbl. Muli et Caveat Brush sont sous licence SIL Open Font License (texte et mentions dans [`assets/fonts/OFL.txt`](assets/fonts/OFL.txt), joint au zip) ; le thème les sert en WOFF2, limitées aux caractères du français. Les QR codes sont dessinés par [QR Code for PHP](https://github.com/kazuhikoarase/qrcode-generator) de Kazuhiko Arase (licence MIT), copié dans `inc/lib/qrcode.php`.
+Ce thème est né dans un fork du [template des sites d’unité](https://github.com/lesscouts/template-unite) de Les Scouts asbl, dont il reprend la charte graphique ; il vit désormais dans son propre dépôt. Le code est sous licence MIT (voir [`LICENSE`](LICENSE)). Les logos, toppings et éléments de la charte restent la propriété de Les Scouts asbl. Muli et Caveat Brush sont sous licence SIL Open Font License (texte et mentions dans [`assets/fonts/OFL.txt`](assets/fonts/OFL.txt), joint au zip) ; le thème les sert en WOFF2, limitées aux caractères du français. Les QR codes sont dessinés par [QR Code for PHP](https://github.com/kazuhikoarase/qrcode-generator) de Kazuhiko Arase (licence MIT), copié dans `extension/inc/lib/qrcode.php`.

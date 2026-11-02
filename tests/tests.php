@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests du thème, dans un WordPress neuf (WordPress Playground) : droits, répétition, annulation,
+ * Tests du thème et de son extension, dans un WordPress neuf (WordPress Playground) : droits, répétition, annulation,
  * notes protégées, feuilles à imprimer, QR codes et liens. Lancés par tests/lancer.sh et avant chaque publication.
  *
  * Écrit les résultats dans tests/resultats.txt ; une exception arrête le Playground en erreur
@@ -12,7 +12,8 @@
 require '/wordpress/wp-load.php';
 require_once ABSPATH . 'wp-admin/includes/admin.php';
 
-$resultats = array( 'PHP ' . PHP_VERSION . ' · WordPress ' . get_bloginfo( 'version' ) . ' · thème ' . wp_get_theme()->get( 'Version' ), '' );
+$extension = scoutsunite_extension_numero();
+$resultats = array( 'PHP ' . PHP_VERSION . ' · WordPress ' . get_bloginfo( 'version' ) . ' · thème ' . wp_get_theme()->get( 'Version' ) . ' · extension ' . $extension, '' );
 $echecs    = 0;
 $ok        = function ( $condition, $message ) use ( &$resultats, &$echecs ) {
 	$resultats[] = ( $condition ? 'OK     ' : 'ÉCHEC  ' ) . $message;
@@ -165,6 +166,18 @@ add_filter( 'home_url', $sous );
 $ok( '<a href="/scouts/contact/">C</a><a href="//cdn.ex/x">X</a>' === scoutsunite_liens_racine( $html ), 'liens : le sous-dossier est ajouté' );
 $ok( '<a href="/scouts/contact/">C</a>' === scoutsunite_liens_racine( '<a href="/scouts/contact/">C</a>' ), 'liens : jamais deux fois' );
 remove_filter( 'home_url', $sous );
+
+/* Thème et extension ------------------------------------------------------- */
+
+$ok( wp_get_theme()->get( 'Version' ) === $extension, 'thème et extension à la même version' );
+wp_set_current_user( $admin );
+ob_start();
+scoutsunite_avis_extension();
+$ok( '' === ob_get_clean(), 'thème : pas d’avis « extension manquante » quand elle est active' );
+$ok( ! get_option( 'scoutsunite_agenda_flush' ) && isset( get_option( 'rewrite_rules' )['agenda/?$'] ), 'extension : l’adresse /agenda/ existe dès l’activation' );
+$ok( get_permalink( get_page_by_path( 'iama' ) ) === scoutsunite_agenda_section_url( 'iama' ) && get_permalink( $baladins ) === scoutsunite_agenda_section_url( 'baladins' ), 'extension : trouve les pages de section et la page IAmA sans le thème' );
+$ok( '' !== scoutsunite_extension_theme_url( 'assets/css/imprimer.css' ) && '' !== scoutsunite_extension_theme_url( 'assets/images/' . scoutsunite_imprimer_section( 'louveteaux' )['logo'] ), 'frigo : le style et le logo viennent du thème' );
+$ok( '' === scoutsunite_extension_theme_url( 'assets/css/absent.css' ), 'frigo : un thème sans feuille de style ne casse rien' );
 
 $resultats[] = '';
 $total       = count( $resultats ) - 3;

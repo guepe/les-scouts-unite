@@ -122,13 +122,17 @@ function scoutsunite_agenda_nettoyage( $key ) {
 }
 
 /**
- * Les adresses /agenda/ doivent exister dès l'activation du thème.
+ * Les adresses /agenda/ doivent exister dès l'activation de l'extension
+ * (scoutsunite_extension_activer), une fois le type de contenu déclaré.
  */
 function scoutsunite_agenda_flush() {
-	scoutsunite_agenda_register();
+	if ( ! get_option( 'scoutsunite_agenda_flush' ) ) {
+		return;
+	}
+	delete_option( 'scoutsunite_agenda_flush' );
 	flush_rewrite_rules();
 }
-add_action( 'after_switch_theme', 'scoutsunite_agenda_flush' );
+add_action( 'init', 'scoutsunite_agenda_flush', 99 );
 
 /**
  * Reprise d'un site installé avec l'ancien thème scouts-11om-magnee : ses réunions
@@ -193,9 +197,9 @@ function scoutsunite_agenda_editor_assets() {
 	}
 	wp_enqueue_script(
 		'scoutsunite-reunion',
-		get_theme_file_uri( 'assets/js/reunion.js' ),
+		scoutsunite_extension_url( 'assets/js/reunion.js' ),
 		array( 'wp-plugins', 'wp-editor', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-core-data' ),
-		scoutsunite_version( 'assets/js/reunion.js' ),
+		scoutsunite_extension_version( 'assets/js/reunion.js' ),
 		true
 	);
 	wp_add_inline_script(
@@ -596,11 +600,18 @@ function scoutsunite_agenda_horaire( $post_id ) {
 }
 
 /**
- * Adresse de la page d'une section, si elle existe.
+ * Adresse de la page d'une section, si elle existe. La page IAmA peut être
+ * à la racine (/iama/) ou rangée sous « Les sections » (/sections/iama/).
  */
 function scoutsunite_agenda_section_url( $section ) {
-	$page = 'iama' === $section ? scoutsunite_page_iama() : get_page_by_path( 'sections/' . $section );
-	return $page ? get_permalink( $page ) : '';
+	$chemins = 'iama' === $section ? array( 'iama', 'sections/iama' ) : array( 'sections/' . $section );
+	foreach ( $chemins as $chemin ) {
+		$page = get_page_by_path( $chemin );
+		if ( $page && ( 'iama' !== $section || 'publish' === $page->post_status ) ) {
+			return get_permalink( $page );
+		}
+	}
+	return '';
 }
 
 /**
@@ -626,9 +637,9 @@ function scoutsunite_agenda_titre( $post ) {
 function scoutsunite_agenda_blocks() {
 	wp_register_script(
 		'scoutsunite-blocs',
-		get_theme_file_uri( 'assets/js/blocs.js' ),
+		scoutsunite_extension_url( 'assets/js/blocs.js' ),
 		array( 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-server-side-render' ),
-		scoutsunite_version( 'assets/js/blocs.js' ),
+		scoutsunite_extension_version( 'assets/js/blocs.js' ),
 		true
 	);
 

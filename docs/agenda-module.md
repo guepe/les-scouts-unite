@@ -1,6 +1,6 @@
 # Module « Agenda des réunions » pour un thème de bloc WordPress
 
-Spécification d'un module existant (thème `les-scouts-unite`), à reproduire dans un autre site WordPress. Il est intégré au thème, sans extension. Adapte les préfixes, la liste des sections et les textes au site cible ; garde les comportements.
+Spécification d'un module existant (thème `les-scouts-unite`), à reproduire dans un autre site WordPress. Depuis la version 3.0, il vit dans l'extension du thème (dossier `extension/` du dépôt) ; le thème n'en fait que l'apparence (modèles et styles). Adapte les préfixes, la liste des sections et les textes au site cible ; garde les comportements.
 
 ## Objectif
 
@@ -15,9 +15,10 @@ Contraintes :
 
 | Fichier | Rôle |
 |---|---|
-| `inc/agenda.php` (≈ 1 040 lignes, chargé par `functions.php` via `require`) | type de contenu, champs, répétition, colonnes d'administration, requêtes, 7 blocs dynamiques |
-| `assets/js/reunion.js` | panneau « Quand et où ? » dans l'éditeur d'une réunion |
-| `assets/js/blocs.js` | déclaration des blocs dans l'éditeur (ceux de l'agenda, et ceux du staff, de WhatsApp et des documents), avec un aperçu rendu par le serveur |
+| `extension/les-scouts-unite-extension.php` | charge le cœur une fois le thème chargé (sauf si un thème d'avant la 3.0 le contient encore) ; adresses et versions des fichiers de l'extension |
+| `extension/inc/agenda.php` (≈ 1 040 lignes) | type de contenu, champs, répétition, colonnes d'administration, requêtes, 7 blocs dynamiques |
+| `extension/assets/js/reunion.js` | panneau « Quand et où ? » dans l'éditeur d'une réunion |
+| `extension/assets/js/blocs.js` | déclaration des blocs dans l'éditeur (ceux de l'agenda, et ceux du staff, de WhatsApp et des documents), avec un aperçu rendu par le serveur |
 | `templates/archive-reunion.html` | page `/agenda/` |
 | `templates/single-reunion.html` | page d'une réunion |
 | `style.css` | styles des lignes, des filtres et de l'affiche (voir « Classes CSS ») |
@@ -131,7 +132,7 @@ Une réunion reste donc visible toute la journée où elle a lieu.
 
 Les notes d'une réunion passent toujours par `scoutsunite_agenda_notes( $post )` (mise en forme) ou `scoutsunite_agenda_notes_visibles( $post )` (texte brut) : rien pour une réunion protégée par un mot de passe.
 
-Feuilles pour le frigo : `scoutsunite_imprimer_camps( $section, $sauf )` (`inc/imprimer.php`) met en tête du programme et de la convocation un encadré « À retenir » avec les camps à venir de la section et de `unite` (`a_venir( …, 10, false, [ 'camp' ] )`), sans les camps annulés ni le camp `$sauf` de la convocation, quelle que soit la période imprimée.
+Feuilles pour le frigo : `scoutsunite_imprimer_camps( $section, $sauf )` (`extension/inc/imprimer.php`) met en tête du programme et de la convocation un encadré « À retenir » avec les camps à venir de la section et de `unite` (`a_venir( …, 10, false, [ 'camp' ] )`), sans les camps annulés ni le camp `$sauf` de la convocation, quelle que soit la période imprimée.
 
 Fonctions de mise en forme :
 - `agenda_jour( 'Y-m-d', $format = 'l j F' )` renvoie « samedi 24 octobre ». Elle construit la date à 12:00 dans `wp_timezone()` puis appelle `wp_date`, ce qui évite les décalages de jour.
@@ -208,7 +209,7 @@ Les blocs :
 - **Affiche** : `.agenda-prochaine__date`, `.agenda-prochaine__notes`, `.agenda-prochaine__suite`, et pour « À la une » `.a-la-une__quand` (gras), `.a-la-une__suite` (petit, filet au-dessus).
 - **Agenda** : `.agenda__filtres a` (pastilles, couleur via `--section` sur `.agenda__filtre-{slug}`, `[aria-current="page"]` pour l'état actif), `.agenda__mois`, `.agenda__liste`, `.agenda__vide`.
 
-## Droits (`inc/droits.php`)
+## Droits (`extension/inc/droits.php`)
 
 - Le type `reunion` a ses propres droits : `capability_type => [ 'reunion', 'reunions' ]` et `map_meta_cap => true`. Administrateur et éditeur reçoivent `edit_reunions`, `publish_reunions`, etc. Les champs ne s'enregistrent que si `user_can( $user_id, 'edit_post', $post_id )` (`auth_callback`).
 - Rôle **Animateur** (`scoutsunite_animateur`) : `read`, `upload_files`, `edit_pages`, `edit_others_pages`, `edit_published_pages`, `publish_pages` (sans lui, l'éditeur propose « Soumettre à la relecture » et la page quitte le site), tous les droits `*_reunions` et `*_documents`, et le droit repère `scoutsunite_animateur`. Ses sections sont dans la méta utilisateur `scoutsunite_sections` (tableau), cochées par un administrateur (`promote_users`) dans le profil.
@@ -219,7 +220,7 @@ Les blocs :
 - Un animateur ne crée pas de page : `rest_pre_insert_page` refuse une nouvelle page, `load-post-new.php` refuse l'écran « Ajouter une page » et le sous-menu est retiré. Filet de sécurité sur `wp_insert_post_data` : une page publiée qu'il modifie garde le statut `publish` et son identifiant.
 - Les rôles sont (ré)écrits quand `SCOUTSUNITE_DROITS_VERSION` change (option `scoutsunite_droits_version`, version 3 depuis la 2.10.1).
 
-## Documents (`inc/documents.php`)
+## Documents (`extension/inc/documents.php`)
 
 - Type de contenu `document` : `public => false`, `show_ui`, `show_in_rest`, `capability_type => [ 'document', 'documents' ]`, `supports => [ 'title', 'page-attributes' ]` (l'« Ordre »). Écran classique, sans éditeur de blocs : une boîte « Le document » (section, fichier choisi avec `wp.media`, explication), enregistrée sur `save_post_document` avec un nonce.
 - Champs `su_section` (nettoyé par `scoutsunite_droits_section_permise`), `su_fichier` (ID d'une pièce jointe), `su_explication`. Un document sans fichier n'est affiché nulle part ; un avis le signale dans l'administration.
@@ -239,13 +240,13 @@ Les blocs :
 - Agenda complet et page de la réunion : seule l'explication remplace les notes. À la une et temps forts : étiquette et explication.
 - Feuilles à imprimer : ligne grisée et barrée, étiquette « Annulée » ; convocation avec un bandeau « Cette activité est annulée ». Calendrier : `STATUS:CANCELLED`, `SUMMARY` préfixé « ANNULÉ – », explication en tête de la description. Liste de l'administration : « ANNULÉE – » dans la colonne Quand.
 
-## Bon à savoir (`inc/unite.php`)
+## Bon à savoir (`extension/inc/unite.php`)
 
 - Champ `{section}_infos` (textarea, une info par ligne) dans le groupe « Bon à savoir » de Réglages → Unité, pour chaque section d'âge.
 - `scoutsunite_bon_a_savoir( $section, $exemple = true )` renvoie une liste `ul.bon-a-savoir__liste`. « Mot : texte » met le mot en gras. Un champ vide montre l'exemple surligné sur le site (`$exemple`), et rien sur les feuilles à imprimer.
 - Affiché dans le bloc « Prochaine réunion d'une section » (`div.bon-a-savoir`, avant les liens, état vide compris) et sur le programme et la convocation imprimés (`section.feuille__bon`, sur deux colonnes). Au-delà de 8 réunions, la liste du programme imprimé passe elle aussi sur deux colonnes (`feuille__reunions--colonnes`).
 
-## Calendrier iCalendar (`inc/calendrier.php`)
+## Calendrier iCalendar (`extension/inc/calendrier.php`)
 
 - Sur `template_redirect`, `?ical` sert un flux `text/calendar` à la place de la page : `/agenda/?section={slug}&ical` (une section d'âge reçoit aussi `unite`), `/agenda/?ical` (tout l'agenda), `/agenda/{réunion}/?ical` (un seul événement, en pièce jointe `reunion-{date}.ics`).
 - Le flux contient les réunions publiées à venir et celles terminées depuis 30 jours. `UID` stable (`reunion-{ID}@{hôte}`), `LAST-MODIFIED` depuis `post_modified_gmt`, `REFRESH-INTERVAL` et `X-PUBLISHED-TTL` à 12 h.
@@ -253,19 +254,19 @@ Les blocs :
 - `SUMMARY` : « Section · titre » ; `LOCATION` : le lieu, suivi de l'adresse du local s'il contient « local » ; `DESCRIPTION` : les notes en texte brut et le lien de la réunion. Texte échappé (`\\ ; , \n`) et lignes pliées à 75 octets sans couper un caractère (`mb_strcut`).
 - `scoutsunite_liens_pratiques( $section, $post_id )` : les liens « à mettre sur le frigo » et « Ajouter à mon calendrier » (un `details` avec `webcal://`, Google Agenda via `calendar.google.com/calendar/render?cid=` et le lien à copier), sous les blocs « Prochaine réunion d'une section », « Agenda complet » et « Détails de la réunion », états vides compris.
 
-## Feuilles à imprimer (`inc/imprimer.php`)
+## Feuilles à imprimer (`extension/inc/imprimer.php`)
 
-- Sur `template_redirect`, une adresse portant `?imprimer` est servie par une page HTML autonome (sans en-tête ni pied du site, `noindex`), stylée par `assets/css/imprimer.css` (A4, `@page`, barre d'outils masquée à l'impression). Le PDF vient de la fenêtre d'impression du navigateur : aucune bibliothèque côté serveur.
+- Sur `template_redirect`, une adresse portant `?imprimer` est servie par une page HTML autonome (sans en-tête ni pied du site, `noindex`), stylée par `assets/css/imprimer.css` du thème, avec le logo de la section pris dans le thème ; un thème qui n'a pas ces fichiers donne une page sans style ni logo, sans erreur (A4, `@page`, barre d'outils masquée à l'impression). Le PDF vient de la fenêtre d'impression du navigateur : aucune bibliothèque côté serveur.
 - `/agenda/?section={slug}&imprimer&mois={1|3|6|12}` : programme. Une section d'âge reçoit aussi les activités `unite`, comme dans « Temps forts ». Sans section valide : tout l'agenda. Durée par défaut : 3 mois.
 - `/agenda/{réunion}/?imprimer` : convocation d'une réunion (date en grand, horaire, lieu, notes complètes).
 - Le pied de chaque feuille liste le staff de la section, ses contacts et l'adresse du local ; un champ vide de Réglages → Unité est omis, sans exemple « à compléter ».
 - Liens : voir `scoutsunite_liens_pratiques()` ci-dessus, plus l'action de ligne « Convocation à imprimer » dans la liste des réunions (réunions publiées seulement).
 
-## Staff et groupes WhatsApp (`inc/unite.php`, `inc/whatsapp.php`)
+## Staff et groupes WhatsApp (`extension/inc/unite.php`, `extension/inc/whatsapp.php`)
 
 - Une ligne du staff : `Totem – Prénom (fonction) GSM`. `scoutsunite_unite_personne()` renvoie `[ totem, prénom, fonction, gsm ]` : la fonction est le texte entre parenthèses, le GSM le premier numéro commençant par `0` ou `+`. Les anciennes lignes « Totem – Prénom » ou « Totem, Prénom » donnent le même résultat qu'avant.
 - Champs `whatsapp_{section}` (URL) pour chaque entrée de `scoutsunite_agenda_sections()`, y compris `unite` et `iama`.
-- `scoutsunite_qr_svg( $texte, $label )` dessine le QR (niveau M, mode octet, marge de 4 modules) en un seul tracé SVG, avec la bibliothèque MIT de Kazuhiko Arase copiée dans `inc/lib/qrcode.php`, ses classes et constantes préfixées `SU_`.
+- `scoutsunite_qr_svg( $texte, $label )` dessine le QR (niveau M, mode octet, marge de 4 modules) en un seul tracé SVG, avec la bibliothèque MIT de Kazuhiko Arase copiée dans `extension/inc/lib/qrcode.php`, ses classes et constantes préfixées `SU_`.
 - Bloc `scoutsunite/whatsapp` (attribut `section`, `''` = tous les groupes, sinon la section et l'unité), une carte `a.whatsapp__groupe` par groupe encodé. L'affiche du staff de section ajoute la carte de sa section ; les feuilles à imprimer, celles de la section et de l'unité.
 
 ## Installation et mise à jour

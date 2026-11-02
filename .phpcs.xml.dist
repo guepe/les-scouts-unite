@@ -5,8 +5,9 @@
 	<file>functions.php</file>
 	<file>inc</file>
 	<file>patterns</file>
+	<file>extension</file>
 	<!-- Bibliothèque des QR codes, copiée telle quelle. -->
-	<exclude-pattern>inc/lib/*</exclude-pattern>
+	<exclude-pattern>extension/inc/lib/*</exclude-pattern>
 	<arg name="extensions" value="php"/>
 
 	<rule ref="WordPress.Security.EscapeOutput">

@@ -2,6 +2,16 @@
 
 Les versions suivent le numéro `Version:` de `style.css`. Chaque version publiée a son zip dans les [Releases](https://github.com/guepe/les-scouts-unite/releases).
 
+## 3.0.0 – non publiée
+
+**Le thème devient deux morceaux** : le thème garde l’apparence (modèles, compositions, couleurs, polices, images) ; une nouvelle **extension**, « Les Scouts – Unité (extension) », reprend le cœur du site : l’agenda, les documents, les rôles et les droits, Réglages → Unité, les blocs, le calendrier du téléphone, les feuilles à imprimer, WhatsApp et les reprises des anciens sites. Rien ne change pour les parents ni pour les animateurs : mêmes pages, mêmes menus, mêmes adresses.
+
+- **Pourquoi** : changer de thème ne casse plus rien. Avant, un autre thème laissait aux animateurs le droit de modifier toutes les pages ; les droits vivent maintenant dans l’extension. Les futures fonctions qui touchent à des données personnelles (fiches des animateurs) y auront leur place.
+- **Deux zips par version** : `les-scouts-unite.zip` (le thème) et `les-scouts-unite-extension.zip` (l’extension), toujours au même numéro.
+- **Mise à jour depuis la 2.x** : installe et active d’abord l’extension (elle attend le thème 3.0 sans rien changer), puis remplace le thème. Les réunions, les documents, les comptes et Réglages → Unité restent tels quels (voir le README).
+- Sans l’extension, le thème s’affiche sans erreur, sans l’agenda, et prévient l’administrateur.
+- Tests : 41 tests, dont ceux de la répartition entre le thème et l’extension.
+
 ## 2.11.0 – 2026-10-27
 
 - **Les camps toujours sur le frigo** : le programme et la convocation à imprimer commencent par un encadré « À retenir » avec les camps à venir de la section et de toute l’unité, même au-delà de la période imprimée (« Camp d’été du mardi 20 juillet au mardi 3 août 2027 »). Un camp annulé n’y figure pas ; la convocation d’un camp ne se rappelle pas elle-même.
