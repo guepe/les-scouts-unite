@@ -107,11 +107,14 @@ Ces réglages demandent un compte **Administrateur**.
 - [ ] **Réglages → Permaliens** : « Titre de la publication », puis **Enregistrer** (sans quoi l’adresse /agenda/ ne fonctionne pas).
 - [ ] **Réglages → Lecture** : la page des articles = Actualités.
 
-**Mettre à jour le thème** quand une nouvelle version sort :
+**Mettre à jour le site** quand une nouvelle version sort. Depuis la 3.0, il y a deux zips, toujours au même numéro : l’extension (l’agenda, les documents, les droits, Réglages → Unité) et le thème (l’apparence). Il faut les deux.
 
-1. Télécharge `les-scouts-unite.zip` depuis la [dernière version publiée](https://github.com/guepe/les-scouts-unite/releases/latest).
-2. **Apparence → Thèmes → Ajouter → Téléverser un thème**, choisis le zip, puis **Remplacer l’actuel par la version téléversée**.
-3. Ouvre une page de section et vérifie que tout s’affiche. Les réunions, documents, pages et Réglages → Unité ne bougent pas.
+1. Télécharge `les-scouts-unite-extension.zip` et `les-scouts-unite.zip` depuis la [dernière version publiée](https://github.com/guepe/les-scouts-unite/releases/latest).
+2. D’abord l’extension : **Extensions → Ajouter → Téléverser une extension**, choisis `les-scouts-unite-extension.zip`, puis **Remplacer l’actuelle par la version téléversée** (la première fois : **Activer**).
+3. Puis le thème : **Apparence → Thèmes → Ajouter → Téléverser un thème**, choisis `les-scouts-unite.zip`, puis **Remplacer l’actuel par la version téléversée**.
+4. Ouvre une page de section et l’agenda, et vérifie que tout s’affiche. Les réunions, documents, pages et Réglages → Unité ne bougent pas.
+
+Si un message en haut de l’administration dit que l’extension manque ou attend le thème 3.0, fais l’étape qui manque.
 
 Si le site montre encore l’ancienne version après quelques minutes, c’est le cache PHP de l’hébergeur : vide-le dans son panneau (« Vider OPcache » ou « Redémarrer PHP »). Évite de modifier l’en-tête ou le pied de page dans l’éditeur de site : une version modifiée ne suit plus les mises à jour du thème (le nouveau menu, par exemple). Pour revenir à celle du thème : **Apparence → Éditeur → Compositions → En-tête → Réinitialiser**.
 
