@@ -2,7 +2,7 @@
 
 Les versions suivent le numéro `Version:` de `style.css`. Chaque version publiée a son zip dans les [Releases](https://github.com/guepe/les-scouts-unite/releases).
 
-## 3.0.0 – non publiée
+## 3.0.0 – 2026-11-04
 
 **Le thème devient deux morceaux** : le thème garde l’apparence (modèles, compositions, couleurs, polices, images) ; une nouvelle **extension**, « Les Scouts – Unité (extension) », reprend le cœur du site : l’agenda, les documents, les rôles et les droits, Réglages → Unité, les blocs, le calendrier du téléphone, les feuilles à imprimer, WhatsApp et les reprises des anciens sites. Rien ne change pour les parents ni pour les animateurs : mêmes pages, mêmes menus, mêmes adresses.
 
