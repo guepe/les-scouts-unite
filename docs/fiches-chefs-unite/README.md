@@ -27,10 +27,10 @@ Le même contenu en texte, plus détaillé : [Mode d’emploi pour les chefs d�
 | [4 · Une activité pour toute l’unité](04-activite-unite.png) | Toute l’unité, et la mise en avant sur l’accueil |
 | [5 · Les documents de l’unité](05-documents-unite.png) | Un document pour toutes les sections, et sa nouvelle version |
 | [6 · Les pages et le menu](06-pages-et-menu.png) | Les slugs attendus, le menu Parents |
-| [7 · Réglages et mise à jour](07-reglages-mise-a-jour.png) | Fuseau horaire, permaliens, installer une nouvelle version du thème |
+| [7 · Réglages et mise à jour](07-reglages-mise-a-jour.png) | Fuseau horaire, permaliens, installer une nouvelle version (extension et thème) |
 | [8 · Ça coince ?](08-ca-coince.png) | Les sept soucis les plus courants |
 
-Fiches du thème 2.10.1 (octobre 2026), captures prises sur le site de démonstration.
+Fiches du thème 2.10.1 (octobre 2026), fiche 7 revue pour la 3.0 (novembre 2026, les deux zips), captures prises sur le site de démonstration.
 
 ## Mettre les fiches à jour
 
