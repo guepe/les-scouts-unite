@@ -40,22 +40,15 @@ Toutes les informations de l’unité s’encodent une seule fois dans **Réglag
 | --- | --- | --- |
 | Le local | Rue et numéro, code postal et localité | Pied de page, Contact, lien Itinéraire, adresse dans le calendrier des parents |
 | Le staff d’unité | Responsable(s), téléphone, e-mail | Contact, infos pratiques de l’accueil, feuilles à imprimer |
-| Les staffs de section | Par section : le chef, les animateurs, l’e-mail et/ou le GSM de la section | Affiche « Le staff » de chaque page de section, Contact, feuilles à imprimer |
+| L’unité | Le logo de l’unité | Cartes du staff |
+| Joindre les sections | Par section : l’e-mail et/ou le GSM de la section | Contact, affiche « Le staff » de chaque page de section, feuilles à imprimer |
 | Les groupes WhatsApp | Le lien d’invitation de chaque groupe (unité, sections, IAmA) | Pages de section, page Contact, feuilles à imprimer, avec un QR code |
 | Bon à savoir | Par section : ce qui ne change pas d’une semaine à l’autre | Sous la prochaine réunion de chaque page de section, feuilles à imprimer |
 | Le clan IAmA | Responsable et e-mail | Page IAmA, Contact |
 | Les formulaires | Liens des formulaires d’inscription et de contact | Boutons des pages Inscription et Contact |
 | Les inscriptions | Tarifs de cotisation (un par ligne), numéro de compte, places disponibles | Page Inscription, affiche de l’accueil |
 
-**Le staff d’une section**, une personne par ligne. Le prénom suffit ; le totem, la fonction et le GSM sont facultatifs :
-
-```
-Castor – Marie (santé, communication) 0470 12 34 56
-Koala – Tom (trésorerie)
-Jules
-```
-
-La fonction se met entre parenthèses, le GSM est reconnu tout seul, et un prénom seul convient à quelqu’un qui n’a pas encore de totem. Le chef ou la cheffe a son propre champ et s’affiche en premier. Les GSM sont visibles par tout le monde sur le site.
+**Le staff** ne se met plus dans Réglages → Unité : chaque personne a sa fiche dans **Staff** (voir plus bas).
 
 **Le Bon à savoir**, une info par ligne. Un mot suivi de deux-points passe en gras :
 
@@ -118,6 +111,26 @@ Si un message en haut de l’administration dit que l’extension manque ou atte
 
 Si le site montre encore l’ancienne version après quelques minutes, c’est le cache PHP de l’hébergeur : vide-le dans son panneau (« Vider OPcache » ou « Redémarrer PHP »). Évite de modifier l’en-tête ou le pied de page dans l’éditeur de site : une version modifiée ne suit plus les mises à jour du thème (le nouveau menu, par exemple). Pour revenir à celle du thème : **Apparence → Éditeur → Compositions → En-tête → Réinitialiser**.
 
+## Le staff et les cartes
+
+Chaque membre du staff a une fiche dans **Staff → Ajouter** : les animateurs des sections, le staff d’unité et le clan IAmA. Le prénom suffit pour commencer ; le reste se complète plus tard.
+
+| Champ | Où il s’affiche |
+| --- | --- |
+| Totem, prénom, fonction, GSM | Affiche « Le staff » de la page de section, page Contact, feuilles pour le frigo, carte |
+| Nom, quali, photo | Sur la carte seulement, jamais sur le site |
+| Totem de meute (Louveteaux) | Remplace le totem partout : site, frigo et carte |
+| Section, chef ou cheffe, il ou elle | Le rôle écrit sur la carte : « Cheffe de meute », « Chef de troupe », « Animatrice »… |
+| Ordre | L’ordre sur la page de section, après le chef ou la cheffe |
+| Compte du site | La personne peut modifier elle-même sa fiche (pas sa section ni son rôle de chef) |
+| Ancien | La fiche est gardée, mais disparaît du site et des cartes de la section |
+
+**Imprimer les cartes** : en haut de **Staff**, choisis « tout le staff » ou une section ; sous une fiche, « Imprimer la carte ». Imprime en **recto-verso, retourné sur le bord long**, à **100 %** (sans « Ajuster à la page »), puis découpe le long des traits. Chaque feuille de 10 rectos est suivie de ses versos. Fais un essai sur une feuille ordinaire avant d’imprimer sur du papier épais. Au verso, le QR code mène au groupe WhatsApp de la section ; sur les cartes du staff d’unité, il mène au formulaire d’inscription (son lien se met dans Réglages → Unité).
+
+La photo ne va pas dans la médiathèque : elle reste privée, visible seulement des personnes connectées qui ont accès à la fiche. Choisis une photo en hauteur, le visage bien au centre.
+
+Quand quelqu’un quitte le staff, coche **Ancien** plutôt que de supprimer la fiche. Quand quelqu’un change de section, change sa section sur la fiche et imprime-lui une nouvelle carte.
+
 ## En cas de souci
 
 | Tu constates | Que faire |
@@ -130,6 +143,8 @@ Si le site montre encore l’ancienne version après quelques minutes, c’est l
 | Un animateur a besoin de modifier une autre section | Coche aussi cette section dans son profil |
 | Un document ne s’affiche pas | Il lui faut un fichier et le statut Publié ; un avis le signale dans l’administration |
 | Le site montre l’ancienne version après une mise à jour | Recharge avec Cmd + Maj + R (Ctrl + F5 sur PC), puis vide le cache PHP chez l’hébergeur |
+| Juste après la mise à jour vers la 3.x, une erreur « Failed opening required … inc/agenda.php » | Le cache PHP de l’hébergeur garde l’ancien thème : vide-le (« Vider OPcache » ou « Redémarrer PHP »). Voir le README |
+| Le verso d’une carte ne tombe pas derrière son recto | Imprime en recto-verso « bord long » et à 100 % ; fais d’abord un essai sur papier ordinaire |
 | Le calendrier d’un parent ne suit pas un changement | C’est normal pendant quelques heures : Google Agenda relit l’abonnement toutes les 12 à 24 heures |
 
 Pour aller plus loin, le [README du thème](../README.md) décrit chaque fonction en détail.

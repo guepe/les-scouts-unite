@@ -8,6 +8,7 @@
 @font-face { font-family: Muli; font-weight: 700; font-display: swap; src: url(../fonts/Muli-Bold.woff2) format('woff2'), url(../fonts/Muli-Bold.ttf) format('truetype'); }
 @font-face { font-family: Muli; font-weight: 800; font-display: swap; src: url(../fonts/Muli-ExtraBold.woff2) format('woff2'), url(../fonts/Muli-ExtraBold.ttf) format('truetype'); }
 @font-face { font-family: Muli; font-weight: 900; font-display: swap; src: url(../fonts/Muli-Black.woff2) format('woff2'), url(../fonts/Muli-Black.ttf) format('truetype'); }
+@font-face { font-family: "Caveat Brush"; font-weight: 400; font-display: swap; src: url(../fonts/CaveatBrush-Regular.woff2) format('woff2'), url(../fonts/CaveatBrush-Regular.ttf) format('truetype'); }
 
 :root {
 	--bleu: #0A4275;
@@ -15,12 +16,14 @@
 	--fond: #F2F5F8;
 }
 
-.feuille--baladins { --section: #00A0DE; }
-.feuille--louveteaux { --section: #296F52; }
-.feuille--eclaireurs { --section: #004F9F; }
-.feuille--pionniers { --section: #D51317; }
-.feuille--unite { --section: #95C11F; --section-texte: #304A3C; }
-.feuille--iama { --section: #304A3C; }
+.feuille--baladins, .carte--baladins { --section: #00A0DE; }
+.feuille--louveteaux, .carte--louveteaux { --section: #296F52; }
+.feuille--eclaireurs, .carte--eclaireurs { --section: #004F9F; }
+.feuille--pionniers, .carte--pionniers { --section: #D51317; }
+.feuille--unite, .carte--unite { --section: #95C11F; --section-texte: #304A3C; }
+.feuille--iama, .carte--iama { --section: #304A3C; }
+/* Le bleu des Baladins est trop clair pour les petits libellés des cartes. */
+.carte--baladins { --section-texte: #006A94; }
 
 @page {
 	size: A4;
@@ -413,8 +416,10 @@ body {
 
 /* Staff et pied */
 
+/* Trop étroit (PDF fait depuis un téléphone) : le staff passe sous les QR codes, sur toute la largeur. */
 .feuille__staff {
 	display: flex;
+	flex-wrap: wrap-reverse;
 	gap: 6mm;
 	margin-top: 5mm;
 	padding: 5mm 6mm;
@@ -424,7 +429,7 @@ body {
 }
 
 .feuille__equipe {
-	flex: 1;
+	flex: 1 1 85mm;
 	min-width: 0;
 }
 
@@ -548,5 +553,255 @@ body {
 	.feuille__entete {
 		border-top: 3mm solid var(--section);
 		padding-top: 5mm;
+	}
+}
+
+/* ---------------------------------------------------------------------------
+   Cartes du staff (extension, inc/staff.php) : 8,5 × 5,4 cm, 10 par feuille A4,
+   chaque feuille de rectos suivie de ses versos, en miroir.
+   ------------------------------------------------------------------------ */
+
+.cartes main {
+	padding: 0 1rem 2rem;
+}
+
+.cartes__vide {
+	max-width: 210mm;
+	margin: 0 auto;
+}
+
+.planche {
+	display: grid;
+	grid-template-columns: repeat(2, 85mm);
+	grid-auto-rows: 54mm;
+	width: 170mm;
+	margin: 0 auto 2rem;
+	background: #fff;
+	box-shadow: 0 0.5rem 1.5rem rgba(10, 66, 117, 0.15);
+}
+
+.carte {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	width: 85mm;
+	height: 54mm;
+	background: #fff;
+	/* Les traits de découpe. */
+	border: 0.15mm solid var(--trait);
+	color: var(--bleu);
+	line-height: 1.2;
+}
+
+.carte--vide {
+	border-color: transparent;
+}
+
+.carte__logo {
+	position: absolute;
+	top: 2.3mm;
+	right: 3mm;
+	width: 11mm;
+}
+
+.carte__logo-unite {
+	position: absolute;
+	top: 16mm;
+	right: 2mm;
+	width: 16mm;
+}
+
+.carte--unite .carte__logo {
+	top: 3mm;
+	width: 18.5mm;
+}
+
+.carte--unite .carte__logo-unite {
+	top: 12.7mm;
+}
+
+.carte--iama .carte__logo-unite {
+	top: 3mm;
+}
+
+.carte__corps {
+	display: flex;
+	flex: 1;
+	gap: 3.7mm;
+	min-height: 0;
+	padding: 3.7mm 4mm 0;
+}
+
+.carte__photo {
+	flex: none;
+	width: 22mm;
+	height: 28.3mm;
+	border-radius: 1.7mm;
+	object-fit: cover;
+}
+
+.carte__photo--vide {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--section);
+	color: #fff;
+	font-size: 14mm;
+	font-weight: 900;
+}
+
+.carte--unite .carte__photo--vide {
+	color: var(--section-texte);
+}
+
+.carte__noms {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	min-width: 0;
+	padding: 5mm 15mm 0 0;
+	overflow-wrap: anywhere;
+}
+
+.carte__jungle,
+.carte__libelle {
+	color: var(--section-texte, var(--section));
+	font-size: 1.85mm;
+	font-weight: 800;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.carte__totem {
+	font-size: 6.7mm;
+	font-weight: 900;
+	letter-spacing: -0.02em;
+	line-height: 1;
+}
+
+.carte__quali {
+	margin-top: 1.3mm;
+	font-family: "Caveat Brush", cursive;
+	font-size: 5mm;
+	line-height: 1.1;
+}
+
+.carte__nom {
+	margin-top: 1.3mm;
+	color: #4A6A8A;
+	font-size: 2mm;
+}
+
+.carte__bandeau {
+	display: flex;
+	flex: none;
+	align-items: center;
+	justify-content: space-between;
+	height: 7.7mm;
+	padding: 0 4mm;
+	background: var(--section);
+	color: #fff;
+	font-size: 2.2mm;
+	font-weight: 700;
+}
+
+.carte--unite .carte__bandeau {
+	color: var(--section-texte);
+}
+
+.carte__bandeau strong {
+	font-size: 3mm;
+	font-weight: 900;
+}
+
+.carte__logo-bandeau {
+	height: 5mm;
+}
+
+/* Verso */
+
+.carte--verso {
+	border-top: 2.3mm solid var(--section);
+}
+
+.carte--verso .carte__corps {
+	gap: 4mm;
+	padding: 3.3mm 4mm 3.3mm;
+}
+
+.carte__qr {
+	display: flex;
+	flex: none;
+	flex-direction: column;
+	gap: 1.3mm;
+	width: 26mm;
+	font-size: 2mm;
+	font-weight: 800;
+	line-height: 1.3;
+	text-align: center;
+}
+
+.carte__qr svg {
+	display: block;
+	width: 26mm;
+	height: 26mm;
+}
+
+.carte__infos {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.carte__libelle ~ .carte__libelle {
+	margin-top: 2.3mm;
+}
+
+.carte__gsm {
+	font-size: 4.7mm;
+	font-weight: 900;
+	letter-spacing: -0.01em;
+	white-space: nowrap;
+}
+
+.carte__role {
+	font-size: 2.85mm;
+	font-weight: 800;
+}
+
+.carte__fonction {
+	font-size: 2.35mm;
+}
+
+.carte__unite {
+	display: flex;
+	flex-direction: column;
+	gap: 0.3mm;
+	margin-top: auto;
+	padding-top: 1.7mm;
+	border-top: 0.35mm solid var(--trait);
+	font-size: 2.2mm;
+}
+
+.carte__unite strong {
+	font-size: 2.35mm;
+	font-weight: 900;
+}
+
+@media print {
+	.cartes main {
+		padding: 0;
+	}
+
+	.planche {
+		margin: 0 auto;
+		box-shadow: none;
+		break-after: page;
+	}
+
+	.planche:last-child {
+		break-after: auto;
 	}
 }

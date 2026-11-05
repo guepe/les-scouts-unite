@@ -129,7 +129,7 @@ $ok( 61 === $compte(), 'répétition : au plus 60 semaines' );
 
 /* Annulation --------------------------------------------------------------- */
 
-$annulee = $reunion( 'Réunion', array( 'su_section' => 'pionniers', 'su_date' => $dans( 1 ), 'su_debut' => '19:00', 'su_annulee' => '1', 'su_annulee_pourquoi' => 'Examens' ) );
+$annulee = $reunion( 'Réunion', array( 'su_section' => 'pionniers', 'su_date' => $dans( 1 ), 'su_debut' => '08:00', 'su_annulee' => '1', 'su_annulee_pourquoi' => 'Examens' ) );
 $ics     = scoutsunite_calendrier_evenement( get_post( $annulee ) );
 $ok( false !== strpos( $ics, 'STATUS:CANCELLED' ) && false !== strpos( $ics, 'ANNULÉ' ), 'annulation : le calendrier la barre' );
 list( $prochaine, $annulees ) = scoutsunite_agenda_prochaine_maintenue( scoutsunite_agenda_a_venir( 'pionniers', 8 ) );
@@ -166,6 +166,52 @@ add_filter( 'home_url', $sous );
 $ok( '<a href="/scouts/contact/">C</a><a href="//cdn.ex/x">X</a>' === scoutsunite_liens_racine( $html ), 'liens : le sous-dossier est ajouté' );
 $ok( '<a href="/scouts/contact/">C</a>' === scoutsunite_liens_racine( '<a href="/scouts/contact/">C</a>' ), 'liens : jamais deux fois' );
 remove_filter( 'home_url', $sous );
+
+/* Fiches du staff et cartes ------------------------------------------------ */
+
+wp_set_current_user( $admin );
+update_option( 'scoutsunite_unite', array( 'baladins_chef' => 'Akéla – Marie (santé) 0470 12 34 56', 'baladins_staff' => "Castor – Paul\nLéa" ) );
+delete_option( 'scoutsunite_reprise_fiches' );
+scoutsunite_reprise_fiches();
+$reprises = scoutsunite_staff_fiches( 'baladins' );
+$ok( 3 === count( $reprises ) && $reprises[0]['chef'] && 'Akéla' === $reprises[0]['totem'] && 'santé' === $reprises[0]['fonction'] && '0470 12 34 56' === $reprises[0]['gsm'], 'fiches : les lignes du staff de Réglages → Unité deviennent des fiches, chef en tête' );
+scoutsunite_reprise_fiches();
+$ok( 3 === count( scoutsunite_staff_fiches( 'baladins' ) ), 'fiches : la reprise ne se fait qu’une fois' );
+
+$fiche = function ( $meta ) {
+	$id = wp_insert_post( array( 'post_type' => 'animateur', 'post_status' => 'draft', 'meta_input' => $meta ) );
+	scoutsunite_staff_titre( $id );
+	return $id;
+};
+$sienne = $fiche( array( 'su_section' => 'louveteaux', 'su_chef' => '1', 'su_genre' => 'f', 'su_prenom' => 'Marie', 'su_nom' => 'NOM-PRIVE', 'su_totem' => 'Castor', 'su_quali' => 'QUALI-PRIVE', 'su_totem_meute' => 'Bagheera', 'su_gsm' => '0470 11 22 33', 'su_compte' => (string) $anim ) );
+$autre  = $fiche( array( 'su_section' => 'louveteaux', 'su_prenom' => 'Paul', 'su_totem' => 'Renard' ) );
+$ancien = $fiche( array( 'su_section' => 'louveteaux', 'su_prenom' => 'Jean', 'su_totem' => 'ANCIEN-TOTEM', 'su_ancien' => '1' ) );
+$ok( 'publish' === get_post_status( $sienne ), 'fiches : toujours publiées (pas de brouillon qui disparaît)' );
+$ok( 'Cheffe de meute' === scoutsunite_staff_role( scoutsunite_staff_fiche( $sienne ) ) && 'Animateur' === scoutsunite_staff_role( scoutsunite_staff_fiche( $autre ) ), 'fiches : rôle écrit d’après chef, section et il/elle' );
+
+$type = get_post_type_object( 'animateur' );
+$ok( ! $type->public && ! $type->publicly_queryable && ! $type->show_in_rest, 'fiches : ni page publique ni API' );
+$ok( 404 === rest_do_request( new WP_REST_Request( 'GET', '/wp/v2/animateur' ) )->get_status(), 'fiches : aucune route dans l’API (404)' );
+$ok( user_can( $staff, 'edit_post', $autre ) && user_can( $staff, $type->cap->create_posts ) && user_can( $staff, 'delete_post', $autre ), 'fiches : le staff d’unité les gère toutes' );
+$ok( user_can( $anim, 'edit_post', $sienne ) && ! user_can( $anim, 'edit_post', $autre ) && ! user_can( $anim, 'read_post', $autre ), 'fiches : un animateur modifie sa fiche, pas celle des autres' );
+$ok( ! user_can( $anim, 'delete_post', $sienne ) && ! user_can( $anim, $type->cap->create_posts ), 'fiches : un animateur n’en ajoute ni n’en supprime' );
+
+$rendu = do_blocks( '<!-- wp:scoutsunite/staff {"section":"louveteaux"} /-->' );
+$ok( (int) strpos( $rendu, 'Bagheera' ) < strpos( $rendu, 'Renard' ) && false !== strpos( $rendu, 'chef de section' ), 'page de section : le staff vient des fiches, chef en tête' );
+$ok( false !== strpos( $rendu, 'Bagheera' ) && false === strpos( $rendu, 'Castor' ), 'page de section : chez les Louveteaux, le totem de meute' );
+$ok( false === strpos( $rendu, 'NOM-PRIVE' ) && false === strpos( $rendu, 'QUALI-PRIVE' ) && false === strpos( $rendu, 'ANCIEN-TOTEM' ), 'page de section : ni nom, ni quali, ni ancien' );
+$ok( false !== strpos( scoutsunite_unite_html( 'louveteaux-chef' ), 'Bagheera – Marie' ) && false !== strpos( scoutsunite_imprimer_staff( 'louveteaux' ), 'Bagheera' ) && false !== strpos( scoutsunite_imprimer_staff( 'louveteaux' ), 'Renard' ), 'page Contact et frigo : lus dans les fiches' );
+
+$planches = scoutsunite_staff_planches( scoutsunite_staff_fiches( 'louveteaux' ) );
+$ok( 2 === substr_count( $planches, 'carte--recto' ) && 2 === substr_count( $planches, 'carte--verso' ) && false !== strpos( $planches, 'Bagheera' ) && false !== strpos( $planches, 'Cheffe de meute' ), 'cartes : recto et verso de chaque fiche, totem de meute et rôle' );
+$ok( strpos( $planches, 'Animateur' ) < strpos( $planches, 'Cheffe de meute' ), 'cartes : au verso, les colonnes sont inversées' );
+$reglages = get_option( 'scoutsunite_unite', array() );
+update_option( 'scoutsunite_unite', array( 'formulaire_inscription' => 'https://exemple.be/inscription', 'whatsapp_unite' => 'https://chat.whatsapp.com/AbCd' ) + (array) $reglages );
+$verso = scoutsunite_staff_carte_verso( scoutsunite_staff_fiche( $fiche( array( 'su_section' => 'unite', 'su_prenom' => 'Luc', 'su_chef' => '1' ) ) ) );
+update_option( 'scoutsunite_unite', $reglages );
+$ok( false !== strpos( $verso, 'formulaire d’inscription' ) && false === strpos( $verso, 'WhatsApp' ), 'cartes : au verso du staff d’unité, le QR du formulaire d’inscription' );
+$ok( '' === scoutsunite_staff_photo_url( $sienne ) && file_exists( scoutsunite_staff_dossier() . '/.htaccess' ), 'photos : dossier protégé, pas d’adresse sans photo' );
+$ok( ! user_can( 0, 'read_post', $sienne ), 'photos : une personne non connectée ne lit pas une fiche (ni sa photo)' );
 
 /* Thème et extension ------------------------------------------------------- */
 

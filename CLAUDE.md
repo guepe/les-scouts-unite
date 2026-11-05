@@ -35,10 +35,11 @@ Extension (`extension/`) :
 - `inc/` : un fichier par fonction, chacun avec un en-tête qui explique son rôle.
   - `agenda.php` : `scoutsunite_agenda_sections()` (les sections de l’agenda, `unite` et `iama` compris), type de contenu `reunion` (archive `/agenda/`), champs `su_*`, répétition hebdomadaire, annulation, colonnes d’administration et les blocs dynamiques de l’agenda.
   - `droits.php` : rôles `scoutsunite_animateur` et `scoutsunite_staff`, limites appliquées par `map_meta_cap` (éditeur, REST et XML-RPC). Les sections d’un animateur sont dans la méta utilisateur `scoutsunite_sections`.
-  - `unite.php` : page **Réglages → Unité** (coordonnées, staffs, tarifs, Bon à savoir…) et la source de liaisons de blocs `scoutsunite/unite` (argument `key`) qu’utilisent les compositions du thème. Un champ vide garde son exemple surligné.
+  - `unite.php` : page **Réglages → Unité** (coordonnées, logo, contacts des sections, tarifs, Bon à savoir…) et la source de liaisons de blocs `scoutsunite/unite` (argument `key`) qu’utilisent les compositions du thème. Un champ vide garde son exemple surligné.
   - `documents.php` : type de contenu `document` et son bloc.
   - `calendrier.php` : flux iCalendar (`?ical`) et liens sous les blocs de l’agenda.
   - `imprimer.php` : feuilles A4 « à mettre sur le frigo » (`?imprimer`, `?mois=`), stylées par `assets/css/imprimer.css` et les logos **du thème**.
+  - `staff.php` : type de contenu `animateur` (menu « Staff ») : une fiche par membre du staff, privée (ni page ni API), photo dans un dossier protégé servie par `admin-post.php`, reprise des anciennes lignes de Réglages → Unité, et cartes d'animateur à imprimer (`admin-post.php?action=scoutsunite_cartes`). Le bloc staff, la page Contact et le frigo lisent `scoutsunite_staff_fiches()`.
   - `whatsapp.php` : liens des groupes et QR codes en SVG, dessinés par `inc/lib/qrcode.php` (bibliothèque tierce, ne pas modifier, exclue de PHPCS).
 - `assets/js/blocs.js` (blocs de l’éditeur, aperçu par `ServerSideRender`) et `assets/js/reunion.js` (panneau « Quand et où ? ») : **pas de build**, ES5 avec `wp.element.createElement`. Pas de JSX, ni d’`import`, ni de syntaxe ES6+.
 - Blocs dynamiques (rendus en PHP) : `scoutsunite/agenda`, `prochaine-reunion`, `prochaines-reunions`, `reunion`, `a-la-une`, `camps`, `iama`, `documents`, `staff`, `whatsapp`. Un nouveau bloc se déclare côté PHP (`register_block_type` avec `render_callback`) **et** dans `blocs.js`.

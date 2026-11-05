@@ -2,6 +2,19 @@
 
 Les versions suivent le numéro `Version:` de `style.css`. Chaque version publiée a son zip dans les [Releases](https://github.com/guepe/les-scouts-unite/releases).
 
+## 3.1.0 – non publiée
+
+**La carte d’animateur** : chaque membre du staff a sa fiche, et sa carte à imprimer.
+
+- **Staff → Ajouter** : une fiche par personne (sections, staff d’unité et clan IAmA) avec prénom, nom, totem, quali, totem de meute pour les Louveteaux, chef ou cheffe, fonction, GSM et photo. Les fiches ne sont pas en ligne : pas de page, rien dans l’API. La photo n’est pas dans la médiathèque mais dans un dossier protégé, visible seulement par les personnes connectées qui ont droit à la fiche.
+- **Une seule source** : le bloc « Staff de la section », la page Contact et les feuilles pour le frigo lisent les fiches et montrent ce qu’ils montraient déjà (totem, prénom, fonction, GSM). Chez les Louveteaux, c’est le totem de meute qui s’affiche, s’il est rempli. Le nom, le quali et la photo restent sur la carte.
+- **Feuilles pour le frigo** : quand la feuille est trop étroite (PDF fait depuis un téléphone), le staff passe sous les QR codes WhatsApp, sur toute la largeur, au lieu d’être serré dans une colonne.
+- **Les cartes** (8,5 × 5,4 cm, 10 par feuille A4, recto-verso) : au recto la photo, le totem et le quali en grand (le totem de meute chez les Louveteaux), le nom en petit, les logos de la section et de l’unité ; au verso le QR du groupe WhatsApp de la section (pour le staff d’unité, celui du formulaire d’inscription), le GSM, le rôle (« Cheffe de meute », « Animateur »…) et l’adresse du site. On les imprime depuis Staff : une carte, une section ou tout le staff.
+- **Logo de l’unité** : un nouveau champ dans Réglages → Unité, imprimé sur les cartes.
+- **Droits** : les administrateurs et le staff d’unité gèrent les fiches et impriment les cartes. Un animateur dont le compte est relié à une fiche la modifie lui-même, sans changer sa section ni son rôle de chef.
+- **Mise à jour** : les lignes du staff de Réglages → Unité deviennent des fiches, à compléter (nom, quali, photo, il ou elle). Les champs « chef » et « animateurs » quittent Réglages → Unité.
+- **Passer de la 2.x à la 3.x** : si le site affiche « Failed opening required … inc/agenda.php » juste après la mise à jour du thème, c’est le cache PHP de l’hébergeur (OPcache) qui garde l’ancien thème. Vide-le (« Vider OPcache » ou « Redémarrer PHP ») : voir le README.
+
 ## 3.0.0 – 2026-11-04
 
 **Le thème devient deux morceaux** : le thème garde l’apparence (modèles, compositions, couleurs, polices, images) ; une nouvelle **extension**, « Les Scouts – Unité (extension) », reprend le cœur du site : l’agenda, les documents, les rôles et les droits, Réglages → Unité, les blocs, le calendrier du téléphone, les feuilles à imprimer, WhatsApp et les reprises des anciens sites. Rien ne change pour les parents ni pour les animateurs : mêmes pages, mêmes menus, mêmes adresses.

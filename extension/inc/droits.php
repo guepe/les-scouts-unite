@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /** Version des rôles : l'augmenter pour réécrire les rôles au prochain chargement. */
-const SCOUTSUNITE_DROITS_VERSION = 4;
+const SCOUTSUNITE_DROITS_VERSION = 5;
 
 /**
  * Droits sur les réunions (type de contenu « reunion »).
@@ -49,11 +49,22 @@ function scoutsunite_droits_documents() {
 	return str_replace( 'reunions', 'documents', scoutsunite_droits_reunions() );
 }
 
+/**
+ * Droits sur les fiches du staff (type de contenu « animateur », inc/staff.php) : les mêmes que pour les réunions.
+ *
+ * @return array
+ */
+function scoutsunite_droits_fiches() {
+	return str_replace( 'reunions', 'animateurs', scoutsunite_droits_reunions() );
+}
+
 function scoutsunite_droits_roles() {
 	if ( SCOUTSUNITE_DROITS_VERSION === (int) get_option( 'scoutsunite_droits_version' ) ) {
 		return;
 	}
 	$reunions = array_fill_keys( array_merge( scoutsunite_droits_reunions(), scoutsunite_droits_documents() ), true );
+	// Les fiches du staff (inc/staff.php) : le staff d'unité et les administrateurs les gèrent toutes.
+	$fiches = array_fill_keys( scoutsunite_droits_fiches(), true );
 
 	remove_role( 'scoutsunite_animateur' );
 	add_role(
@@ -71,6 +82,10 @@ function scoutsunite_droits_roles() {
 				// Il ne vaut que pour les pages de ses sections (map_meta_cap) ; créer une page reste interdit.
 				'publish_pages'         => true,
 				'scoutsunite_animateur' => true,
+				// Sa fiche seulement, si son compte y est relié (scoutsunite_staff_droits()) ; jamais d'ajout ni de suppression.
+				'edit_animateurs'           => true,
+				'edit_others_animateurs'    => true,
+				'edit_published_animateurs' => true,
 			),
 			$reunions
 		)
@@ -84,7 +99,7 @@ function scoutsunite_droits_roles() {
 	add_role(
 		'scoutsunite_staff',
 		'Staff d’unité',
-		array_merge( $staff, $reunions, array( 'manage_unite' => true ) )
+		array_merge( $staff, $reunions, $fiches, array( 'manage_unite' => true ) )
 	);
 
 	foreach ( array( 'administrator', 'editor' ) as $nom ) {
@@ -97,7 +112,9 @@ function scoutsunite_droits_roles() {
 	}
 	$admin = get_role( 'administrator' );
 	if ( $admin ) {
-		$admin->add_cap( 'manage_unite' );
+		foreach ( array_merge( array( 'manage_unite' ), array_keys( $fiches ) ) as $cap ) {
+			$admin->add_cap( $cap );
+		}
 	}
 
 	update_option( 'scoutsunite_droits_version', SCOUTSUNITE_DROITS_VERSION );

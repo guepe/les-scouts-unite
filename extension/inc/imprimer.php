@@ -88,17 +88,13 @@ function scoutsunite_imprimer_staff( $section ) {
 	$contacts = array();
 
 	if ( isset( scoutsunite_agenda_sections_age()[ $section ] ) ) {
-		$chef = scoutsunite_unite( $section . '_chef' );
-		if ( '' !== $chef ) {
-			$membres[] = array( $chef, 'chef de section' );
-		}
-		foreach ( array_filter( array_map( 'trim', explode( "\n", scoutsunite_unite( $section . '_staff' ) ) ) ) as $ligne ) {
-			$membres[] = array( $ligne, '' );
+		foreach ( scoutsunite_staff_fiches( $section ) as $fiche ) {
+			$membres[] = array( scoutsunite_staff_totem( $fiche ), $fiche['prenom'], $fiche['chef'] ? 'chef de section' : '', $fiche['fonction'], $fiche['gsm'] );
 		}
 		$contacts[] = implode( ' · ', array_filter( array( scoutsunite_unite( $section . '_email' ), scoutsunite_unite( $section . '_gsm' ) ) ) );
 	} elseif ( 'iama' === $section ) {
 		if ( '' !== scoutsunite_unite( 'iama_chef' ) ) {
-			$membres[] = array( scoutsunite_unite( 'iama_chef' ), 'responsable IAmA' );
+			$membres[] = array( '', scoutsunite_unite( 'iama_chef' ), 'responsable IAmA', '', '' );
 		}
 		$contacts[] = scoutsunite_unite( 'iama_email' );
 	}
@@ -116,8 +112,8 @@ function scoutsunite_imprimer_staff( $section ) {
 	if ( $membres ) {
 		$html .= '<ul class="feuille__membres">';
 		foreach ( $membres as $m ) {
-			list( $totem, $prenom, $fonction, $gsm ) = scoutsunite_unite_personne( $m[0] );
-			$roles = implode( ' · ', array_filter( array( $m[1], $fonction ) ) );
+			list( $totem, $prenom, $role, $fonction, $gsm ) = $m;
+			$roles = implode( ' · ', array_filter( array( $role, $fonction ) ) );
 			$html .= '<li><span>' . ( '' !== $totem ? '<strong>' . esc_html( $totem ) . '</strong> ' : '' ) . esc_html( $prenom ) . '</span>';
 			$html .= ( $roles ? '<em>' . esc_html( $roles ) . '</em>' : '' ) . ( $gsm ? '<span class="feuille__gsm">' . esc_html( $gsm ) . '</span>' : '' ) . '</li>';
 		}

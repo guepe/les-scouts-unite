@@ -21,6 +21,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function scoutsunite_unite_champs() {
 	$champs = array(
+		'L’unité'           => array(
+			'logo' => array( 'Logo de l’unité (sur les cartes du staff)', 'logo', '' ),
+		),
 		'Le local'          => array(
 			'local_rue'      => array( 'Rue et numéro', 'text', 'Rue du Local 1' ),
 			'local_localite' => array( 'Code postal et localité', 'text', '0000 Localité' ),
@@ -30,7 +33,7 @@ function scoutsunite_unite_champs() {
 			'ru_telephone' => array( 'Téléphone', 'tel', '0400 00 00 00' ),
 			'staff_email'  => array( 'E-mail du staff d’unité', 'email', 'staff@example.org' ),
 		),
-		'Les staffs de section' => array(),
+		'Joindre les sections'  => array(),
 		'Les groupes WhatsApp'  => array(),
 		'Bon à savoir'          => array(),
 		'Le clan IAmA'      => array(
@@ -48,11 +51,9 @@ function scoutsunite_unite_champs() {
 		),
 	);
 	foreach ( scoutsunite_agenda_sections_age() as $slug => $nom ) {
-		$champs['Les staffs de section'][ $slug . '_chef' ]  = array( $nom . ' : chef ou cheffe de section', 'text', 'Totem – Prénom (fonction) 0470 00 00 00' );
-		$champs['Les staffs de section'][ $slug . '_staff' ] = array( $nom . ' : animateurs (un par ligne)', 'textarea', "Totem – Prénom (santé) 0470 00 00 00\nTotem – Prénom (communication)" );
-		$champs['Les staffs de section'][ $slug . '_email' ] = array( $nom . ' : e-mail', 'email', $slug . '@example.org' );
-		$champs['Les staffs de section'][ $slug . '_gsm' ]   = array( $nom . ' : GSM de la section', 'tel', '0470 00 00 00' );
-		$champs['Bon à savoir'][ $slug . '_infos' ]          = array( $nom . ' (une info par ligne)', 'textarea', "Réunions : le samedi de 14 h à 17 h, au local\nUniforme : pull de la section, foulard, short ou jupe bleu marine\nÀ emporter : une gourde et un goûter" );
+		$champs['Joindre les sections'][ $slug . '_email' ] = array( $nom . ' : e-mail', 'email', $slug . '@example.org' );
+		$champs['Joindre les sections'][ $slug . '_gsm' ]   = array( $nom . ' : GSM de la section', 'tel', '0470 00 00 00' );
+		$champs['Bon à savoir'][ $slug . '_infos' ]         = array( $nom . ' (une info par ligne)', 'textarea', "Réunions : le samedi de 14 h à 17 h, au local\nUniforme : pull de la section, foulard, short ou jupe bleu marine\nÀ emporter : une gourde et un goûter" );
 	}
 	foreach ( scoutsunite_agenda_sections() as $slug => $nom ) {
 		$champs['Les groupes WhatsApp'][ 'whatsapp_' . $slug ] = array( 'unite' === $slug ? 'Groupe de toute l’unité' : 'Groupe ' . scoutsunite_whatsapp_de( $slug ), 'url', 'https://chat.whatsapp.com/…' );
@@ -182,9 +183,24 @@ function scoutsunite_unite_html( $cle ) {
 	}
 	// Staffs de section : « baladins-chef », « baladins-email » (l'e-mail et/ou le GSM de la section)…
 	if ( preg_match( '/^([a-z]+)-(chef|email)$/', $cle, $m ) ) {
-		return 'chef' === $m[2] ? scoutsunite_unite_texte( $m[1] . '_chef' ) : scoutsunite_unite_contact_section( $m[1] );
+		return 'chef' === $m[2] ? scoutsunite_unite_chef( $m[1] ) : scoutsunite_unite_contact_section( $m[1] );
 	}
 	return '';
+}
+
+/**
+ * Le chef ou la cheffe d'une section (fiches du staff, inc/staff.php) : « Totem – Prénom » et son GSM.
+ *
+ * @param string $section Section d'âge.
+ * @return string HTML.
+ */
+function scoutsunite_unite_chef( $section ) {
+	foreach ( scoutsunite_staff_fiches( $section ) as $fiche ) {
+		if ( $fiche['chef'] ) {
+			return esc_html( scoutsunite_staff_appel( $fiche ) ) . ( '' !== $fiche['gsm'] ? '<br>' . scoutsunite_unite_gsm( $fiche['gsm'] ) : '' );
+		}
+	}
+	return '<mark class="a-completer">Totem – Prénom 0470 00 00 00</mark>';
 }
 
 /**
@@ -279,8 +295,7 @@ function scoutsunite_unite_gsm( $gsm ) {
  */
 function scoutsunite_bloc_staff( $attributes ) {
 	$section = sanitize_key( $attributes['section'] ?? 'baladins' );
-	$chef    = scoutsunite_unite( $section . '_chef' );
-	$autres  = array_filter( array_map( 'trim', explode( "\n", scoutsunite_unite( $section . '_staff' ) ) ) );
+	$fiches  = scoutsunite_staff_fiches( $section );
 
 	$membre = function ( $totem, $prenom, $est_chef, $exemple = false, $fonction = '', $gsm = '' ) {
 		$initiale = mb_substr( '' !== $totem ? $totem : $prenom, 0, 1 );
@@ -308,21 +323,18 @@ function scoutsunite_bloc_staff( $attributes ) {
 	};
 
 	$liste = '';
-	if ( '' === $chef && ! $autres ) {
+	if ( ! $fiches ) {
 		$liste .= $membre( 'Totem', 'Prénom', true, true ) . $membre( 'Totem', 'Prénom', false, true ) . $membre( 'Totem', 'Prénom', false, true );
 		$total  = '';
 	} else {
-		if ( '' !== $chef ) {
-			list( $totem, $prenom, $fonction, $gsm ) = scoutsunite_unite_personne( $chef );
-			$liste .= $membre( $totem, $prenom, true, false, $fonction, $gsm );
-		} else {
+		// Les fiches arrivent chef en tête (scoutsunite_staff_fiches()) ; sans chef, sa place reste à compléter.
+		if ( ! $fiches[0]['chef'] ) {
 			$liste .= $membre( 'Totem', 'Prénom', true, true );
 		}
-		foreach ( $autres as $ligne ) {
-			list( $totem, $prenom, $fonction, $gsm ) = scoutsunite_unite_personne( $ligne );
-			$liste .= $membre( $totem, $prenom, false, false, $fonction, $gsm );
+		foreach ( $fiches as $f ) {
+			$liste .= $membre( scoutsunite_staff_totem( $f ), $f['prenom'], $f['chef'], false, $f['fonction'], $f['gsm'] );
 		}
-		$nombre = count( $autres ) + ( '' !== $chef ? 1 : 0 );
+		$nombre = count( $fiches );
 		$total  = '<p class="staff__total">' . $nombre . ( 1 === $nombre ? ' animateur' : ' animateurs' ) . '</p>';
 	}
 
@@ -502,7 +514,9 @@ function scoutsunite_unite_reglages() {
 				foreach ( scoutsunite_unite_champs() as $groupe ) {
 					foreach ( $groupe as $cle => $champ ) {
 						$v              = isset( $valeurs[ $cle ] ) ? wp_unslash( $valeurs[ $cle ] ) : '';
-						if ( 'email' === $champ[1] ) {
+						if ( 'logo' === $champ[1] ) {
+							$propre[ $cle ] = absint( $v ) && wp_attachment_is_image( absint( $v ) ) ? (string) absint( $v ) : '';
+						} elseif ( 'email' === $champ[1] ) {
 							$propre[ $cle ] = sanitize_email( $v );
 						} elseif ( 'url' === $champ[1] ) {
 							$propre[ $cle ] = esc_url_raw( $v );
@@ -524,7 +538,9 @@ function scoutsunite_unite_reglages() {
 add_action( 'admin_init', 'scoutsunite_unite_reglages' );
 
 function scoutsunite_unite_menu() {
-	add_options_page( 'Coordonnées de l’unité', 'Unité', 'manage_unite', 'scoutsunite-unite', 'scoutsunite_unite_page' );
+	$page = add_options_page( 'Coordonnées de l’unité', 'Unité', 'manage_unite', 'scoutsunite-unite', 'scoutsunite_unite_page' );
+	// La médiathèque, pour choisir le logo de l'unité.
+	add_action( 'load-' . $page, 'wp_enqueue_media' );
 }
 
 /**
@@ -544,7 +560,7 @@ function scoutsunite_unite_page() {
 		<h1>Coordonnées de l’unité</h1>
 		<p>Encode ces informations une seule fois : elles s’affichent d’elles-mêmes dans le pied de page, les infos pratiques de l’accueil, la page Contact et la page Inscription. Les liens des formulaires (Google Forms, extension de formulaire…) deviennent des boutons sur ces deux pages.
 			Un champ laissé vide garde son exemple surligné en orange sur le site, pour qu’on voie ce qu’il reste à compléter.</p>
-		<p>Pour les staffs, écris une personne par ligne sous la forme « Totem – Prénom » (un prénom seul si la personne n’a pas encore de totem). Tu peux ajouter sa fonction entre parenthèses et son GSM : « Castor – Marie (santé, communication) 0470 12 34 56 ». Le chef ou la cheffe de section s’affiche en premier sur la page de la section. Les GSM sont visibles par tout le monde sur le site et sur les feuilles à imprimer. Pour joindre une section, remplis son e-mail, son GSM ou les deux : la page Contact et les feuilles à imprimer montrent ce qui est rempli.</p>
+		<p>Le staff de chaque section (totem, prénom, fonction, GSM) se gère dans <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=animateur' ) ); ?>">Staff</a> : une fiche par personne, qui sert aussi à imprimer sa carte. Pour joindre une section, remplis ici son e-mail, son GSM ou les deux : la page Contact et les feuilles à imprimer montrent ce qui est rempli.</p>
 		<p>« Bon à savoir » : ce qui ne change pas d’une semaine à l’autre (horaire habituel, lieu, uniforme, à emporter), une info par ligne. Commence une ligne par un mot suivi de deux-points pour le mettre en gras : « Uniforme : pull de la section, foulard ». Les infos s’affichent sous la prochaine réunion, sur la page de la section, et sur les feuilles à imprimer.</p>
 		<p>Pour un groupe WhatsApp, colle son lien d’invitation (dans WhatsApp : infos du groupe → Inviter via un lien). Le site en fait un QR code, affiché sur la page Contact, la page de la section et les feuilles à imprimer. Toute personne qui a le lien peut rejoindre le groupe : garde l’approbation des nouveaux membres activée dans WhatsApp.</p>
 		<p>Le nom de l’unité se règle dans <a href="<?php echo esc_url( admin_url( 'options-general.php' ) ); ?>">Réglages → Général</a> (titre et slogan du site).</p>
@@ -557,7 +573,14 @@ function scoutsunite_unite_page() {
 						<tr>
 							<th scope="row"><label for="su-<?php echo esc_attr( $cle ); ?>"><?php echo esc_html( $champ[0] ); ?></label></th>
 							<td>
-								<?php if ( 'textarea' === $champ[1] ) : ?>
+								<?php if ( 'logo' === $champ[1] ) : ?>
+									<?php $logo = absint( scoutsunite_unite( $cle ) ); ?>
+									<input type="hidden" id="su-<?php echo esc_attr( $cle ); ?>" name="scoutsunite_unite[<?php echo esc_attr( $cle ); ?>]" value="<?php echo esc_attr( $logo ? (string) $logo : '' ); ?>">
+									<span id="su-logo-apercu"><?php echo $logo ? wp_get_attachment_image( $logo, 'thumbnail', false, array( 'style' => 'display:block;max-height:96px;width:auto;margin-bottom:8px' ) ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput -- balise construite par WordPress. ?></span>
+									<button type="button" class="button" id="su-logo-choisir">Choisir le logo</button>
+									<button type="button" class="button-link" id="su-logo-retirer"<?php echo $logo ? '' : ' hidden'; ?>>Retirer</button>
+									<p class="description">Il s’imprime sur chaque carte du staff, sous le logo de la section. Sans logo, la carte s’en passe.</p>
+								<?php elseif ( 'textarea' === $champ[1] ) : ?>
 									<textarea class="large-text" rows="4" id="su-<?php echo esc_attr( $cle ); ?>" name="scoutsunite_unite[<?php echo esc_attr( $cle ); ?>]" placeholder="<?php echo esc_attr( $champ[2] ); ?>"><?php echo esc_textarea( scoutsunite_unite( $cle ) ); ?></textarea>
 								<?php else : ?>
 									<input class="regular-text" type="<?php echo esc_attr( $champ[1] ); ?>" id="su-<?php echo esc_attr( $cle ); ?>" name="scoutsunite_unite[<?php echo esc_attr( $cle ); ?>]" value="<?php echo esc_attr( scoutsunite_unite( $cle ) ); ?>" placeholder="<?php echo esc_attr( $champ[2] ); ?>">
@@ -570,5 +593,32 @@ function scoutsunite_unite_page() {
 			<?php submit_button( 'Enregistrer les coordonnées' ); ?>
 		</form>
 	</div>
+	<script>
+	( function () {
+		var cadre;
+		var champ = document.getElementById( 'su-logo' );
+		var apercu = document.getElementById( 'su-logo-apercu' );
+		var retirer = document.getElementById( 'su-logo-retirer' );
+		document.getElementById( 'su-logo-choisir' ).addEventListener( 'click', function () {
+			if ( ! cadre ) {
+				cadre = wp.media( { title: 'Logo de l’unité', button: { text: 'Utiliser ce logo' }, library: { type: 'image' }, multiple: false } );
+				cadre.on( 'select', function () {
+					var image = cadre.state().get( 'selection' ).first().toJSON();
+					var url = image.sizes && image.sizes.thumbnail ? image.sizes.thumbnail.url : image.url;
+					champ.value = image.id;
+					apercu.innerHTML = '<img alt="" style="display:block;max-height:96px;width:auto;margin-bottom:8px">';
+					apercu.querySelector( 'img' ).src = url;
+					retirer.hidden = false;
+				} );
+			}
+			cadre.open();
+		} );
+		retirer.addEventListener( 'click', function () {
+			champ.value = '';
+			apercu.innerHTML = '';
+			retirer.hidden = true;
+		} );
+	} )();
+	</script>
 	<?php
 }

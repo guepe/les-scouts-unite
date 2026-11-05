@@ -17,7 +17,7 @@ Pour te connecter : va sur l’adresse du site suivie de `/wp-admin` (par exempl
 | Ajouter, modifier, annuler et supprimer les réunions de ta section | Toucher aux réunions des autres sections |
 | Ajouter et modifier les documents de ta section | Gérer les documents de toute l’unité |
 | Modifier les textes et les images de la page de ta section | Changer la mise en page, créer ou supprimer une page |
-| Téléverser des images et des fichiers | Modifier les coordonnées, le staff, le Bon à savoir ou les groupes WhatsApp (Réglages → Unité) |
+| Téléverser des images et des fichiers ; modifier ta fiche dans **Staff**, si ton compte y est relié | Modifier les coordonnées, le Bon à savoir ou les groupes WhatsApp (Réglages → Unité), les fiches des autres, imprimer les cartes |
 
 Si un message te dit « Aucune section ne t’est encore attribuée », demande à un administrateur de cocher ta section dans ton profil.
 
@@ -81,7 +81,8 @@ Certaines parties de la page se remplissent toutes seules et ne se modifient pas
 | --- | --- |
 | Prochaine réunion, « Ensuite », Les temps forts | Agenda (tes réunions) |
 | Les documents | Documents |
-| Bon à savoir, staff, contact de la section, groupe WhatsApp | Réglages → Unité : demande au staff d’unité |
+| Bon à savoir, contact de la section, groupe WhatsApp | Réglages → Unité : demande au staff d’unité |
+| Ton totem, ta fonction, ton GSM, ta photo | **Staff** → ta fiche, si ton compte y est relié ; sinon, demande au staff d’unité |
 
 ## Ce que voient les parents
 
@@ -103,6 +104,7 @@ C’est pour cela qu’une réunion qui n’a pas lieu s’annule plutôt qu’e
 | Une réunion répétée apparaît en double | Mets les doublons à la corbeille dans Agenda → Toutes les réunions |
 | Le site affiche encore l’ancienne version d’une page | Recharge la page (Cmd + Maj + R sur Mac, Ctrl + F5 sur PC) |
 | « Aucune section ne t’est encore attribuée », ou une réunion refusée (« pas autorisé ») | Demande à un administrateur de vérifier tes sections dans ton profil |
-| Un nom, un GSM, le Bon à savoir ou le groupe WhatsApp est faux | Demande au staff d’unité : ça se change dans Réglages → Unité |
+| Un nom ou un GSM du staff est faux | Corrige ta fiche dans **Staff**, ou demande au staff d’unité |
+| Le Bon à savoir ou le groupe WhatsApp est faux | Demande au staff d’unité : ça se change dans Réglages → Unité |
 
 Pour tout le reste, écris au staff d’unité. Si tu as un doute, enregistre plutôt en brouillon : rien n’apparaît sur le site tant que tu n’as pas publié.
