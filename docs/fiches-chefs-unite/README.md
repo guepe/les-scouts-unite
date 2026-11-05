@@ -9,7 +9,7 @@ Le même contenu en texte, plus détaillé : [Mode d’emploi pour les chefs d�
 <p>
 <a href="00-couverture.png"><img src="00-couverture.png" width="260" alt="Couverture : le site de l’unité en 8 fiches"></a>
 <a href="01-donner-acces.png"><img src="01-donner-acces.png" width="260" alt="Fiche 1 : donner accès à un animateur"></a>
-<a href="02-le-staff.png"><img src="02-le-staff.png" width="260" alt="Fiche 2 : le staff des sections"></a>
+<a href="02-le-staff.png"><img src="02-le-staff.png" width="260" alt="Fiche 2 : le staff et les cartes"></a>
 <a href="03-bon-a-savoir-whatsapp.png"><img src="03-bon-a-savoir-whatsapp.png" width="260" alt="Fiche 3 : Bon à savoir et WhatsApp"></a>
 <a href="04-activite-unite.png"><img src="04-activite-unite.png" width="260" alt="Fiche 4 : une activité pour toute l’unité"></a>
 <a href="05-documents-unite.png"><img src="05-documents-unite.png" width="260" alt="Fiche 5 : les documents de l’unité"></a>
@@ -22,15 +22,15 @@ Le même contenu en texte, plus détaillé : [Mode d’emploi pour les chefs d�
 |---|---|
 | [0 · Couverture](00-couverture.png) | Les trois rôles, et le menu du staff d’unité |
 | [1 · Donner accès à un animateur](01-donner-acces.png) | Créer son compte, cocher sa section, et quand il quitte le staff |
-| [2 · Le staff des sections](02-le-staff.png) | Chefs, animateurs, e-mail et GSM de chaque section dans Réglages → Unité |
+| [2 · Le staff et les cartes](02-le-staff.png) | Une fiche par personne dans Staff, ce qui s’affiche où, imprimer les cartes recto-verso |
 | [3 · Bon à savoir et WhatsApp](03-bon-a-savoir-whatsapp.png) | Les infos fixes de chaque section, les liens des groupes WhatsApp |
 | [4 · Une activité pour toute l’unité](04-activite-unite.png) | Toute l’unité, et la mise en avant sur l’accueil |
 | [5 · Les documents de l’unité](05-documents-unite.png) | Un document pour toutes les sections, et sa nouvelle version |
 | [6 · Les pages et le menu](06-pages-et-menu.png) | Les slugs attendus, le menu Parents |
 | [7 · Réglages et mise à jour](07-reglages-mise-a-jour.png) | Fuseau horaire, permaliens, installer une nouvelle version (extension et thème) |
-| [8 · Ça coince ?](08-ca-coince.png) | Les sept soucis les plus courants |
+| [8 · Ça coince ?](08-ca-coince.png) | Les neuf soucis les plus courants, dont le cache PHP après une mise à jour |
 
-Fiches du thème 2.10.1 (octobre 2026), fiche 7 revue pour la 3.0 (novembre 2026, les deux zips), captures prises sur le site de démonstration.
+Fiches du thème 2.10.1 (octobre 2026), fiche 7 revue pour la 3.0 (novembre 2026, les deux zips), couverture et fiches 2 et 8 revues pour la 3.1 (le staff et les cartes), captures prises sur le site de démonstration.
 
 ## Mettre les fiches à jour
 

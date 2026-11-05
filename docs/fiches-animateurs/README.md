@@ -28,7 +28,7 @@ Le même contenu en texte, plus détaillé : [Mode d’emploi pour les animateur
 | [6 · Ce que voient les parents](06-ce-que-voient-les-parents.png) | La page de section, le programme frigo, le calendrier |
 | [7 · Ça coince ?](07-ca-coince.png) | Les six soucis les plus courants |
 
-Fiches du thème 2.10.1 (octobre 2026), captures prises sur le site de démonstration.
+Fiches du thème 2.10.1 (octobre 2026), fiches 5 et 7 revues pour la 3.1 (ta fiche dans Staff), captures prises sur le site de démonstration.
 
 ## Mettre les fiches à jour
 
