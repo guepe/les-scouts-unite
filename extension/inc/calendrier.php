@@ -4,7 +4,8 @@
  * s'abonnent (Google Agenda, Apple Calendrier, Outlook), et un fichier .ics par réunion.
  *
  * - /agenda/?section=baladins&ical : les réunions de la section (et de toute l'unité),
- *   à venir et des 30 derniers jours ; /agenda/?ical : tout l'agenda ;
+ *   à venir et des 30 derniers jours ; ?section=baladins,louveteaux pour plusieurs sections
+ *   (un seul abonnement par famille) ; /agenda/?ical : tout l'agenda ;
  * - /agenda/une-reunion/?ical : cette seule réunion, à ajouter une fois.
  *
  * Aussi : les liens « à mettre sur le frigo » et « Ajouter à mon calendrier » sous les blocs de l'agenda.
@@ -17,13 +18,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Adresse du flux d'une section, '' pour toute l'unité.
+ * Adresse du flux d'une ou de plusieurs sections, '' pour toute l'unité.
  *
- * @param string $section Identifiant de section.
+ * @param string|string[] $section Identifiant de section, ou plusieurs.
  * @return string URL.
  */
 function scoutsunite_calendrier_url( $section = '' ) {
-	$args = $section ? array( 'section' => $section, 'ical' => '1' ) : array( 'ical' => '1' );
+	$choix = scoutsunite_agenda_choix_texte( $section );
+	$args  = $choix ? array( 'section' => $choix, 'ical' => '1' ) : array( 'ical' => '1' );
 	return add_query_arg( $args, get_post_type_archive_link( 'reunion' ) );
 }
 
@@ -202,13 +204,14 @@ function scoutsunite_calendrier_evenement( $r ) {
 }
 
 /**
- * Réunions du flux : celles de la section (et de toute l'unité pour une section d'âge),
+ * Réunions du flux : celles des sections choisies (et de toute l'unité pour une section d'âge),
  * à venir ou terminées depuis moins de 30 jours.
  *
- * @param string $section Identifiant de section, '' pour tout l'agenda.
+ * @param string|string[] $section Identifiant de section, ou plusieurs ; '' pour tout l'agenda.
  * @return WP_Post[]
  */
 function scoutsunite_calendrier_reunions( $section ) {
+	$choix      = scoutsunite_agenda_choix_lire( $section );
 	$depuis     = wp_date( 'Y-m-d', time() - 30 * DAY_IN_SECONDS );
 	$meta_query = array(
 		array(
@@ -227,10 +230,10 @@ function scoutsunite_calendrier_reunions( $section ) {
 			),
 		),
 	);
-	if ( $section ) {
+	if ( $choix ) {
 		$meta_query[] = array(
 			'key'     => 'su_section',
-			'value'   => isset( scoutsunite_agenda_sections_age()[ $section ] ) ? array( $section, 'unite' ) : array( $section ),
+			'value'   => scoutsunite_agenda_choix_avec_unite( $choix ),
 			'compare' => 'IN',
 		);
 	}
@@ -251,18 +254,16 @@ function scoutsunite_calendrier() {
 	if ( ! isset( $_GET['ical'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
 		return;
 	}
-	$sections = scoutsunite_agenda_sections();
-	$unite    = get_bloginfo( 'name' );
+	$unite = get_bloginfo( 'name' );
 
 	if ( is_singular( 'reunion' ) ) {
 		$reunions = array( get_queried_object() );
 		$nom      = $unite;
 		$fichier  = 'reunion-' . get_post_meta( $reunions[0]->ID, 'su_date', true ) . '.ics';
 	} elseif ( is_post_type_archive( 'reunion' ) ) {
-		$section  = isset( $_GET['section'] ) ? sanitize_key( wp_unslash( $_GET['section'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
-		$section  = isset( $sections[ $section ] ) ? $section : '';
-		$reunions = scoutsunite_calendrier_reunions( $section );
-		$nom      = $unite . ( $section ? ' · ' . $sections[ $section ] : '' );
+		$choix    = scoutsunite_agenda_choix();
+		$reunions = scoutsunite_calendrier_reunions( $choix );
+		$nom      = $unite . ( $choix ? ' · ' . scoutsunite_agenda_choix_noms( $choix ) : '' );
 		$fichier  = '';
 	} else {
 		return;
@@ -317,7 +318,7 @@ function scoutsunite_liens_icone( $nom ) {
 /**
  * « Le programme à mettre sur le frigo » et « Ajouter à mon calendrier ».
  *
- * @param string $section Section du programme, '' pour tout l'agenda.
+ * @param string|string[] $section Section du programme, ou plusieurs ; '' pour tout l'agenda.
  * @param int    $post_id Réunion : sa convocation et son fichier .ics.
  * @return string HTML.
  */

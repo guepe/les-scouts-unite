@@ -213,6 +213,34 @@ $ok( false !== strpos( $verso, 'formulaire d’inscription' ) && false === strpo
 $ok( '' === scoutsunite_staff_photo_url( $sienne ) && file_exists( scoutsunite_staff_dossier() . '/.htaccess' ), 'photos : dossier protégé, pas d’adresse sans photo' );
 $ok( ! user_can( 0, 'read_post', $sienne ), 'photos : une personne non connectée ne lit pas une fiche (ni sa photo)' );
 
+/* Agenda de la famille : plusieurs sections ------------------------------- */
+
+$ok( array( 'baladins', 'louveteaux' ) === scoutsunite_agenda_choix_lire( 'louveteaux,Baladins,inconnue,louveteaux' ) && 'Baladins et Louveteaux' === scoutsunite_agenda_choix_noms( array( 'baladins', 'louveteaux' ) ), 'famille : sections lues dans l’ordre, sans doublon ni inconnue' );
+
+$famille_b = $reunion( 'FAMILLE-BALADINS', array( 'su_section' => 'baladins', 'su_date' => $dans( 12 ), 'su_debut' => '14:00' ) );
+$famille_l = $reunion( 'FAMILLE-LOUVETEAUX', array( 'su_section' => 'louveteaux', 'su_date' => $dans( 13 ), 'su_debut' => '14:00' ) );
+$famille_e = $reunion( 'FAMILLE-ECLAIREURS', array( 'su_section' => 'eclaireurs', 'su_date' => $dans( 14 ), 'su_debut' => '14:00' ) );
+$famille_u = $reunion( 'FAMILLE-UNITE', array( 'su_section' => 'unite', 'su_date' => $dans( 15 ), 'su_debut' => '14:00' ) );
+
+$_GET['section'] = 'louveteaux,baladins';
+$agenda          = do_blocks( '<!-- wp:scoutsunite/agenda /-->' );
+unset( $_GET['section'] );
+$ok( false !== strpos( $agenda, 'FAMILLE-BALADINS' ) && false !== strpos( $agenda, 'FAMILLE-LOUVETEAUX' ) && false === strpos( $agenda, 'FAMILLE-ECLAIREURS' ) && false === strpos( $agenda, 'FAMILLE-UNITE' ), 'famille : l’agenda montre les deux sections, sans les autres ni toute l’unité' );
+$ok( false !== strpos( $agenda, 'section=baladins,louveteaux,eclaireurs' ) && preg_match( '#agenda__filtre-baladins" href="[^"]*section=louveteaux"#', $agenda ) && 2 === substr_count( $agenda, 'aria-current="true"' ), 'famille : un bouton ajoute sa section, un bouton allumé la retire' );
+
+$ids = wp_list_pluck( scoutsunite_calendrier_reunions( array( 'baladins', 'louveteaux' ) ), 'ID' );
+$ok( in_array( $famille_b, $ids, true ) && in_array( $famille_l, $ids, true ) && in_array( $famille_u, $ids, true ) && ! in_array( $famille_e, $ids, true ), 'famille : un seul calendrier, avec toute l’unité' );
+$ok( false !== strpos( scoutsunite_calendrier_url( array( 'louveteaux', 'baladins' ) ), 'section=baladins,louveteaux&ical=1' ) && false !== strpos( scoutsunite_imprimer_url( array( 'louveteaux', 'baladins' ) ), 'section=baladins,louveteaux' ), 'famille : les liens du calendrier et du frigo gardent les deux sections' );
+
+list( , , $programme ) = scoutsunite_imprimer_programme( array( 'baladins', 'louveteaux' ), 3 );
+$ok( false !== strpos( $programme, 'FAMILLE-BALADINS' ) && false !== strpos( $programme, 'FAMILLE-UNITE' ) && false === strpos( $programme, 'FAMILLE-ECLAIREURS' ) && false !== strpos( $programme, 'feuille__tag">Louveteaux' ), 'famille : une feuille commune, chaque réunion avec sa section' );
+
+$reglages = get_option( 'scoutsunite_unite', array() );
+update_option( 'scoutsunite_unite', array( 'local_rue' => 'Rue du Local 1', 'whatsapp_unite' => 'https://chat.whatsapp.com/AbCd', 'baladins_infos' => 'Goûter : à emporter', 'louveteaux_infos' => 'Uniforme : foulard' ) + (array) $reglages );
+$bas = scoutsunite_imprimer_bas( array( 'baladins', 'louveteaux' ) );
+update_option( 'scoutsunite_unite', $reglages );
+$ok( 1 === substr_count( $bas, 'Rue du Local 1' ) && 1 === substr_count( $bas, '<p>Groupe WhatsApp de l’unité</p>' ) && false !== strpos( $bas, '<h3>Baladins</h3>' ) && false !== strpos( $bas, 'Le staff de la Meute' ), 'famille : Bon à savoir et staff de chaque section, l’unité une seule fois' );
+
 /* Thème et extension ------------------------------------------------------- */
 
 $ok( wp_get_theme()->get( 'Version' ) === $extension, 'thème et extension à la même version' );

@@ -92,6 +92,7 @@ Tout ce que tu encodes sert directement aux parents. Mieux vaut savoir ce qu’i
 - **Le programme à mettre sur le frigo** : le lien sous la prochaine réunion ouvre une feuille A4 avec le logo de la section, les réunions des prochains mois, le Bon à savoir, le staff et le QR WhatsApp. Le bouton « Imprimer ou enregistrer en PDF » permet aussi de l’envoyer en PDF dans le groupe WhatsApp.
 - **La convocation à mettre sur le frigo** : la même chose pour une seule réunion, en grand, depuis sa page. Pratique pour un week-end ou le camp. Tu la trouves aussi sous chaque réunion, dans **Agenda → Toutes les réunions**.
 - **Ajouter à mon calendrier** : le parent abonne son téléphone (iPhone, Google Agenda, Outlook) à l’agenda de la section. Chaque réunion que tu ajoutes, déplaces ou annules y apparaît d’elle-même.
+- **Plusieurs enfants, plusieurs sections** : dans l’agenda, le parent touche chaque section de ses enfants ; elles s’affichent ensemble. Le calendrier et la feuille pour le frigo, sous l’agenda, suivent ce choix.
 
 C’est pour cela qu’une réunion qui n’a pas lieu s’annule plutôt qu’elle ne se supprime : une réunion supprimée disparaît sans explication du site et des calendriers, alors qu’une réunion annulée dit aux parents qu’elle n’a pas lieu, et pourquoi.
 

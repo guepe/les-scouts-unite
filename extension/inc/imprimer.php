@@ -32,7 +32,7 @@ function scoutsunite_imprimer_durees() {
 /**
  * Adresse de la feuille à imprimer.
  *
- * @param string           $section Section du programme, '' pour toute l'unité.
+ * @param string|string[]  $section Section du programme, ou plusieurs ; '' pour toute l'unité.
  * @param int|WP_Post|null $post    Réunion, pour sa convocation.
  * @return string URL.
  */
@@ -40,9 +40,10 @@ function scoutsunite_imprimer_url( $section = '', $post = null ) {
 	if ( $post ) {
 		return add_query_arg( 'imprimer', '1', get_permalink( $post ) );
 	}
-	$args = array( 'imprimer' => '1' );
-	if ( $section ) {
-		$args = array( 'section' => $section ) + $args;
+	$args  = array( 'imprimer' => '1' );
+	$choix = scoutsunite_agenda_choix_texte( $section );
+	if ( $choix ) {
+		$args = array( 'section' => $choix ) + $args;
 	}
 	return add_query_arg( $args, get_post_type_archive_link( 'reunion' ) );
 }
@@ -80,9 +81,11 @@ function scoutsunite_imprimer_section( $section ) {
  * est simplement omis : pas d'exemple « à compléter » sur une feuille imprimée.
  *
  * @param string $section Identifiant de section, '' pour toute l'unité.
+ * @param bool   $commun  Avec le responsable d'unité, le local et le groupe de l'unité ; false quand
+ *                        la feuille de plusieurs sections les donne une seule fois, à la fin.
  * @return string HTML.
  */
-function scoutsunite_imprimer_staff( $section ) {
+function scoutsunite_imprimer_staff( $section, $commun = true ) {
 	$infos    = scoutsunite_imprimer_section( $section );
 	$membres  = array();
 	$contacts = array();
@@ -98,13 +101,13 @@ function scoutsunite_imprimer_staff( $section ) {
 		}
 		$contacts[] = scoutsunite_unite( 'iama_email' );
 	}
-	if ( 'iama' !== $section ) {
+	if ( $commun && 'iama' !== $section ) {
 		$ru         = scoutsunite_unite( 'ru_nom' );
 		$contacts[] = implode( ' · ', array_filter( array( $ru ? 'Responsable d’unité : ' . $ru : '', scoutsunite_unite( 'ru_telephone' ) ) ) );
 		$contacts[] = '' === $section || 'unite' === $section ? scoutsunite_unite( 'staff_email' ) : '';
 	}
 	$local = trim( scoutsunite_unite( 'local_rue' ) . ', ' . scoutsunite_unite( 'local_localite' ), ', ' );
-	if ( '' !== $local ) {
+	if ( $commun && '' !== $local ) {
 		$contacts[] = 'Le local : ' . $local;
 	}
 
@@ -123,7 +126,7 @@ function scoutsunite_imprimer_staff( $section ) {
 	if ( $contacts ) {
 		$html .= '<p class="feuille__contact">' . implode( '<br>', array_map( 'esc_html', $contacts ) ) . '</p>';
 	}
-	$whatsapp = scoutsunite_imprimer_whatsapp( $section );
+	$whatsapp = scoutsunite_imprimer_whatsapp( $section, $commun );
 	if ( '' === $html && '' === $whatsapp ) {
 		return '';
 	}
@@ -135,11 +138,12 @@ function scoutsunite_imprimer_staff( $section ) {
  * QR codes des groupes WhatsApp de la section et de l'unité, à scanner depuis le frigo.
  *
  * @param string $section Identifiant de section, '' pour toute l'unité.
+ * @param bool   $commun  Avec le groupe de toute l'unité.
  * @return string HTML.
  */
-function scoutsunite_imprimer_whatsapp( $section ) {
+function scoutsunite_imprimer_whatsapp( $section, $commun = true ) {
 	$html = '';
-	foreach ( array_unique( array_filter( array( $section, 'unite' ) ) ) as $groupe ) {
+	foreach ( array_unique( array_filter( array( $section, $commun ? 'unite' : '' ) ) ) as $groupe ) {
 		$lien = scoutsunite_whatsapp_lien( $groupe );
 		$nom  = 'Groupe WhatsApp ' . scoutsunite_whatsapp_de( $groupe );
 		$qr   = '' === $lien ? '' : scoutsunite_qr_svg( $lien, 'QR code du ' . $nom );
@@ -190,15 +194,17 @@ function scoutsunite_imprimer_notes( $post ) {
 /**
  * Programme : les réunions des prochains mois, une ligne par réunion.
  *
- * @param string $section Identifiant de section, '' pour toute l'unité.
- * @param int    $mois    Nombre de mois à couvrir.
+ * @param string|string[] $section Identifiant de section, ou plusieurs ; '' pour toute l'unité.
+ * @param int             $mois    Nombre de mois à couvrir.
  * @return array Titre de la feuille, sous-titre, HTML du corps.
  */
 function scoutsunite_imprimer_programme( $section, $mois ) {
 	$noms   = scoutsunite_agenda_sections();
+	$choix  = scoutsunite_agenda_choix_lire( $section );
+	$seule  = 1 === count( $choix ) ? $choix[0] : '';
 	$limite = wp_date( 'Y-m-d', ( new DateTimeImmutable( 'now', wp_timezone() ) )->modify( '+' . $mois . ' months' )->getTimestamp() );
 	// Une section voit aussi les activités de toute l'unité, comme sur sa page.
-	$qui      = isset( scoutsunite_agenda_sections_age()[ $section ] ) ? array( $section, 'unite' ) : $section;
+	$qui      = $choix ? scoutsunite_agenda_choix_avec_unite( $choix ) : '';
 	$reunions = array_filter(
 		scoutsunite_agenda_a_venir( $qui, 200 ),
 		function ( $r ) use ( $limite ) {
@@ -221,7 +227,8 @@ function scoutsunite_imprimer_programme( $section, $mois ) {
 		if ( $titre && $type ) {
 			$tags[] = $type;
 		}
-		if ( $s !== $section && isset( $noms[ $s ] ) ) {
+		// Avec plusieurs sections, chaque ligne dit de laquelle il s'agit.
+		if ( $s !== $seule && isset( $noms[ $s ] ) ) {
 			$tags[] = $noms[ $s ];
 		}
 		$infos = array_filter( array( scoutsunite_agenda_horaire( $r->ID ), get_post_meta( $r->ID, 'su_lieu', true ) ) );
@@ -261,14 +268,16 @@ function scoutsunite_imprimer_programme( $section, $mois ) {
  * « À retenir » : les camps à venir de la section et de toute l'unité, même au-delà de la période
  * imprimée, pour que la date du camp soit sur le frigo dès le premier programme de l'année.
  *
- * @param string $section Identifiant de section, '' ou 'unite' pour toute l'unité.
- * @param int    $sauf    Réunion à ne pas rappeler (la convocation de ce camp lui-même).
+ * @param string|string[] $section Identifiant de section, ou plusieurs ; '' ou 'unite' pour toute l'unité.
+ * @param int             $sauf    Réunion à ne pas rappeler (la convocation de ce camp lui-même).
  * @return string HTML, vide s'il n'y a pas de camp à venir.
  */
 function scoutsunite_imprimer_camps( $section, $sauf = 0 ) {
 	$noms   = scoutsunite_agenda_sections();
-	$unite  = '' === $section || 'unite' === $section;
-	$camps  = scoutsunite_agenda_a_venir( $unite ? '' : array( $section, 'unite' ), 10, false, array( 'camp' ) );
+	$choix  = scoutsunite_agenda_choix_lire( $section );
+	$seule  = 1 === count( $choix ) ? $choix[0] : '';
+	$unite  = ! $choix || array( 'unite' ) === $choix;
+	$camps  = scoutsunite_agenda_a_venir( $unite ? '' : array_values( array_unique( array_merge( $choix, array( 'unite' ) ) ) ), 10, false, array( 'camp' ) );
 	$lignes = '';
 	foreach ( $camps as $c ) {
 		if ( (int) $c->ID === (int) $sauf || scoutsunite_agenda_annulee( $c->ID ) ) {
@@ -278,7 +287,7 @@ function scoutsunite_imprimer_camps( $section, $sauf = 0 ) {
 		$titre = scoutsunite_agenda_titre( $c );
 		$fin   = get_post_meta( $c->ID, 'su_jusqua', true );
 		$annee = substr( $fin ? $fin : get_post_meta( $c->ID, 'su_date', true ), 0, 4 );
-		$qui   = $s !== $section && isset( $noms[ $s ] ) ? ' <span class="feuille__tag">' . esc_html( $noms[ $s ] ) . '</span>' : '';
+		$qui   = $s !== $seule && isset( $noms[ $s ] ) ? ' <span class="feuille__tag">' . esc_html( $noms[ $s ] ) . '</span>' : '';
 
 		$lignes .= '<li><strong>' . esc_html( $titre ? $titre : 'Camp' ) . '</strong> ' . esc_html( scoutsunite_agenda_quand( $c->ID ) . ' ' . $annee ) . $qui . '</li>';
 	}
@@ -316,6 +325,31 @@ function scoutsunite_imprimer_convocation( $post ) {
 }
 
 /**
+ * Le bas de la feuille : Bon à savoir et staff. Pour plusieurs sections, ceux de chacune, puis une seule
+ * fois le responsable d'unité, le local et le groupe WhatsApp de l'unité.
+ *
+ * @param string[] $sections Une section ('' pour toute l'unité), ou plusieurs.
+ * @return string HTML.
+ */
+function scoutsunite_imprimer_bas( $sections ) {
+	$plusieurs = count( $sections ) > 1;
+	$noms      = scoutsunite_agenda_sections();
+	$bon       = '';
+	$staff     = '';
+	foreach ( $sections as $s ) {
+		$liste = scoutsunite_bon_a_savoir( $s, false );
+		if ( $liste ) {
+			$bon .= ( $plusieurs ? '<h3>' . esc_html( $noms[ $s ] ) . '</h3>' : '' ) . $liste;
+		}
+		$staff .= scoutsunite_imprimer_staff( $s, ! $plusieurs );
+	}
+	if ( $plusieurs ) {
+		$staff .= scoutsunite_imprimer_staff( 'unite' );
+	}
+	return ( $bon ? '<section class="feuille__bon"><h2>Bon à savoir</h2>' . $bon . '</section>' : '' ) . $staff;
+}
+
+/**
  * Sert la feuille à la place de la page quand l'adresse porte ?imprimer.
  */
 function scoutsunite_imprimer() {
@@ -324,6 +358,7 @@ function scoutsunite_imprimer() {
 	}
 	$sections = scoutsunite_agenda_sections();
 	$mois     = 3;
+	$choix    = array();
 
 	if ( is_singular( 'reunion' ) ) {
 		$post    = get_queried_object();
@@ -332,19 +367,19 @@ function scoutsunite_imprimer() {
 		list( $titre, $sous_titre, $corps ) = scoutsunite_imprimer_convocation( $post );
 		$retour  = get_permalink( $post );
 	} elseif ( is_post_type_archive( 'reunion' ) ) {
-		// Lecture seule depuis l'adresse, comme le filtre de l'agenda.
-		$section = isset( $_GET['section'] ) ? sanitize_key( wp_unslash( $_GET['section'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
-		$section = isset( $sections[ $section ] ) ? $section : '';
+		// Lecture seule depuis l'adresse, comme le filtre de l'agenda. Plusieurs sections : une feuille commune.
+		$choix   = scoutsunite_agenda_choix();
+		$section = 1 === count( $choix ) ? $choix[0] : '';
 		$demande = isset( $_GET['mois'] ) ? absint( $_GET['mois'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification
 		$mois    = isset( scoutsunite_imprimer_durees()[ $demande ] ) ? $demande : $mois;
-		list( $titre, $sous_titre, $corps ) = scoutsunite_imprimer_programme( $section, $mois );
-		$retour  = $section ? add_query_arg( 'section', $section, get_post_type_archive_link( 'reunion' ) ) : get_post_type_archive_link( 'reunion' );
+		list( $titre, $sous_titre, $corps ) = scoutsunite_imprimer_programme( $choix, $mois );
+		$retour  = $choix ? add_query_arg( 'section', scoutsunite_agenda_choix_texte( $choix ), get_post_type_archive_link( 'reunion' ) ) : get_post_type_archive_link( 'reunion' );
 	} else {
 		return;
 	}
 
 	$infos = scoutsunite_imprimer_section( $section );
-	$nom   = '' === $section ? 'Agenda de l’unité' : $infos['nom'];
+	$nom   = count( $choix ) > 1 ? scoutsunite_agenda_choix_noms( $choix ) : ( '' === $section ? 'Agenda de l’unité' : $infos['nom'] );
 	$css   = scoutsunite_extension_theme_url( 'assets/css/imprimer.css' );
 	$logo  = scoutsunite_extension_theme_url( 'assets/images/' . $infos['logo'] );
 	$site  = preg_replace( '#^https?://(www\.)?#', '', get_post_type_archive_link( 'reunion' ) );
@@ -368,8 +403,8 @@ function scoutsunite_imprimer() {
 	<?php if ( is_post_type_archive( 'reunion' ) ) : ?>
 		<form method="get" action="<?php echo esc_url( get_post_type_archive_link( 'reunion' ) ); ?>">
 			<input type="hidden" name="imprimer" value="1">
-			<?php if ( $section ) : ?>
-				<input type="hidden" name="section" value="<?php echo esc_attr( $section ); ?>">
+			<?php if ( $choix ) : ?>
+				<input type="hidden" name="section" value="<?php echo esc_attr( scoutsunite_agenda_choix_texte( $choix ) ); ?>">
 			<?php endif; ?>
 			<label>Réunions pour
 				<select name="mois" onchange="this.form.submit()">
@@ -395,13 +430,9 @@ function scoutsunite_imprimer() {
 			<p class="feuille__titre"><?php echo esc_html( $titre ); ?><?php echo $sous_titre ? ' <span>' . esc_html( $sous_titre ) . '</span>' : ''; ?></p>
 		</div>
 	</header>
-	<?php echo scoutsunite_imprimer_camps( $section, isset( $post ) ? $post->ID : 0 ); // phpcs:ignore WordPress.Security.EscapeOutput -- échappé à la construction. ?>
+	<?php echo scoutsunite_imprimer_camps( $choix ? $choix : $section, isset( $post ) ? $post->ID : 0 ); // phpcs:ignore WordPress.Security.EscapeOutput -- échappé à la construction. ?>
 	<?php echo $corps; // phpcs:ignore WordPress.Security.EscapeOutput -- échappé à la construction. ?>
-	<?php $bon = scoutsunite_bon_a_savoir( $section, false ); ?>
-	<?php if ( $bon ) : ?>
-		<section class="feuille__bon"><h2>Bon à savoir</h2><?php echo $bon; // phpcs:ignore WordPress.Security.EscapeOutput ?></section>
-	<?php endif; ?>
-	<?php echo scoutsunite_imprimer_staff( $section ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+	<?php echo scoutsunite_imprimer_bas( count( $choix ) > 1 ? $choix : array( $section ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- échappé à la construction. ?>
 	<footer class="feuille__pied">
 		À jour au <?php echo esc_html( wp_date( 'j F Y' ) ); ?>. Toujours à jour sur <strong><?php echo esc_html( untrailingslashit( $site ) ); ?></strong>
 	</footer>

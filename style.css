@@ -3,7 +3,7 @@ Theme Name: Les Scouts – Unité
 Theme URI: https://github.com/guepe/les-scouts-unite
 Author: Pierre-Henri Delaval
 Description: Thème de bloc pour le site d’une unité Les Scouts asbl, construit sur la charte graphique de la fédération : bleu de la fédération, toppings, couleurs de section et police Muli. Le nom de l’unité vient du titre du site ; tout se modifie dans l’éditeur de site.
-Version: 3.1.0
+Version: 3.2.0
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
@@ -1536,10 +1536,15 @@ a.lien-fleche:hover::after {
 	box-shadow: inset 0 0 0 2px var(--su-bleu);
 }
 
-.agenda__filtres a[aria-current="page"] {
+.agenda__filtres a[aria-current] {
 	background: var(--su-bleu);
 	color: #fff;
 	box-shadow: none;
+}
+
+.agenda__aide {
+	margin: calc(-1 * var(--wp--preset--spacing--60) + 0.5rem) 0 var(--wp--preset--spacing--60);
+	font-size: var(--wp--preset--font-size--small);
 }
 
 .agenda__filtre-baladins { --section: var(--wp--preset--color--baladins); }

@@ -2,6 +2,15 @@
 
 Les versions suivent le numéro `Version:` de `style.css`. Chaque version publiée a son zip dans les [Releases](https://github.com/guepe/les-scouts-unite/releases).
 
+## 3.2.0 – non publiée
+
+**L’agenda de la famille** : un parent qui a des enfants dans plusieurs sections les voit ensemble.
+
+- **Agenda** : les boutons de sections s’additionnent. Toucher « Baladins » puis « Louveteaux » montre les deux, mélangées par date ; toucher une section allumée la retire ; « Toutes » remet à zéro. L’adresse garde le choix (`/agenda/?section=baladins,louveteaux`) : à mettre en favori ou à envoyer à l’autre parent. Les activités « Toute l’unité » restent hors de l’agenda filtré, comme avant (sauf si on choisit aussi « Toute l’unité »).
+- **Calendrier du téléphone** : « Ajouter à mon calendrier », sous l’agenda filtré, abonne aux sections choisies et à toute l’unité, en un seul calendrier.
+- **Feuille pour le frigo** : une feuille commune pour les sections choisies. Chaque réunion porte le nom de sa section ; en bas, le Bon à savoir et le staff de chaque section, puis une seule fois le responsable d’unité, le local et le groupe WhatsApp de l’unité.
+- Les adresses d’une seule section (`?section=baladins`) marchent comme avant.
+
 ## 3.1.0 – 2026-11-05
 
 **La carte d’animateur** : chaque membre du staff a sa fiche, et sa carte à imprimer.

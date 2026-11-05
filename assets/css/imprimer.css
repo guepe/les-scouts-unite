@@ -414,6 +414,21 @@ body {
 	break-inside: avoid;
 }
 
+/* Feuille de plusieurs sections : le Bon à savoir de chacune, sous son nom */
+.feuille__bon h3 {
+	margin: 2.5mm 0 1mm;
+	font-weight: 800;
+	font-size: 10pt;
+}
+
+.feuille__bon h2 + h3 {
+	margin-top: 0;
+}
+
+.feuille__staff + .feuille__staff {
+	margin-top: 3mm;
+}
+
 /* Staff et pied */
 
 /* Trop étroit (PDF fait depuis un téléphone) : le staff passe sous les QR codes, sur toute la largeur. */

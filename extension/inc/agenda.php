@@ -38,6 +38,61 @@ function scoutsunite_agenda_sections_age() {
 	return array_diff_key( scoutsunite_agenda_sections(), array_flip( array( 'unite', 'iama' ) ) );
 }
 
+/**
+ * Les sections choisies dans l'adresse (?section=baladins,louveteaux), dans l'ordre des sections :
+ * un parent de deux enfants voit leurs deux sections ensemble. Lecture seule, sans effet de bord.
+ *
+ * @return string[] Identifiants valides, vide pour tout l'agenda.
+ */
+function scoutsunite_agenda_choix() {
+	$brut = isset( $_GET['section'] ) && is_string( $_GET['section'] ) ? sanitize_text_field( wp_unslash( $_GET['section'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
+	return scoutsunite_agenda_choix_lire( $brut );
+}
+
+/**
+ * Les sections valides d'une liste « baladins,louveteaux », sans doublon, dans l'ordre des sections.
+ *
+ * @param string|string[] $liste Liste séparée par des virgules, ou tableau.
+ * @return string[]
+ */
+function scoutsunite_agenda_choix_lire( $liste ) {
+	$demandes = array_map( 'sanitize_key', is_array( $liste ) ? $liste : explode( ',', (string) $liste ) );
+	return array_values( array_intersect( array_keys( scoutsunite_agenda_sections() ), $demandes ) );
+}
+
+/**
+ * Les sections choisies pour une adresse : « baladins,louveteaux ».
+ *
+ * @param string|string[] $choix Une section ou plusieurs.
+ * @return string
+ */
+function scoutsunite_agenda_choix_texte( $choix ) {
+	return implode( ',', scoutsunite_agenda_choix_lire( $choix ) );
+}
+
+/**
+ * Les noms des sections choisies : « Baladins et Louveteaux ».
+ *
+ * @param string[] $choix Sections.
+ * @return string
+ */
+function scoutsunite_agenda_choix_noms( $choix ) {
+	$noms = array_values( array_intersect_key( scoutsunite_agenda_sections(), array_flip( $choix ) ) );
+	$fin  = array_pop( $noms );
+	return $noms ? implode( ', ', $noms ) . ' et ' . $fin : (string) $fin;
+}
+
+/**
+ * Les sections dont on montre les activités, avec « Toute l'unité » dès qu'une section d'âge est choisie
+ * (calendrier et programme à imprimer d'une section, comme sur sa page).
+ *
+ * @param string[] $choix Sections choisies.
+ * @return string[]
+ */
+function scoutsunite_agenda_choix_avec_unite( $choix ) {
+	return array_intersect_key( scoutsunite_agenda_sections_age(), array_flip( $choix ) ) ? array_values( array_unique( array_merge( $choix, array( 'unite' ) ) ) ) : $choix;
+}
+
 /* ---------------------------------------------------------------------------
    Type de contenu et champs
    ------------------------------------------------------------------------ */
@@ -845,20 +900,21 @@ function scoutsunite_agenda_bon_a_savoir( $section ) {
  */
 function scoutsunite_bloc_agenda() {
 	$sections = scoutsunite_agenda_sections();
-	// Filtre en lecture seule depuis l'adresse, sans effet de bord.
-	$filtre = isset( $_GET['section'] ) ? sanitize_key( wp_unslash( $_GET['section'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
-	if ( ! isset( $sections[ $filtre ] ) ) {
-		$filtre = '';
-	}
-	$base = get_post_type_archive_link( 'reunion' );
+	$filtre   = scoutsunite_agenda_choix();
+	$base     = get_post_type_archive_link( 'reunion' );
 
-	$nav = '<nav class="agenda__filtres" aria-label="Filtrer par section"><a href="' . esc_url( $base ) . '"' . ( '' === $filtre ? ' aria-current="page"' : '' ) . '>Toutes</a>';
+	// Les boutons s'additionnent : toucher une section l'ajoute au choix, la toucher encore l'en retire.
+	$nav = '<nav class="agenda__filtres" aria-label="Filtrer par section"><a href="' . esc_url( $base ) . '"' . ( ! $filtre ? ' aria-current="page"' : '' ) . '>Toutes</a>';
 	foreach ( $sections as $slug => $nom ) {
-		$nav .= '<a class="agenda__filtre-' . esc_attr( $slug ) . '" href="' . esc_url( add_query_arg( 'section', $slug, $base ) ) . '"' . ( $filtre === $slug ? ' aria-current="page"' : '' ) . '>' . esc_html( $nom ) . '</a>';
+		$choisie = in_array( $slug, $filtre, true );
+		$autre   = $choisie ? array_diff( $filtre, array( $slug ) ) : array_merge( $filtre, array( $slug ) );
+		$lien    = $autre ? add_query_arg( 'section', scoutsunite_agenda_choix_texte( $autre ), $base ) : $base;
+		$courant = $choisie ? ( 1 === count( $filtre ) ? ' aria-current="page"' : ' aria-current="true"' ) : '';
+		$nav    .= '<a class="agenda__filtre-' . esc_attr( $slug ) . '" href="' . esc_url( $lien ) . '"' . $courant . '>' . esc_html( $nom ) . '</a>';
 	}
-	$nav .= '</nav>';
+	$nav .= '</nav><p class="agenda__aide">Des enfants dans plusieurs sections ? Touche chacune : elles s’affichent ensemble.</p>';
 
-	$reunions = scoutsunite_agenda_a_venir( $filtre, 200 );
+	$reunions = scoutsunite_agenda_a_venir( $filtre ? $filtre : '', 200 );
 	if ( ! $reunions ) {
 		return '<div ' . get_block_wrapper_attributes( array( 'class' => 'agenda' ) ) . '>' . $nav . '<p class="agenda__vide">Aucune réunion à venir pour l’instant. Le staff publie les dates ici dès qu’elles sont fixées.</p>' . scoutsunite_liens_pratiques( $filtre ) . '</div>';
 	}

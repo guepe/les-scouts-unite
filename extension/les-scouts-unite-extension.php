@@ -3,7 +3,7 @@
  * Plugin Name: Les Scouts – Unité (extension)
  * Plugin URI: https://github.com/guepe/les-scouts-unite
  * Description: Le cœur du site d’une unité Les Scouts asbl : agenda des réunions, documents, droits des animateurs et du staff d’unité, Réglages → Unité, calendrier du téléphone, feuilles à imprimer et groupes WhatsApp. À utiliser avec le thème Les Scouts – Unité, qui en fait l’apparence.
- * Version: 3.1.0
+ * Version: 3.2.0
  * Requires at least: 6.6
  * Requires PHP: 7.4
  * Author: Pierre-Henri Delaval

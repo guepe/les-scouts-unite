@@ -173,8 +173,9 @@ Les blocs :
    - Sans réunion : « Pas encore fixée » et « Le staff publiera bientôt la prochaine date dans l'agenda. ».
 
 3. **`scoutsunite/agenda`** : « Agenda complet », pour `/agenda/`. Classe `agenda`.
-   - Navigation `nav.agenda__filtres` avec `aria-label="Filtrer par section"` : « Toutes » puis un lien par section, chacun avec la classe `agenda__filtre-{slug}`.
-   - Le filtre est le paramètre `?section=` : `sanitize_key`, validé contre la liste des sections, en lecture seule. Le lien actif porte `aria-current="page"`.
+   - Navigation `nav.agenda__filtres` avec `aria-label="Filtrer par section"` : « Toutes » puis un lien par section, chacun avec la classe `agenda__filtre-{slug}`, suivie de `p.agenda__aide`.
+   - Le filtre est le paramètre `?section=`, une ou plusieurs sections séparées par des virgules (`?section=baladins,louveteaux`), lu par `scoutsunite_agenda_choix()` : chaque valeur passe par `sanitize_key`, les inconnues et les doublons tombent, l'ordre est celui de `scoutsunite_agenda_sections()`. Lecture seule. Les liens s'additionnent : celui d'une section non choisie l'ajoute au choix, celui d'une section choisie l'en retire. Une seule section choisie porte `aria-current="page"`, plusieurs portent `aria-current="true"`.
+   - Le même choix sert au flux iCalendar (`scoutsunite_calendrier_reunions()`, avec `unite` dès qu'une section d'âge est choisie) et à la feuille à imprimer : plusieurs sections donnent une feuille commune (`scoutsunite_imprimer_programme()` étiquette chaque réunion, `scoutsunite_imprimer_bas()` met le Bon à savoir et le staff de chaque section, puis une fois le bloc de l'unité).
    - Les réunions sont groupées par mois : `h2.agenda__mois` (« Octobre 2026 ») suivi de `div.agenda__liste`, au maximum 200 réunions.
    - Chaque ligne affiche « **samedi 24 octobre** · titre · lieu », l'horaire, et les notes réduites à 40 mots en texte brut, suivies d'un lien « Lire la suite » (`.agenda__suite`) vers la réunion quand elles sont coupées.
    - Liste vide : `p.agenda__vide` « Aucune réunion à venir pour l'instant. Le staff publie les dates ici dès qu'elles sont fixées. ».
@@ -207,7 +208,7 @@ Les blocs :
   - `.ligne__notes` s'étend sur toute la largeur sous la ligne, et `.ligne__vide` est en sourdine.
   - Ces mêmes classes `is-style-ligne-*` sont aussi déclarées comme styles du bloc Groupe (`register_block_style`), pour que l'éditeur puisse les réutiliser à la main.
 - **Affiche** : `.agenda-prochaine__date`, `.agenda-prochaine__notes`, `.agenda-prochaine__suite`, et pour « À la une » `.a-la-une__quand` (gras), `.a-la-une__suite` (petit, filet au-dessus).
-- **Agenda** : `.agenda__filtres a` (pastilles, couleur via `--section` sur `.agenda__filtre-{slug}`, `[aria-current="page"]` pour l'état actif), `.agenda__mois`, `.agenda__liste`, `.agenda__vide`.
+- **Agenda** : `.agenda__filtres a` (pastilles, couleur via `--section` sur `.agenda__filtre-{slug}`, `[aria-current]` pour l'état actif), `.agenda__aide`, `.agenda__mois`, `.agenda__liste`, `.agenda__vide`.
 
 ## Droits (`extension/inc/droits.php`)
 
