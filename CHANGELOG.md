@@ -2,7 +2,7 @@
 
 Les versions suivent le numéro `Version:` de `style.css`. Chaque version publiée a son zip dans les [Releases](https://github.com/guepe/les-scouts-unite/releases).
 
-## 3.1.0 – non publiée
+## 3.1.0 – 2026-11-05
 
 **La carte d’animateur** : chaque membre du staff a sa fiche, et sa carte à imprimer.
 
