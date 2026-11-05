@@ -142,6 +142,16 @@ $rendu  = do_blocks( '<!-- wp:scoutsunite/prochaine-reunion {"section":"baladins
 $ok( 1 === substr_count( $rendu, 'Notes de la boucle' ), 'boucle : une réunion n’est pas affichée dans ses propres notes' );
 $secret = $reunion( 'Protégée', array( 'su_section' => 'louveteaux', 'su_date' => $dans( 1 ) ), array( 'post_password' => 'secret', 'post_content' => '<!-- wp:paragraph --><p>NOTES-SECRETES</p><!-- /wp:paragraph -->' ) );
 $ok( '' === scoutsunite_agenda_notes( get_post( $secret ) ) && false === strpos( scoutsunite_calendrier_evenement( get_post( $secret ) ), 'NOTES-SECRETES' ), 'mot de passe : les notes ne sortent pas' );
+$protegee = $reunion( 'Répétée protégée', array( 'su_section' => 'louveteaux', 'su_date' => $dans( 2 ), 'su_repeter' => $dans( 16 ) ), array( 'post_password' => 'secret', 'post_content' => '<!-- wp:paragraph --><p>NOTES-REPETEES</p><!-- /wp:paragraph -->' ) );
+scoutsunite_agenda_repeter( get_post( $protegee ) );
+$copies = get_posts( array( 'post_type' => 'reunion', 'title' => 'Répétée protégée', 'numberposts' => -1, 'exclude' => array( $protegee ) ) );
+$fuite  = array_filter(
+	$copies,
+	function ( $c ) {
+		return 'secret' !== $c->post_password || false !== strpos( scoutsunite_calendrier_evenement( $c ), 'NOTES-REPETEES' );
+	}
+);
+$ok( 2 === count( $copies ) && ! $fuite, 'mot de passe : les copies d’une réunion répétée restent protégées' );
 
 /* Feuilles à imprimer : les camps à retenir ------------------------------- */
 
@@ -196,6 +206,39 @@ $ok( user_can( $staff, 'edit_post', $autre ) && user_can( $staff, $type->cap->cr
 $ok( user_can( $anim, 'edit_post', $sienne ) && ! user_can( $anim, 'edit_post', $autre ) && ! user_can( $anim, 'read_post', $autre ), 'fiches : un animateur modifie sa fiche, pas celle des autres' );
 $ok( ! user_can( $anim, 'delete_post', $sienne ) && ! user_can( $anim, $type->cap->create_posts ), 'fiches : un animateur n’en ajoute ni n’en supprime' );
 
+// Par XML-RPC, l'animateur relié à sa fiche ne change ni sa section, ni son rôle de chef, ni « ancien », ni l'ordre.
+global $wpdb;
+$avant_xml = get_current_user_id();
+$mid = function ( $cle ) use ( $wpdb, $sienne ) {
+	return (int) $wpdb->get_var( $wpdb->prepare( "SELECT meta_id FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s", $sienne, $cle ) );
+};
+try {
+	( new wp_xmlrpc_server() )->wp_editPost(
+		array(
+			1,
+			'anim',
+			'anim-pass-123',
+			$sienne,
+			array(
+				'post_status'   => 'draft',
+				'menu_order'    => 99,
+				'custom_fields' => array(
+					array( 'id' => $mid( 'su_section' ), 'key' => 'su_section', 'value' => 'pionniers' ),
+					array( 'id' => $mid( 'su_chef' ) ),
+					array( 'key' => 'su_ancien', 'value' => '1' ),
+					array( 'id' => $mid( 'su_gsm' ), 'key' => 'su_gsm', 'value' => '0470 99 99 99' ),
+				),
+			),
+		)
+	);
+} catch ( RuntimeException $e ) {
+	unset( $e );
+}
+wp_set_current_user( $avant_xml );
+$apres = scoutsunite_staff_fiche( $sienne );
+$ok( 'louveteaux' === $apres['section'] && $apres['chef'] && ! $apres['ancien'] && 0 === $apres['ordre'] && '0470 99 99 99' === $apres['gsm'], 'fiches : par XML-RPC, un animateur change son GSM, pas sa section, son rôle ni l’ordre' );
+$ok( ! user_can( $anim, 'edit_post_meta', $sienne, 'su_photo' ) && user_can( $staff, 'edit_post_meta', $sienne, 'su_chef' ), 'fiches : la photo et les champs réservés, pour le staff d’unité seulement' );
+
 $rendu = do_blocks( '<!-- wp:scoutsunite/staff {"section":"louveteaux"} /-->' );
 $ok( (int) strpos( $rendu, 'Bagheera' ) < strpos( $rendu, 'Renard' ) && false !== strpos( $rendu, 'chef de section' ), 'page de section : le staff vient des fiches, chef en tête' );
 $ok( false !== strpos( $rendu, 'Bagheera' ) && false === strpos( $rendu, 'Castor' ), 'page de section : chez les Louveteaux, le totem de meute' );
@@ -212,6 +255,24 @@ update_option( 'scoutsunite_unite', $reglages );
 $ok( false !== strpos( $verso, 'formulaire d’inscription' ) && false === strpos( $verso, 'WhatsApp' ), 'cartes : au verso du staff d’unité, le QR du formulaire d’inscription' );
 $ok( '' === scoutsunite_staff_photo_url( $sienne ) && file_exists( scoutsunite_staff_dossier() . '/.htaccess' ), 'photos : dossier protégé, pas d’adresse sans photo' );
 $ok( ! user_can( 0, 'read_post', $sienne ), 'photos : une personne non connectée ne lit pas une fiche (ni sa photo)' );
+delete_transient( 'scoutsunite_photos_exposees' );
+$etat = scoutsunite_staff_photos_exposees();
+$ok( in_array( $etat, array( 'oui', 'non', 'inconnu' ), true ) && ! glob( scoutsunite_staff_dossier() . '/verification-*' ), 'photos : le dossier est vérifié, sans laisser de fichier témoin' );
+$avant = get_current_user_id();
+set_current_screen( 'edit-animateur' );
+wp_set_current_user( $staff );
+$avis = function ( $etat ) {
+	set_transient( 'scoutsunite_photos_exposees', $etat, 60 );
+	ob_start();
+	scoutsunite_staff_avis();
+	return ob_get_clean();
+};
+$ok( false !== strpos( $avis( 'oui' ), 'ne sont pas protégées' ) && false === strpos( $avis( 'non' ), 'ne sont pas protégées' ), 'photos : un avis si le serveur montre le dossier' );
+delete_transient( 'scoutsunite_photos_exposees' );
+$GLOBALS['current_screen'] = null;
+$GLOBALS['typenow']        = '';
+$GLOBALS['taxnow']         = '';
+wp_set_current_user( $avant );
 
 /* Agenda de la famille : plusieurs sections ------------------------------- */
 

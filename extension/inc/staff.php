@@ -94,6 +94,28 @@ function scoutsunite_staff_register() {
 			'supports'            => array( 'revisions' ),
 		)
 	);
+
+	// Les droits sur chaque champ valent pour toutes les voies (formulaire, XML-RPC, API) :
+	// la personne modifie les siens, seul le staff d'unité touche aux champs réservés et à la photo.
+	$reserves = array_merge( scoutsunite_staff_champs_reserves(), array( 'su_photo' ) );
+	foreach ( array_merge( array_keys( scoutsunite_staff_champs() ), $reserves ) as $cle ) {
+		register_post_meta(
+			'animateur',
+			$cle,
+			array(
+				'type'          => 'string',
+				'single'        => true,
+				'show_in_rest'  => false,
+				'auth_callback' => in_array( $cle, $reserves, true )
+					? function ( $permis, $champ, $post_id, $user_id ) {
+						return user_can( $user_id, 'manage_unite' );
+					}
+					: function ( $permis, $champ, $post_id, $user_id ) {
+						return user_can( $user_id, 'edit_post', $post_id );
+					},
+			)
+		);
+	}
 }
 add_action( 'init', 'scoutsunite_staff_register' );
 
@@ -296,17 +318,23 @@ add_action( 'pre_get_posts', 'scoutsunite_staff_liste_limitee', 20 );
  * Une fiche est toujours « publiée » : son état (cette année ou ancien) est un champ à part.
  * Un brouillon ou une relecture la ferait disparaître du site sans qu'on comprenne pourquoi.
  *
- * @param array $data Données de la fiche.
+ * @param array $data    Données de la fiche.
+ * @param array $postarr Données reçues (l'identifiant d'une fiche existante).
  * @return array
  */
-function scoutsunite_staff_toujours_publiee( $data ) {
+function scoutsunite_staff_toujours_publiee( $data, $postarr = array() ) {
 	if ( 'animateur' === $data['post_type'] && ! in_array( $data['post_status'], array( 'auto-draft', 'trash', 'inherit' ), true ) ) {
 		$data['post_status']   = 'publish';
 		$data['post_password'] = '';
+		// L'ordre sur la page de section est réservé au staff d'unité, par toutes les voies.
+		$avant = empty( $postarr['ID'] ) ? null : get_post( $postarr['ID'] );
+		if ( $avant && ! current_user_can( 'manage_unite' ) ) {
+			$data['menu_order'] = $avant->menu_order;
+		}
 	}
 	return $data;
 }
-add_filter( 'wp_insert_post_data', 'scoutsunite_staff_toujours_publiee' );
+add_filter( 'wp_insert_post_data', 'scoutsunite_staff_toujours_publiee', 10, 2 );
 
 /* ---------------------------------------------------------------------------
    La photo, dans un dossier protégé
@@ -328,6 +356,38 @@ function scoutsunite_staff_dossier() {
 		file_put_contents( $dossier . '/index.php', "<?php\n// Rien à voir.\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions
 	}
 	return $dossier;
+}
+
+/**
+ * Le dossier des photos est-il servi tel quel par le serveur ? Le site demande lui-même un fichier témoin
+ * à son adresse directe : un serveur qui ignore le .htaccess (nginx, par exemple) le donne.
+ * Vérifié au plus une fois par jour.
+ *
+ * @return string 'oui' (le serveur montre les fichiers), 'non', ou 'inconnu' (la vérification n'a pas pu se faire).
+ */
+function scoutsunite_staff_photos_exposees() {
+	$memo = get_transient( 'scoutsunite_photos_exposees' );
+	if ( $memo ) {
+		return $memo;
+	}
+	$temoin = 'verification-' . wp_generate_password( 12, false ) . '.txt';
+	$chemin = scoutsunite_staff_dossier() . '/' . $temoin;
+	file_put_contents( $chemin, 'scoutsunite-temoin' ); // phpcs:ignore WordPress.WP.AlternativeFunctions -- fichier témoin, effacé aussitôt.
+	$reponse = wp_remote_get(
+		wp_upload_dir( null, false )['baseurl'] . '/scoutsunite-staff/' . $temoin,
+		array(
+			'timeout'     => 5,
+			'redirection' => 0,
+		)
+	);
+	wp_delete_file( $chemin );
+	if ( is_wp_error( $reponse ) ) {
+		$etat = 'inconnu';
+	} else {
+		$etat = 200 === wp_remote_retrieve_response_code( $reponse ) && false !== strpos( wp_remote_retrieve_body( $reponse ), 'scoutsunite-temoin' ) ? 'oui' : 'non';
+	}
+	set_transient( 'scoutsunite_photos_exposees', $etat, DAY_IN_SECONDS );
+	return $etat;
 }
 
 /**
@@ -690,6 +750,9 @@ function scoutsunite_staff_avis() {
 			$liens[] = '<a href="' . esc_url( scoutsunite_staff_cartes_url( array( 'section' => $slug ) ) ) . '" target="_blank">' . esc_html( $nom ) . '</a>';
 		}
 		echo '<div class="notice notice-info"><p><strong>Imprimer les cartes :</strong> ' . implode( ' · ', $liens ) . '</p></div>'; // phpcs:ignore WordPress.Security.EscapeOutput -- échappé à la construction.
+		if ( 'oui' === scoutsunite_staff_photos_exposees() ) {
+			echo '<div class="notice notice-warning"><p><strong>Les photos du staff ne sont pas protégées par ton serveur.</strong> Il ignore le fichier qui en bloque l’accès direct : quelqu’un qui connaît l’adresse d’une photo peut l’ouvrir sans se connecter. Leurs noms sont tirés au hasard, mais demande à ton hébergeur de refuser l’accès au dossier <code>wp-content/uploads/scoutsunite-staff/</code>. Cet avis disparaît le lendemain de la correction.</p></div>';
+		}
 	}
 }
 add_action( 'admin_notices', 'scoutsunite_staff_avis' );

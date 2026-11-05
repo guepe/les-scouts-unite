@@ -309,13 +309,15 @@ function scoutsunite_agenda_repeter( $post ) {
 		if ( $dernier ) {
 			$dates['su_jusqua'] = $dernier->modify( $decalage )->format( 'Y-m-d' );
 		}
+		// Une réunion protégée par mot de passe le reste dans chacune de ses copies.
 		$copie = wp_insert_post(
 			array(
-				'post_type'    => 'reunion',
-				'post_status'  => 'publish',
-				'post_title'   => $post->post_title,
-				'post_content' => $post->post_content,
-				'post_author'  => $post->post_author,
+				'post_type'     => 'reunion',
+				'post_status'   => 'publish',
+				'post_title'    => $post->post_title,
+				'post_content'  => $post->post_content,
+				'post_password' => $post->post_password,
+				'post_author'   => $post->post_author,
 				'meta_input'   => array_merge( $meta, $dates ),
 			)
 		);

@@ -2,6 +2,14 @@
 
 Les versions suivent le numéro `Version:` de `style.css`. Chaque version publiée a son zip dans les [Releases](https://github.com/guepe/les-scouts-unite/releases).
 
+## 3.2.1 – non publiée
+
+**Sécurité** : trois corrections après une revue du code. Mets le site à jour.
+
+- **Réunion protégée et répétée** : les copies de chaque semaine perdaient le mot de passe de la réunion. Leurs notes s’affichaient alors à tout le monde : sur le site, sur le frigo et dans le calendrier des parents. Les copies gardent maintenant le mot de passe. Les copies déjà faites ne sont pas corrigées : si une réunion répétée a un mot de passe, remets-le sur ses copies (ou supprime-les et enregistre de nouveau l’originale).
+- **Fiches du staff** : un animateur relié à sa fiche pouvait, en passant par XML-RPC au lieu du formulaire, changer sa section, se déclarer chef, se cocher « ancien » ou changer l’ordre. Ces champs et la photo sont maintenant réservés au staff d’unité par toutes les voies.
+- **Photos du staff** : leur dossier est protégé par un fichier que seul Apache lit. Le site vérifie maintenant chaque jour que le serveur refuse bien l’accès direct, et sinon affiche un avis dans **Staff** (à transmettre à l’hébergeur).
+
 ## 3.2.0 – 2026-11-05
 
 **L’agenda de la famille** : un parent qui a des enfants dans plusieurs sections les voit ensemble.
