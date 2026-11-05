@@ -2,7 +2,7 @@
 
 Les versions suivent le numéro `Version:` de `style.css`. Chaque version publiée a son zip dans les [Releases](https://github.com/guepe/les-scouts-unite/releases).
 
-## 3.2.0 – non publiée
+## 3.2.0 – 2026-11-05
 
 **L’agenda de la famille** : un parent qui a des enfants dans plusieurs sections les voit ensemble.
 
