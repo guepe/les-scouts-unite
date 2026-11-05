@@ -2,7 +2,7 @@
 
 Les versions suivent le numéro `Version:` de `style.css`. Chaque version publiée a son zip dans les [Releases](https://github.com/guepe/les-scouts-unite/releases).
 
-## 3.2.1 – non publiée
+## 3.2.1 – 2026-11-05
 
 **Sécurité** : trois corrections après une revue du code. Mets le site à jour.
 
