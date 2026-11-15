@@ -1,0 +1,12 @@
+/* Sources des fiches : polices locales et même format pour les images et les PDF. */
+@font-face { font-family: Mulish; src: url('../assets/fonts/Muli-Regular.woff2'); font-weight: 400; }
+@font-face { font-family: Mulish; src: url('../assets/fonts/Muli-Bold.woff2'); font-weight: 700; }
+@font-face { font-family: Mulish; src: url('../assets/fonts/Muli-ExtraBold.woff2'); font-weight: 800; }
+@font-face { font-family: Mulish; src: url('../assets/fonts/Muli-Black.woff2'); font-weight: 900; }
+@font-face { font-family: 'Caveat Brush'; src: url('../assets/fonts/CaveatBrush-Regular.woff2'); }
+@page { size: 540px 960px; margin: 0; }
+html, body { margin: 0; width: 540px; }
+x-dc { display: block; }
+@media print {
+	html, body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}

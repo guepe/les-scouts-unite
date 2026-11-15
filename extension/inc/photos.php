@@ -15,7 +15,7 @@ require_once __DIR__ . '/photos-stockage.php';
 require_once __DIR__ . '/photos-interface.php';
 
 /** Version du schéma, indépendante de celle des rôles. */
-const SCOUTSUNITE_PHOTOS_SCHEMA = 3;
+const SCOUTSUNITE_PHOTOS_SCHEMA = 4;
 
 /**
  * Nom d'une table du module. Aucune valeur reçue du navigateur ne construit un identifiant SQL.
@@ -40,6 +40,16 @@ function scoutsunite_photos_initialiser() {
 		$images    = scoutsunite_photos_table( 'images' );
 		$sessions  = scoutsunite_photos_table( 'sessions' );
 		$journal   = scoutsunite_photos_table( 'journal' );
+		// dbDelta ne retire pas les anciennes contraintes : conserver les lignes et leurs liens.
+		$indices = get_option( 'scoutsunite_photos_schema' ) ? $wpdb->get_results( $wpdb->prepare( 'SHOW INDEX FROM %i', $albums ) ) : array();
+		foreach ( (array) $indices as $indice ) {
+			if ( 'section_annee' === $indice->Key_name && ! (int) $indice->Non_unique ) {
+				if ( false === $wpdb->query( $wpdb->prepare( 'ALTER TABLE %i DROP INDEX section_annee', $albums ) ) ) {
+					return; // La version reste inchangée pour réessayer la migration au prochain chargement.
+				}
+				break;
+			}
+		}
 		dbDelta( "CREATE TABLE $albums (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 			adresse char(24) NOT NULL,
@@ -55,7 +65,7 @@ function scoutsunite_photos_initialiser() {
 			cree_le datetime NOT NULL,
 			PRIMARY KEY  (id),
 			UNIQUE KEY adresse (adresse),
-			UNIQUE KEY section_annee (section,annee)
+			KEY section_annee (section,annee)
 		) $collation;" );
 		dbDelta( "CREATE TABLE $images (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -295,16 +305,16 @@ function scoutsunite_photos_executer( $operation, $donnees, $fichier = array() )
 		if ( 'creer' === $operation ) {
 			$section = scoutsunite_photos_texte( $donnees, 'section' );
 			$annee   = absint( scoutsunite_photos_texte( $donnees, 'annee' ) );
+			$titre   = wp_html_excerpt( scoutsunite_photos_texte( $donnees, 'titre' ), 180, '' );
 			if ( ! isset( scoutsunite_photos_sections_permises()[ $section ] ) || $annee < 2000 || $annee > (int) wp_date( 'Y' ) + 2 ) {
 				return new WP_Error( 'champs', 'Choisis ta section et une année de camp valide.' );
 			}
-			$existant = $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM %i WHERE section = %s AND annee = %d', scoutsunite_photos_table( 'albums' ), $section, $annee ) );
-			if ( $existant ) {
-				return array( 'album' => (int) $existant, 'message' => 'Cet album existe déjà. Tu peux le compléter.' );
+			if ( '' === $titre ) {
+				return new WP_Error( 'titre', 'Donne un nom à cet album, par exemple « Grand camp » ou « Week-end de printemps ».' );
 			}
 			$adresse = bin2hex( random_bytes( 12 ) );
 			$cle     = scoutsunite_photos_generer_cle( $adresse, 1 );
-			$cree = $wpdb->insert( scoutsunite_photos_table( 'albums' ), array( 'adresse' => $adresse, 'section' => $section, 'annee' => $annee, 'titre' => wp_html_excerpt( scoutsunite_photos_texte( $donnees, 'titre' ), 180, '' ), 'etat' => 'ouvert', 'cle_hash' => scoutsunite_photos_empreinte_cle( $cle ), 'auteur' => get_current_user_id(), 'cree_le' => gmdate( 'Y-m-d H:i:s' ) ), array( '%s', '%s', '%d', '%s', '%s', '%s', '%d', '%s' ) );
+			$cree = $wpdb->insert( scoutsunite_photos_table( 'albums' ), array( 'adresse' => $adresse, 'section' => $section, 'annee' => $annee, 'titre' => $titre, 'etat' => 'ouvert', 'cle_hash' => scoutsunite_photos_empreinte_cle( $cle ), 'auteur' => get_current_user_id(), 'cree_le' => gmdate( 'Y-m-d H:i:s' ) ), array( '%s', '%s', '%d', '%s', '%s', '%s', '%d', '%s' ) );
 			if ( ! $cree ) {
 				return new WP_Error( 'base', 'L’album n’a pas été créé. Réessaie.' );
 			}
@@ -351,6 +361,10 @@ function scoutsunite_photos_executer( $operation, $donnees, $fichier = array() )
 			return array( 'album' => $id, 'message' => $fermeture ? 'Accès parent fermé. Le même lien pourra être réutilisé à la réouverture.' : 'État de l’album enregistré.' );
 		}
 		if ( 'regler' === $operation ) {
+			$titre = array_key_exists( 'titre', $donnees ) ? wp_html_excerpt( scoutsunite_photos_texte( $donnees, 'titre' ), 180, '' ) : $album->titre;
+			if ( array_key_exists( 'titre', $donnees ) && '' === $titre ) {
+				return new WP_Error( 'titre', 'Donne un nom à cet album.' );
+			}
 			$date       = scoutsunite_photos_texte( $donnees, 'expiration' );
 			$expiration = '';
 			if ( $date ) {
@@ -359,7 +373,7 @@ function scoutsunite_photos_executer( $operation, $donnees, $fichier = array() )
 					return new WP_Error( 'date', 'Choisis une date d’expiration valide.' );
 				}
 			}
-			$wpdb->update( scoutsunite_photos_table( 'albums' ), array( 'titre' => wp_html_excerpt( scoutsunite_photos_texte( $donnees, 'titre' ), 180, '' ), 'expiration' => $expiration ? $expiration->modify( '+1 day' )->getTimestamp() : 0 ), array( 'id' => $id ) );
+			$wpdb->update( scoutsunite_photos_table( 'albums' ), array( 'titre' => $titre, 'expiration' => $expiration ? $expiration->modify( '+1 day' )->getTimestamp() : 0 ), array( 'id' => $id ) );
 			scoutsunite_photos_journal( $id, 'regler' );
 			return array( 'album' => $id, 'message' => 'Réglages enregistrés. L’expiration ferme la lecture parent, sans effacer les photos.' );
 		}
@@ -544,6 +558,43 @@ function scoutsunite_photos_jeton( $id ) {
  */
 function scoutsunite_photos_peut_lire( $image, $album ) {
 	return $image && $album && (int) $image->album === (int) $album->id && ( scoutsunite_photos_peut_gerer( $album ) || ( 'publiee' === $image->statut && scoutsunite_photos_session_valide( $album, scoutsunite_photos_jeton( $album->id ) ) ) );
+}
+
+/**
+ * Une photo et ses voisines dans tout l'album, ou seulement dans le tag affiché.
+ * Aucune liste privée ni référence de photo retirée n'est renvoyée sans droit de lecture.
+ *
+ * @param object|null $album Album demandé.
+ * @param int         $id Photo demandée.
+ * @param string      $tag Filtre facultatif.
+ * @return array|WP_Error
+ */
+function scoutsunite_photos_visionner( $album, $id, $tag = '' ) {
+	global $wpdb;
+	$image = scoutsunite_photos_image( $id );
+	if ( ! scoutsunite_photos_peut_lire( $image, $album ) || is_wp_error( scoutsunite_photos_dossier() ) || ( $tag && ! isset( scoutsunite_photos_tags_image( $image )[ $tag ] ) ) ) {
+		return new WP_Error( 'acces', 'Cette photo n’est plus accessible. Recharge l’album : l’accès a peut-être changé ou la photo a été retirée.' );
+	}
+	$statut = scoutsunite_photos_peut_gerer( $album ) ? '' : 'publiee';
+	$motif  = '%"' . $wpdb->esc_like( $tag ) . '":%';
+	$voisines = $wpdb->get_row( $wpdb->prepare(
+		'SELECT COUNT(*) AS total, COALESCE(SUM(id > %d), 0) AS avant, MIN(CASE WHEN id > %d THEN id END) AS precedente, MAX(CASE WHEN id < %d THEN id END) AS suivante FROM %i WHERE album = %d AND (%s = %s OR statut = %s) AND (%s = %s OR tags LIKE %s)',
+		$id, $id, $id, scoutsunite_photos_table( 'images' ), $album->id, $statut, '', $statut, $tag, '', $motif
+	) );
+	if ( ! $voisines || ! $voisines->total ) {
+		return new WP_Error( 'acces', 'Cette photo n’est plus accessible. Recharge l’album.' );
+	}
+	$url = scoutsunite_photos_url( $album );
+	return array(
+		'photo'       => (int) $image->id,
+		'image'       => add_query_arg( 'fichier', $image->id, $url ),
+		'telecharger' => add_query_arg( array( 'fichier' => $image->id, 'telecharger' => 1 ), $url ),
+		'legende'     => $image->legende ?: 'Souvenir du camp',
+		'position'    => (int) $voisines->avant + 1,
+		'total'       => (int) $voisines->total,
+		'precedente'  => (int) $voisines->precedente,
+		'suivante'    => (int) $voisines->suivante,
+	);
 }
 
 /** Sessions expirées et journal de gestion : 90 jours. Aucun effacement automatique d'album. */

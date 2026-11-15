@@ -3,7 +3,7 @@ Theme Name: Les Scouts – Unité
 Theme URI: https://github.com/guepe/les-scouts-unite
 Author: Pierre-Henri Delaval
 Description: Thème de bloc pour le site d’une unité Les Scouts asbl, construit sur la charte graphique de la fédération : bleu de la fédération, toppings, couleurs de section et police Muli. Le nom de l’unité vient du titre du site ; tout se modifie dans l’éditeur de site.
-Version: 3.4.0
+Version: 3.5.0
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
@@ -1669,6 +1669,13 @@ a.lien-fleche:hover::after {
 .photos__photo a { display: block; }
 .photos__photo figcaption { font-size: 0.8rem; padding-top: 0.5rem; overflow-wrap: anywhere; }
 .photos__photo figcaption > span { display: block; }
+.photos__photo-outils { display: flex; align-items: center; justify-content: space-between; gap: 0.25rem; }
+.photos__photo-outils label { flex: 1; min-width: 0; }
+.photos-page .photos__poubelle { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 44px; width: 44px; min-width: 44px; height: 44px; padding: 0; border-color: var(--su-trait); }
+.photos__quitter { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem 1rem; margin-top: 2rem; }
+.photos-page .photos__quitter button { padding: 0.35rem 0.65rem; font-size: 0.85rem; }
+.photos__suppression { margin: 1rem 0; }
+.photos__suppression > summary { cursor: pointer; min-height: 44px; display: list-item; }
 .photos__galerie .photos__actions { margin-top: 1.25rem; }
 .photos__tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1rem 0 1.5rem; }
 .photos__tags a { display: inline-flex; align-items: center; min-height: 44px; padding: 0.4rem 0.75rem; border: 1px solid var(--su-trait); text-decoration: none; background: white; }
@@ -1688,7 +1695,7 @@ a.lien-fleche:hover::after {
 .photos__dialogue { width: min(74rem, 96vw); max-width: 96vw; max-height: 96vh; padding: 1rem; border: 0; background: var(--su-fond); color: var(--su-bleu); overflow-y: auto; }
 .photos__dialogue::backdrop { background: rgba(6, 47, 85, 0.9); }
 .photos__vue-entete { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-.photos__dialogue > img { display: block; width: 100%; height: min(65vh, 700px); object-fit: contain; margin: 1rem 0; }
+.photos__dialogue > img { display: block; width: 100%; height: min(65vh, 700px); object-fit: contain; margin: 1rem 0; touch-action: pan-y pinch-zoom; }
 .photos__pied { background: var(--su-bleu); color: white; padding: 1.5rem; text-align: center; font-size: 0.85rem; }
 .photos__evitement { position: absolute; left: -10000px; }
 .photos__evitement:focus { position: static; display: block; padding: 1rem; }

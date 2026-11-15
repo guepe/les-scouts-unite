@@ -1,8 +1,8 @@
 # Mode d'emploi du site – Animateurs
 
-Thème et extension 3.3.0 · 15 novembre 2026
+Thème et extension 3.5.0 · 15 novembre 2026
 
-> Plus rapide à lire : [le site en 7 fiches](fiches-animateurs/), avec les vrais écrans ([PDF](fiches-animateurs/fiches-animateurs.pdf)).
+> Plus rapide à lire : [le site en 8 fiches](fiches-animateurs/), avec les vrais écrans ([PDF](fiches-animateurs/fiches-animateurs.pdf)).
 
 Ce guide t’explique, pas à pas, comment tenir à jour le site de l’unité pour ta section : les réunions, les documents, les photos de camp et la page de ta section. Les photos s’envoient aussi directement depuis ton téléphone.
 
@@ -68,21 +68,26 @@ Pour remplacer un document par sa nouvelle version, ouvre-le, choisis le nouveau
 
 ## Les photos du camp, depuis ton téléphone
 
-1. Connecte-toi au site avec ton compte habituel, puis touche **Photos de camp** dans le menu. Tu peux garder cette adresse en favori sur ton téléphone.
-2. Ouvre l’album de ta section et de l’année. S’il n’existe pas, touche **Créer un album**, choisis ta section et l’année du camp, puis **Créer l’album**.
-3. Dans **Ajouter des photos**, touche **Choisir des photos** et sélectionne jusqu’à 50 photos de ta pellicule. Tu peux aussi toucher **Prendre une photo**.
-4. Retire celles que tu ne veux pas envoyer. Tu peux ajouter un mot commun au lot et des **tags**, par exemple « Petit déjeuner, Grand jeu ». Sépare les tags par des virgules ; une photo peut en avoir jusqu’à huit.
-5. Touche **Envoyer les photos**. Garde la page ouverte : la progression indique ce qui est reçu. En cas de coupure, **Envoyer les photos restantes** reprend les échecs. Si tu fermes la page, resélectionne les fichiers manquants ; un fichier identique déjà reçu ne sera pas ajouté deux fois.
-6. Touche **Vérifier les photos reçues**, regarde-les et coche celles à publier. **Sélectionner les photos de cette page** permet de cocher le lot affiché.
-7. Après avoir vérifié les autorisations et écarté les images qui ne conviennent pas, touche **Publier la sélection**. Les parents ne voient jamais les photos encore « À vérifier ».
+1. Connecte-toi avec ton compte habituel, puis touche **Photos de camp**. Garde cette adresse en favori sur ton téléphone.
+2. Ouvre l’album de ta section et de l’année, ou touche **Créer un album**. Choisis la section, l’année et un nom, par exemple « Grand camp ». Tu peux créer plusieurs albums la même année, avec des noms différents ; chacun a son propre lien privé, prêt à partager.
+3. Dans **Publier des photos**, touche **Choisir des photos** et sélectionne jusqu’à 50 images. Tu peux aussi prendre une photo.
+4. Vérifie ta sélection et les autorisations, retire les images à écarter et ajoute si tu veux une légende et des tags, séparés par des virgules.
+5. Touche **Publier les photos**. Garde la page ouverte : chaque photo devient visible dès sa réception si l’accès parent est ouvert. Il n’y a pas de deuxième étape de publication.
+6. En cas de coupure, **Publier les photos restantes** reprend les échecs. Une photo identique déjà publiée ne sera pas ajoutée deux fois. **Voir les photos de l’album** rafraîchit la galerie.
 
-**Pour retirer une photo** : sélectionne-la puis **Retirer de l’album parent**. Le staff pourra encore la consulter ; les parents ne pourront plus l’ouvrir ni la télécharger. **Supprimer la sélection** efface définitivement les fichiers du site, après confirmation. Les copies déjà téléchargées restent chez leurs destinataires.
+**Partager et gérer l’accès** : en haut de l’album, ouvre **Partager l’album et gérer l’accès**. Le lien, le message et le QR restent retrouvables à chaque visite. Tu peux copier le message, ouvrir ou fermer l’accès, archiver ou rouvrir l’album et régler le dernier jour d’accès des parents.
 
-Le staff d’unité s’occupe de transmettre le lien et la clé aux parents. La clé est différente pour chaque section et chaque année. Un album archivé n’accepte plus d’envoi : demande au staff d’unité de le rouvrir si nécessaire.
+**Fermer puis rouvrir** conserve le même lien, mais la fermeture coupe les sessions déjà ouvertes. **Renouveler le lien des parents**, dans les options du panneau, change la clé : l’ancien lien ne fonctionne plus et il faut transmettre le nouveau message. Tu gères uniquement tes sections ; le staff d’unité peut gérer tous les albums.
 
-**À plusieurs** : tous les animateurs dont le compte est rattaché à ta section peuvent compléter ce même album et vérifier les photos. Chacun garde son compte habituel.
+**Albums créés pendant les essais 3.3** : pour retrouver le QR d’un ancien lien, renouvelle ce lien une seule fois et transmets le nouveau message. Les anciens liens restent valables jusqu’à ce renouvellement. Les anciennes photos « À vérifier » ne sont pas publiées automatiquement : sélectionne celles à partager, puis **Classer ou remettre en ligne la sélection → Remettre la sélection en ligne**.
 
-**Pour classer après l’envoi** : sélectionne des photos, ouvre **Classer la sélection**, indique les tags puis **Ajouter ces tags**. Les filtres au-dessus de la grille permettent ensuite de retrouver un moment, côté parents aussi. **Retirer tous les tags de la sélection** permet de corriger un classement.
+**Pour retirer une photo** : sélectionne-la puis **Retirer de l’album parent**. Le staff de la section peut encore la consulter ; les parents ne peuvent plus l’ouvrir ni la télécharger. La **poubelle à côté de la photo**, après confirmation, efface ses fichiers du site. Pour plusieurs photos, coche-les puis **Supprimer la sélection**. La poubelle individuelle n’efface que sa photo, même si d’autres sont cochées. Un nouvel envoi d’une photo retirée ne la republie pas : utilise **Remettre la sélection en ligne** pour la rétablir volontairement. Les copies déjà téléchargées restent chez leurs destinataires. Seuls les administrateurs et le staff d’unité peuvent supprimer tout l’album.
+
+**Côté parents** : toucher une photo ouvre la visionneuse. Les boutons, les flèches du clavier ou un balayage au doigt permettent de parcourir tout l’album, ou seulement le tag affiché. Le bouton **Fermer** dans la visionneuse revient à la grille. Le petit bouton **Fermer en bas de l’album** efface l’accès mémorisé à cet album : il faut rouvrir le lien pour revenir. Les demandes de retrait ne sont plus proposées dans cette interface, en attendant un parcours plus complet.
+
+**À plusieurs** : tous les animateurs dont le compte est rattaché à ta section peuvent publier dans le même album et gérer son accès. Chacun garde son compte habituel.
+
+**Pour classer après l’envoi** : sélectionne des photos, ouvre **Classer ou remettre en ligne la sélection**, indique les tags puis **Ajouter ces tags**. Les filtres au-dessus de la grille permettent ensuite de retrouver un moment, côté parents aussi. **Retirer tous les tags de la sélection** permet de corriger un classement.
 
 **Pour préparer un livre photo** : ouvre **Exporter pour préparer un livre photo**, puis **Exporter les photos publiées (ZIP)**. Si un tag est sélectionné, seules ses photos publiées sont exportées. Le ZIP contient les images optimisées et un index des tags et légendes. Pour un grand tirage, retrouve les originaux sur les téléphones des animateurs. La mise en page du livre et l’imprimeur seront choisis ensuite.
 

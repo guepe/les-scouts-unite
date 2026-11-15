@@ -1,13 +1,13 @@
-# Le site de l’unité en 8 fiches – pour le staff d’unité
+# Le site de l’unité en 9 fiches – pour le staff d’unité
 
 Un geste par fiche, avec les vrais écrans de WordPress : ce que le staff d’unité règle une fois, et ce qu’il tient à jour pour toute l’unité. Pour les réunions et les documents d’une section, les [fiches des animateurs](../fiches-animateurs/) valent aussi pour le staff d’unité, dans toutes les sections.
 
-**[Télécharger toutes les fiches en PDF](fiches-chefs-unite.pdf)** (9 pages)
+**[Télécharger toutes les fiches en PDF](fiches-chefs-unite.pdf)** (10 pages)
 
 Le même contenu en texte, plus détaillé : [Mode d’emploi pour les chefs d’unité](../mode-emploi-chefs-unite.md).
 
 <p>
-<a href="00-couverture.png"><img src="00-couverture.png" width="260" alt="Couverture : le site de l’unité en 8 fiches"></a>
+<a href="00-couverture.png"><img src="00-couverture.png" width="260" alt="Couverture : le site de l’unité en 9 fiches"></a>
 <a href="01-donner-acces.png"><img src="01-donner-acces.png" width="260" alt="Fiche 1 : donner accès à un animateur"></a>
 <a href="02-le-staff.png"><img src="02-le-staff.png" width="260" alt="Fiche 2 : le staff et les cartes"></a>
 <a href="03-bon-a-savoir-whatsapp.png"><img src="03-bon-a-savoir-whatsapp.png" width="260" alt="Fiche 3 : Bon à savoir et WhatsApp"></a>
@@ -16,6 +16,7 @@ Le même contenu en texte, plus détaillé : [Mode d’emploi pour les chefs d�
 <a href="06-pages-et-menu.png"><img src="06-pages-et-menu.png" width="260" alt="Fiche 6 : les pages et le menu"></a>
 <a href="07-reglages-mise-a-jour.png"><img src="07-reglages-mise-a-jour.png" width="260" alt="Fiche 7 : réglages et mise à jour"></a>
 <a href="08-ca-coince.png"><img src="08-ca-coince.png" width="260" alt="Fiche 8 : ça coince ?"></a>
+<a href="09-photos-camp.png"><img src="09-photos-camp.png" width="260" alt="Fiche 9 : Partager les photos du camp"></a>
 </p>
 
 | Fiche | Ce qu’on y apprend |
@@ -29,15 +30,18 @@ Le même contenu en texte, plus détaillé : [Mode d’emploi pour les chefs d�
 | [6 · Les pages et le menu](06-pages-et-menu.png) | Les slugs attendus, le menu Parents |
 | [7 · Réglages et mise à jour](07-reglages-mise-a-jour.png) | Fuseau horaire, permaliens, installer une nouvelle version (extension et thème) |
 | [8 · Ça coince ?](08-ca-coince.png) | Les neuf soucis les plus courants, dont le cache PHP après une mise à jour |
+| [9 · Partager les photos du camp](09-photos-camp.png) | Partager, fermer, renouveler les accès et supprimer un album |
 
-Fiches du thème 2.10.1 (octobre 2026), fiche 7 revue pour la 3.0 (novembre 2026, les deux zips), couverture et fiches 2 et 8 revues pour la 3.1 (le staff et les cartes), captures prises sur le site de démonstration.
+Fiches de la version **3.5.0** (15 novembre 2026), avec des captures prises sur le site de démonstration.
 
 ## Mettre les fiches à jour
 
-### Complément 3.3 : l’accès aux photos
+### Fiche 9 : l’accès aux photos
 
-[La fiche illustrée « Donner accès aux photos du camp »](09-photos-camp.png) explique l’ouverture de l’album, la clé montrée une seule fois et son renouvellement. [Source modifiable](source/Photos.dc.html).
+[La fiche illustrée « Donner accès aux photos du camp »](09-photos-camp.png) explique l’ouverture de l’album, le lien et le QR retrouvables, la fermeture et le renouvellement. [Source modifiable](source/Photos.dc.html).
 
-Cette fiche complémentaire est fournie séparément ; le PDF historique de neuf pages ci-dessus ne l’inclut pas.
+Cette fiche est incluse dans le PDF de dix pages ci-dessus.
 
 Les sources sont dans [`source/`](source/) : une page `.dc.html` par fiche (format du canevas Claude Design), `canvas.json` et les captures d’écran dans `source/captures/`. Après un changement d’écran dans WordPress ou dans le thème, refaire la capture concernée, adapter la fiche, puis regénérer les images et le PDF.
+
+Le script [`../generer-fiches.cjs`](../generer-fiches.cjs) régénère les images et les deux PDF depuis ces sources, sans ressource distante. Il demande Playwright avec Chromium et Python avec `pypdf`. Lance-le depuis la racine : `node docs/generer-fiches.cjs`. Les variables `SCOUTSUNITE_PLAYWRIGHT` et `SCOUTSUNITE_PYTHON` permettent d’utiliser des installations existantes.

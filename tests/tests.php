@@ -323,12 +323,12 @@ if ( is_wp_error( $cree_b ) ) {
 	throw new Exception( 'Albums : ' . $cree_b->get_error_message() );
 }
 $album_b = scoutsunite_photos_album( $cree_b['album'] );
-$cree_l = scoutsunite_photos_executer( 'creer', array( 'section' => 'louveteaux', 'annee' => $annee_photo ) );
+$cree_l = scoutsunite_photos_executer( 'creer', array( 'section' => 'louveteaux', 'annee' => $annee_photo, 'titre' => 'Grand camp' ) );
 $album_l = scoutsunite_photos_album( $cree_l['album'] );
-$cree_ancien = scoutsunite_photos_executer( 'creer', array( 'section' => 'baladins', 'annee' => $annee_photo - 1 ) );
+$cree_ancien = scoutsunite_photos_executer( 'creer', array( 'section' => 'baladins', 'annee' => $annee_photo - 1, 'titre' => 'Camp précédent' ) );
 $album_ancien = scoutsunite_photos_album( $cree_ancien['album'] );
-$doublon_album = scoutsunite_photos_executer( 'creer', array( 'section' => 'baladins', 'annee' => $annee_photo ) );
-$ok( $album_b && $album_b->adresse === scoutsunite_photos_album( $album_b->adresse )->adresse && (int) $album_b->id === $doublon_album['album'], 'albums : adresse stable et unicité section + année' );
+$ok( $album_b && $album_b->adresse === scoutsunite_photos_album( $album_b->adresse )->adresse, 'albums : adresse stable propre à chaque album' );
+$ok( is_wp_error( scoutsunite_photos_executer( 'creer', array( 'section' => 'baladins', 'annee' => $annee_photo ) ) ), 'albums : un nom est nécessaire pour distinguer les albums' );
 $ok( false === strpos( $album_b->titre, '<script>' ) && 'ouvert' === $album_b->etat && 36 === strlen( scoutsunite_photos_cle_partage( $album_b ) ), 'albums : création prête à partager, avec un accès par clé uniquement' );
 $cle_initiale = scoutsunite_photos_cle_partage( $album_b );
 $qr_initial = scoutsunite_photos_qr( scoutsunite_photos_url( $album_b ) . '#cle=' . $cle_initiale );
@@ -398,10 +398,32 @@ if ( is_wp_error( $recu_photo ) ) {
 }
 $image_photo = scoutsunite_photos_image( $recu_photo['photo'] );
 $ok( 'publiee' === $image_photo->statut && scoutsunite_photos_chemin( $image_photo ) && scoutsunite_photos_chemin( $image_photo, true ), 'albums : vraie photo publiée directement, avec ses deux variantes privées' );
+// Rejouer une mise à jour depuis le schéma 3 avec une photo, une clé et une session existantes.
+$wpdb->query( $wpdb->prepare( 'ALTER TABLE %i DROP INDEX section_annee', scoutsunite_photos_table( 'albums' ) ) );
+$wpdb->query( $wpdb->prepare( 'ALTER TABLE %i ADD UNIQUE KEY section_annee (section,annee)', scoutsunite_photos_table( 'albums' ) ) );
+update_option( 'scoutsunite_photos_schema', 3 );
+unregister_block_type( 'scoutsunite/photos' );
+scoutsunite_photos_initialiser();
+scoutsunite_agenda_flush(); // Comme en fin d'init, après la migration rejouée dans ce test.
+$album_migre = scoutsunite_photos_album( $album_b->id );
+$ok( 4 === (int) get_option( 'scoutsunite_photos_schema' ) && $album_b->adresse === $album_migre->adresse && $album_b->cle_hash === $album_migre->cle_hash && scoutsunite_photos_chemin( $image_photo ) && scoutsunite_photos_session_valide( $album_migre, $session_photo['jeton'] ), 'albums : migration sans changer les photos, liens, clés et sessions existantes' );
+$second_b = scoutsunite_photos_executer( 'creer', array( 'section' => 'baladins', 'annee' => $annee_photo, 'titre' => 'Week-end de printemps' ) );
+$album_second = is_wp_error( $second_b ) ? null : scoutsunite_photos_album( $second_b['album'] );
+$ok( $album_second && $album_second->id !== $album_b->id && $album_second->adresse !== $album_b->adresse && scoutsunite_photos_cle_partage( $album_second ) !== scoutsunite_photos_cle_partage( $album_b ), 'albums : un animateur crée deux albums la même année, avec des clés distinctes après migration' );
+$ok( $album_second && ! scoutsunite_photos_session_valide( $album_second, $session_photo['jeton'] ), 'albums : la session d’un album ne donne pas accès au second de la même section et année' );
+wp_set_current_user( $admin );
+$troisieme_b = scoutsunite_photos_executer( 'creer', array( 'section' => 'baladins', 'annee' => $annee_photo, 'titre' => 'Journée de rentrée' ) );
+$ok( ! is_wp_error( $troisieme_b ) && $troisieme_b['album'] !== $album_b->id, 'albums : un administrateur crée aussi plusieurs albums pour la même section et année' );
+if ( ! is_wp_error( $troisieme_b ) ) { scoutsunite_photos_executer( 'supprimer_album', array( 'album' => $troisieme_b['album'], 'confirmation' => 'SUPPRIMER' ) ); }
 $_COOKIE[ scoutsunite_photos_cookie( $album_b->id ) ] = $session_photo['jeton'];
 wp_set_current_user( 0 );
 $ok( scoutsunite_photos_peut_lire( $image_photo, $album_b ), 'albums : le parent voit la photo dès la fin de l’envoi, sans deuxième publication' );
 $ok( '' === scoutsunite_photos_cle_partage( $album_b ), 'albums : la session parent ne permet pas de récupérer la clé' );
+ob_start();
+scoutsunite_photos_page( $album_b, null, true );
+$page_parent = ob_get_clean();
+$ok( false !== strpos( $page_parent, 'id="photos-acces" hidden' ) && false === strpos( $page_parent, $cle_photo['cle'] ), 'albums : une nouvelle clé peut être soumise depuis la galerie sans conserver la précédente dans la page' );
+$ok( false === strpos( $page_parent, 'Demander le retrait' ) && false === strpos( $page_parent, 'Pour le retrait' ) && false === strpos( $page_parent, 'photo_supprimer' ) && strpos( $page_parent, 'class="photos__quitter"' ) > strpos( $page_parent, 'id="photos-visionneuse"' ), 'albums : parent sans demande de retrait ni poubelle, bouton Fermer après la galerie' );
 ob_start();
 scoutsunite_photos_gestion_formulaire( $album_b );
 $ok( '' === ob_get_clean(), 'albums : ni panneau d’accès ni QR de partage pour les parents' );
@@ -411,6 +433,10 @@ ob_start();
 scoutsunite_photos_gestion_formulaire( scoutsunite_photos_album( $album_b->id ) );
 $partage_anim = ob_get_clean();
 $ok( false !== strpos( $partage_anim, '#cle=' . $cle_photo['cle'] ) && false !== strpos( $partage_anim, 'photos__qr' ) && false !== strpos( $partage_anim, 'Enregistrer l’accès' ), 'albums : partage, QR et commandes d’accès visibles à l’animateur' );
+ob_start();
+scoutsunite_photos_galerie( $album_b, true );
+$galerie_anim = ob_get_clean();
+$ok( false !== strpos( $galerie_anim, 'name="photo_supprimer"' ) && false !== strpos( $galerie_anim, 'Supprimer la sélection' ), 'albums : poubelle individuelle et suppression multiple disponibles pour l’animateur' );
 
 // Compatibilité : les images restées en attente avec l'ancienne version restent privées.
 $wpdb->update( scoutsunite_photos_table( 'images' ), array( 'statut' => 'attente' ), array( 'id' => $image_photo->id ) );
@@ -469,10 +495,40 @@ if ( class_exists( 'ZipArchive' ) ) {
 } else {
 	$ok( is_wp_error( $export_photo ) && 'zip' === $export_photo->get_error_code(), 'albums : absence de PHP ZIP expliquée sans export incomplet' );
 }
+// Plus d'une page : les voisines doivent ignorer les photos privées et respecter le tag.
+$photos_parcours = array();
+for ( $i = 0; $i < 27; $i++ ) {
+	$ligne = get_object_vars( $image_photo );
+	unset( $ligne['id'] );
+	$ligne['nom'] = bin2hex( random_bytes( 16 ) );
+	$ligne['empreinte'] = hash( 'sha256', 'photo-parcours-' . $i );
+	$ligne['tags'] = '';
+	$ligne['statut'] = $i === 25 ? 'attente' : ( $i === 26 ? 'retiree' : 'publiee' );
+	$wpdb->insert( scoutsunite_photos_table( 'images' ), $ligne );
+	$photos_parcours[] = (int) $wpdb->insert_id;
+}
+$_COOKIE[ scoutsunite_photos_cookie( $album_b->id ) ] = $session_photo['jeton'];
+wp_set_current_user( 0 );
+$vue_fin = scoutsunite_photos_visionner( $album_b, $image_photo->id );
+$vue_debut = scoutsunite_photos_visionner( $album_b, $photos_parcours[24] );
+$vue_tag = scoutsunite_photos_visionner( $album_b, $image_photo->id, 'diner' );
+$ok( ! is_wp_error( $vue_fin ) && 26 === $vue_fin['total'] && 26 === $vue_fin['position'] && ! $vue_fin['suivante'] && $vue_fin['precedente'] && 1 === $vue_debut['position'] && ! $vue_debut['precedente'], 'albums : navigation dans tout l’album au-delà de 24 photos, bornes et compteur corrects' );
+$ok( 1 === $vue_tag['total'] && ! $vue_tag['precedente'] && ! $vue_tag['suivante'] && is_wp_error( scoutsunite_photos_visionner( $album_b, $photos_parcours[0], 'diner' ) ), 'albums : la visionneuse reste dans le tag choisi' );
+$ok( is_wp_error( scoutsunite_photos_visionner( $album_b, $photos_parcours[25] ) ) && is_wp_error( scoutsunite_photos_visionner( $album_b, $photos_parcours[26] ) ) && is_wp_error( scoutsunite_photos_visionner( $album_l, $image_photo->id ) ), 'albums : visionneuse inaccessible aux photos en attente, retirées ou d’un autre album' );
+unset( $_COOKIE[ scoutsunite_photos_cookie( $album_b->id ) ] );
+$ok( is_wp_error( scoutsunite_photos_visionner( $album_b, $image_photo->id ) ), 'albums : aucune métadonnée de navigation sans session parent' );
+wp_set_current_user( $anim );
+$supprimee = scoutsunite_photos_executer( 'supprimer_photo', array( 'album' => $album_b->id, 'photos' => array( $photos_parcours[0] ) ) );
+$ok( ! is_wp_error( $supprimee ) && ! scoutsunite_photos_image( $photos_parcours[0] ) && scoutsunite_photos_image( $photos_parcours[1] ), 'albums : un animateur efface une photo de sa section sans effacer la voisine' );
+wp_set_current_user( $staff );
 $ancienne_version = $album_b->version;
 $nouvelle_cle = scoutsunite_photos_executer( 'cle', array( 'album' => $album_b->id, 'version' => $ancienne_version ) );
 $album_b = scoutsunite_photos_album( $album_b->id );
 $ok( ! scoutsunite_photos_session_valide( $album_b, $session_photo['jeton'] ) && is_wp_error( scoutsunite_photos_ouvrir( $album_b, $cle_photo['cle'] ) ), 'albums : renouveler la clé coupe l’ancienne clé et les sessions ouvertes' );
+$_COOKIE[ scoutsunite_photos_cookie( $album_b->id ) ] = $session_photo['jeton'];
+wp_set_current_user( 0 );
+$ok( is_wp_error( scoutsunite_photos_visionner( $album_b, $image_photo->id ) ), 'albums : le renouvellement coupe aussi les appels de la visionneuse' );
+wp_set_current_user( $staff );
 $ok( is_wp_error( scoutsunite_photos_executer( 'cle', array( 'album' => $album_b->id, 'version' => $ancienne_version ) ) ), 'albums : recharger une ancienne demande ne renouvelle pas la clé une seconde fois' );
 $session_photo = scoutsunite_photos_ouvrir( $album_b, $nouvelle_cle['cle'] );
 $_COOKIE[ scoutsunite_photos_cookie( $album_b->id ) ] = $session_photo['jeton'];
@@ -522,7 +578,7 @@ $chemin_efface = scoutsunite_photos_chemin( $image_photo );
 $ok( is_wp_error( scoutsunite_photos_executer( 'supprimer_album', array( 'album' => $album_b->id ) ) ), 'albums : suppression complète avec confirmation obligatoire' );
 scoutsunite_photos_executer( 'supprimer_album', array( 'album' => $album_b->id, 'confirmation' => 'SUPPRIMER' ) );
 $ok( ! scoutsunite_photos_album( $album_b->id ) && ! is_file( $chemin_efface ) && ! scoutsunite_photos_image( $image_photo->id ), 'albums : suppression complète des données et fichiers privés' );
-foreach ( array( $album_l, $album_ancien ) as $album_test ) {
+foreach ( array_filter( array( $album_l, $album_ancien, $album_second ) ) as $album_test ) {
 	scoutsunite_photos_executer( 'supprimer_album', array( 'album' => $album_test->id, 'confirmation' => 'SUPPRIMER' ) );
 }
 wp_delete_file( $source_photo );

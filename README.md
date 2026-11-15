@@ -12,9 +12,9 @@ L’accueil est un **panneau d’affichage** : le bleu de la fédération cribl�
 
 Des guides pas à pas, à envoyer aux personnes qui tiennent le site :
 
-- [Le site en 7 fiches, pour les animateurs](docs/fiches-animateurs/) : un geste par fiche, avec les vrais écrans, à lire sur un téléphone ou à envoyer en images ([PDF](docs/fiches-animateurs/fiches-animateurs.pdf)).
+- [Le site en 8 fiches, pour les animateurs](docs/fiches-animateurs/) : un geste par fiche, avec les vrais écrans, à lire sur un téléphone ou à envoyer en images ([PDF](docs/fiches-animateurs/fiches-animateurs.pdf)).
 - [Mode d’emploi pour les animateurs](docs/mode-emploi-animateurs.md) : le même contenu en texte, plus détaillé (les réunions, une réunion annulée, les documents et la page de sa section).
-- [Le site en 8 fiches, pour le staff d’unité](docs/fiches-chefs-unite/) : la même chose pour les chefs d’unité, des comptes des animateurs à la mise à jour du thème ([PDF](docs/fiches-chefs-unite/fiches-chefs-unite.pdf)).
+- [Le site en 9 fiches, pour le staff d’unité](docs/fiches-chefs-unite/) : la même chose pour les chefs d’unité, des comptes des animateurs à la mise à jour du thème ([PDF](docs/fiches-chefs-unite/fiches-chefs-unite.pdf)).
 - [Mode d’emploi pour les chefs d’unité](docs/mode-emploi-chefs-unite.md) : les rôles, les comptes des animateurs, Réglages → Unité, les pages, les réglages et la mise à jour du thème.
 
 ## Installer le thème
@@ -109,11 +109,13 @@ Pour un site qui vient de l’ancien thème `scouts-11om-magnee` (versions 1.x),
 
 ## Les photos de camp
 
-Depuis la 3.3, **Photos de camp** dans le menu WordPress ouvre un espace adapté au téléphone. Un album correspond à une section et une année. Les animateurs y envoient les photos de leurs sections, puis vérifient et publient leur sélection. Le staff d’unité ouvre l’accès et transmet aux parents un lien avec une clé commune à cet album. Les parents n’ont pas de compte à créer.
+Depuis la 3.5, **Photos de camp** dans le menu WordPress ouvre un espace adapté au téléphone. Depuis la 3.5, une section peut créer plusieurs albums par année : donne un nom à chacun, par exemple « Grand camp » et « Week-end de printemps ». Chaque album a sa propre clé. Les animateurs y sélectionnent les photos de leurs sections et les publient directement avec « Publier les photos ». Ils gèrent aussi l’accès de leurs albums et transmettent aux parents un lien avec une clé commune à cet album. Les parents n’ont pas de compte à créer. La mise à jour conserve les photos, adresses et clés des albums existants.
 
 L’espace existe à **`/photos/`**, sans créer de page WordPress. Le bloc **Photos de camp** peut ajouter son lien sur une page existante : il ne montre aucune image privée sur le site public. Le catalogue des parents ne contient que les albums déjà ouverts avec leurs liens ; la clé d’une année ne donne pas accès aux précédentes.
 
-Plusieurs comptes animateurs rattachés à la même section peuvent alimenter et relire le même album. Des **tags libres**, par exemple « Petit déjeuner », « Dîner » ou « Grand jeu », s’ajoutent dès l’envoi ou sur une sélection existante. La galerie se filtre par tag ; une photo peut en avoir plusieurs. Les tags des photos à vérifier ne sont pas montrés aux parents.
+La galerie affiche 24 miniatures par page. Toucher une photo ouvre une visionneuse qui parcourt tout l’album avec les boutons **Précédente** et **Suivante**, les flèches du clavier ou un balayage horizontal. Si un tag est choisi, la navigation reste dans ce moment. Le petit bouton **Fermer**, en bas de l’album, efface son accès sur le navigateur ; il faut rouvrir le lien reçu du staff pour revenir. Il ne ferme pas l’album pour les autres parents.
+
+Plusieurs comptes animateurs rattachés à la même section peuvent alimenter et gérer le même album. Des **tags libres**, par exemple « Petit déjeuner », « Dîner » ou « Grand jeu », s’ajoutent dès l’envoi ou sur une sélection existante. La galerie se filtre par tag ; une photo peut en avoir plusieurs. Les tags des photos à vérifier ne sont pas montrés aux parents.
 
 **Exporter pour préparer un livre photo** télécharge un ZIP des photos publiées de l’album, ou du tag affiché, avec un index `photos.json` contenant leurs tags et légendes. Cet export est réservé aux animateurs de la section et au staff, exige l’extension PHP ZIP et est effacé du serveur après téléchargement. Il contient les versions optimisées ; la mise en page du livre, le choix d’un imprimeur et les commandes restent à définir.
 
@@ -142,11 +144,19 @@ define( 'SCOUTSUNITE_PHOTOS_QUOTA_TOTAL', 10 * 1024 * 1024 * 1024 );
 
 ### Partager et conserver
 
-Le staff ouvre l’album, choisit **Gérer l’accès et l’album → Ouvert**, puis **Créer une nouvelle clé**. Il copie immédiatement le message pour les parents ou le QR. La clé n’est montrée qu’une fois : seule son empreinte est enregistrée. Si elle est perdue ou trop diffusée, en créer une nouvelle invalide l’ancienne et toutes les sessions de cet album. Une fermeture invalide aussi la clé ; une réouverture exige une nouvelle clé.
+Les nouveaux albums sont prêts à recevoir des photos et disposent immédiatement d’un lien privé. L’animateur ouvre **Partager l’album et gérer l’accès** pour copier le message ou retrouver le QR à tout moment. Les parents n’ont accès qu’aux photos publiées et seulement avec la clé de cet album. Le staff d’unité peut gérer les albums de toutes les sections.
 
-Une session parent dure sept jours au plus. Une date facultative peut fermer l’accès après un jour choisi. **Archivé** conserve la lecture parent et ferme les envois ; **Fermé** réserve la lecture au staff. Aucune suppression automatique des albums n’est activée : la durée de conservation reste un choix de l’unité. Les actions de gestion sont journalisées 90 jours, sans suivi individuel des parents.
+**Fermer** l’accès bloque les parents et supprime les sessions en cours. **Rouvrir** conserve le même lien : les parents peuvent l’utiliser à nouveau, mais les anciens cookies ne suffisent plus. **Renouveler le lien des parents** change la clé et coupe tous les anciens accès ; il faut transmettre le nouveau message.
+
+Pour rendre le lien retrouvable sans stocker de clé en clair, les nouvelles clés de 144 bits sont dérivées par HMAC-SHA-256 des secrets WordPress, de l’adresse unique de l’album et de la version de son accès. La base ne conserve que leur empreinte de validation. Le lien et le QR ne sont rendus qu’après vérification des droits de l’animateur sur la section. Un changement des secrets WordPress peut nécessiter un renouvellement du lien.
+
+**Mise à jour depuis les essais 3.3** : les anciens liens aléatoires restent valables. Leur empreinte ne permet pas de reconstruire leur QR : renouvelle le lien une fois, puis transmets le nouveau message aux parents. Les albums déjà fermés restent fermés et les anciennes photos « À vérifier » restent privées. Sélectionne-les puis utilise **Classer ou remettre en ligne la sélection → Remettre la sélection en ligne** pour les publier volontairement. Une photo retirée ne sera jamais republiée par un simple nouvel envoi du même fichier.
+
+Une session parent dure sept jours au plus. Une date facultative peut fermer l’accès après un jour choisi. **Archivé** conserve la lecture parent et ferme les envois ; **Fermé** réserve la lecture aux animateurs autorisés, au staff d’unité et aux administrateurs. Aucune suppression automatique des albums n’est activée : la durée de conservation reste un choix de l’unité. Les actions de gestion sont journalisées 90 jours, sans suivi individuel des parents.
 
 Avec une clé commune, toute personne recevant le lien peut ouvrir l’album. On ne peut ni révoquer une seule famille ni rappeler une photo déjà téléchargée. Vérifie les autorisations de diffusion avant publication et utilise **Retirer de l’album parent** si une photo doit disparaître.
+
+Les animateurs autorisés peuvent aussi toucher la **poubelle à côté d’une photo**, puis confirmer sa suppression définitive ; la sélection multiple reste disponible. Les administrateurs et le staff d’unité peuvent supprimer tout l’album : ouvre **Supprimer l’album**, écris **SUPPRIMER**, puis confirme. Un animateur ne peut pas supprimer l’album complet. Le futur parcours de demande de retrait pour les parents reste à définir ; aucun lien de demande n’est affiché dans la galerie.
 
 ### Sauvegarder et restaurer
 

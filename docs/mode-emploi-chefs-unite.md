@@ -1,8 +1,8 @@
 # Mode d'emploi du site – Chefs d'unité
 
-Thème et extension 3.3.0 · 15 novembre 2026
+Thème et extension 3.5.0 · 15 novembre 2026
 
-> Plus rapide à lire : [le site en 8 fiches](fiches-chefs-unite/), avec les vrais écrans ([PDF](fiches-chefs-unite/fiches-chefs-unite.pdf)).
+> Plus rapide à lire : [le site en 9 fiches](fiches-chefs-unite/), avec les vrais écrans ([PDF](fiches-chefs-unite/fiches-chefs-unite.pdf)).
 
 Ce guide est pour le staff d’unité : régler le site une fois, donner accès aux animateurs, puis tenir à jour ce qui concerne toute l’unité. Pour les réunions et les documents d’une section, le [guide des animateurs](mode-emploi-animateurs.md) explique le détail ; tu peux faire tout ce qu’il décrit, pour toutes les sections.
 
@@ -23,20 +23,26 @@ Dans la pratique : une ou deux personnes de confiance sont **Administrateur**, l
 
 ## Les photos de camp et l’accès des parents
 
-Les animateurs ajoutent et vérifient les photos de leurs sections depuis le menu **Photos de camp**, aussi sur téléphone. Le [guide des animateurs](mode-emploi-animateurs.md#les-photos-du-camp-depuis-ton-téléphone) décrit les envois. Toi, tu gères les accès de toutes les sections.
+Les animateurs publient directement les photos de leurs sections depuis le menu **Photos de camp**, aussi sur téléphone. Le [guide des animateurs](mode-emploi-animateurs.md#les-photos-du-camp-depuis-ton-téléphone) décrit les envois. Toi, tu gères les accès de toutes les sections.
 
 Tous les animateurs rattachés à la même section peuvent compléter l’album avec leur propre compte. Les tags (« Petit déjeuner », « Dîner »…) permettent de classer les photos dans le camp. Pour préparer un livre, **Exporter pour préparer un livre photo** fournit un ZIP des photos publiées de l’album ou du tag choisi, avec leurs tags et légendes. Il contient les versions optimisées ; le livre imprimé et le prestataire restent à choisir.
 
-1. Ouvre l’album de la section et de l’année, puis **Gérer l’accès et l’album**.
-2. Choisis **Ouvert** et **Enregistrer l’état**. Les nouvelles photos restent à vérifier avant leur publication.
-3. Touche **Créer une nouvelle clé**, puis confirme. Le lien avec la clé et son QR apparaissent une seule fois.
-4. Touche **Copier le message pour les parents**, puis colle-le dans le groupe des familles concernées. Le site ne l’envoie pas lui-même. Garde ce message : la clé n’est pas réaffichable ensuite.
+Une section peut créer **plusieurs albums la même année**, avec un nom pour chacun, par exemple « Grand camp » ou « Week-end de printemps ». Chacun reçoit son propre lien et son QR ; l’accès au premier n’ouvre pas les autres. Les albums, photos et anciens liens sont conservés lors de la mise à jour.
 
-**Une clé perdue ou trop diffusée ?** Crée-en une nouvelle. L’ancienne et les accès déjà ouverts cessent de fonctionner ; transmets le nouveau message. Chaque album garde sa propre clé : aucune autre section ni année n’est ouverte par ce lien. La clé étant commune, on ne peut pas retirer l’accès à une seule famille.
+1. Ouvre l’album puis **Partager l’album et gérer l’accès**, visible aussi aux animateurs de la section.
+2. Le lien et son QR restent disponibles à chaque visite. Touche **Copier le message pour les parents**, puis colle-le dans le groupe des familles concernées. Le site ne l’envoie pas lui-même.
+3. Pour suspendre la lecture, choisis **Fermé** puis **Enregistrer l’accès**. Pour la rétablir, choisis **Ouvert** : le même lien fonctionne à nouveau, sans réactiver les anciens cookies.
+4. Si le lien a trop circulé, ouvre **Renouveler le lien ou régler l’album**, puis **Renouveler le lien des parents**. L’ancien et les accès déjà ouverts sont coupés ; transmets le nouveau message.
 
-**Les états** : Brouillon = staff seulement ; Ouvert = envois et consultation parent ; Archivé = consultation parent, sans nouveaux envois ; Fermé = staff seulement. Fermer ou remettre en brouillon invalide aussi la clé : il faudra en créer une autre à la réouverture.
+Chaque album garde sa propre clé, différente des autres sections et années. La clé étant commune, on ne peut pas retirer l’accès à une seule famille. Les nouveaux albums reçoivent leur lien dès leur création, et les nouvelles photos sont publiées directement par le bouton **Publier les photos**.
 
-**L’expiration** : tu peux choisir le dernier jour d’accès des parents. Les photos restent conservées après cette date ; elles ne sont jamais effacées automatiquement. Pour supprimer tout l’album, écris **SUPPRIMER** dans la partie correspondante, puis confirme. Le compteur d’espace indique quand il faut libérer de la place ; l’administrateur peut adapter les quotas.
+**Albums créés pendant les essais 3.3** : leurs liens restent valables. Pour retrouver leur QR, renouvelle le lien une fois et transmets le nouveau message. Les anciennes photos « À vérifier » restent privées jusqu’à l’action volontaire **Remettre la sélection en ligne**.
+
+**Les états** : Ouvert = publication et consultation parent ; Archivé = consultation parent sans nouvel envoi ; Fermé = animateurs de la section et staff seulement. Un ancien Brouillon reste fermé tant qu’il n’a pas été ouvert. Fermer conserve le lien et coupe les sessions ; renouveler le lien change la clé. Les animateurs gèrent leurs sections, le staff toutes les sections. La suppression complète reste réservée au staff d’unité.
+
+**L’expiration** : tu peux choisir le dernier jour d’accès des parents. Les photos restent conservées après cette date ; elles ne sont jamais effacées automatiquement. Pour supprimer tout l’album, ouvre **Supprimer l’album**, sous le panneau de partage, écris **SUPPRIMER**, puis confirme. Cette action est réservée aux administrateurs et au staff d’unité. Les animateurs peuvent utiliser la poubelle à côté d’une photo ou supprimer une sélection, avec confirmation. Le compteur d’espace indique quand il faut libérer de la place ; l’administrateur peut adapter les quotas.
+
+**Consultation parent** : la visionneuse permet de passer d’une photo à l’autre dans tout l’album, ou le tag choisi, avec les boutons ou un balayage au doigt. Le petit bouton **Fermer** en bas de l’album efface seulement l’accès de cet album sur ce navigateur ; le parent doit rouvrir son lien pour revenir. Les demandes de retrait ne sont plus affichées, en attendant un futur parcours.
 
 **Un retrait demandé par une famille ?** La référence est dans son message. Sélectionne la photo et choisis **Retirer de l’album parent**. Vérifie les autorisations avant chaque publication : un album privé ne les remplace pas. On ne peut pas rappeler les fichiers déjà téléchargés.
 

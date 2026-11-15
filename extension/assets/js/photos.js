@@ -5,9 +5,12 @@
 ( function () {
 	'use strict';
 
-	var acces = document.getElementById( 'photos-acces' );
-	var fragment = /^#cle=([a-f0-9]{36})$/.exec( window.location.hash );
-	if ( fragment ) {
+	function ouvrirDepuisFragment() {
+		var fragment = /^#cle=([a-f0-9]{36})$/.exec( window.location.hash );
+		if ( ! fragment ) {
+			return;
+		}
+		var acces = document.getElementById( 'photos-acces' );
 		// Retirer le secret avant toute interaction et avant de soumettre le formulaire par POST.
 		window.history.replaceState( null, '', window.location.pathname + window.location.search );
 		if ( acces ) {
@@ -16,6 +19,8 @@
 		}
 		fragment = null;
 	}
+	window.addEventListener( 'hashchange', ouvrirDepuisFragment );
+	ouvrirDepuisFragment();
 
 	Array.prototype.forEach.call( document.querySelectorAll( '[data-confirmer]' ), function ( bouton ) {
 		bouton.addEventListener( 'click', function ( evenement ) {
@@ -235,45 +240,109 @@
 	var dialogue = document.getElementById( 'photos-visionneuse' );
 	if ( dialogue && typeof dialogue.showModal === 'function' ) {
 		var liens = Array.prototype.slice.call( document.querySelectorAll( '.photos__ouvrir' ) );
-		var positionVue = 0;
+		var lienDepart = null;
+		var requeteVue = null;
+		var photoPrecedente = 0;
+		var photoSuivante = 0;
 		var imageVue = document.getElementById( 'photos-vue-image' );
 		var erreurVue = document.getElementById( 'photos-vue-erreur' );
 		var precedente = document.getElementById( 'photos-precedente' );
 		var suivanteVue = document.getElementById( 'photos-suivante' );
-		function afficher( position ) {
-			positionVue = position;
-			var lien = liens[ position ];
-			erreurVue.textContent = '';
-			imageVue.alt = lien.getAttribute( 'data-legende' );
-			imageVue.src = lien.getAttribute( 'data-image' );
-			document.getElementById( 'photos-vue-titre' ).textContent = 'Photo ' + ( position + 1 ) + ' sur ' + liens.length + ' de cette page';
-			document.getElementById( 'photos-telecharger' ).href = lien.getAttribute( 'data-telecharger' );
-			document.getElementById( 'photos-retrait' ).href = lien.getAttribute( 'data-retrait' );
-			precedente.disabled = position === 0;
-			suivanteVue.disabled = position === liens.length - 1;
+		var telechargerVue = document.getElementById( 'photos-telecharger' );
+		function erreurVisionneuse( message ) {
+			erreurVue.textContent = message || 'Cette photo n’est plus accessible. Recharge l’album : l’accès a peut-être changé ou la photo a été retirée.';
+			imageVue.removeAttribute( 'src' );
+			telechargerVue.removeAttribute( 'href' );
+			photoPrecedente = 0;
+			photoSuivante = 0;
+			precedente.disabled = true;
+			suivanteVue.disabled = true;
+		}
+		function afficher( id ) {
+			if ( requeteVue ) { requeteVue.abort(); }
+			// Désactiver un bouton focalisé ferait sortir le focus du dialogue pendant la requête.
+			var focusAvant = document.activeElement;
+			if ( focusAvant === precedente || focusAvant === suivanteVue ) { dialogue.focus(); }
+			precedente.disabled = true;
+			suivanteVue.disabled = true;
+			photoPrecedente = 0;
+			photoSuivante = 0;
+			imageVue.removeAttribute( 'src' );
+			telechargerVue.removeAttribute( 'href' );
+			erreurVue.textContent = 'Chargement de la photo…';
+			var requete = new XMLHttpRequest();
+			requeteVue = requete;
+			var url = dialogue.getAttribute( 'data-url' );
+			requete.open( 'GET', url + ( url.indexOf( '?' ) === -1 ? '?' : '&' ) + 'visionneuse=' + encodeURIComponent( id ), true );
+			requete.timeout = 30000;
+			requete.onload = function () {
+				if ( requeteVue !== requete || ! dialogue.open ) { return; }
+				requeteVue = null;
+				var retour;
+				try { retour = JSON.parse( requete.responseText ); } catch ( erreur ) { retour = null; }
+				if ( requete.status !== 200 || ! retour || ! retour.success ) {
+					erreurVisionneuse( retour && retour.data ? retour.data.message : '' );
+					return;
+				}
+				var vue = retour.data;
+				erreurVue.textContent = '';
+				imageVue.alt = vue.legende;
+				imageVue.src = vue.image;
+				telechargerVue.href = vue.telecharger;
+				document.getElementById( 'photos-vue-titre' ).textContent = 'Photo ' + vue.position + ' sur ' + vue.total;
+				photoPrecedente = vue.precedente;
+				photoSuivante = vue.suivante;
+				precedente.disabled = ! photoPrecedente;
+				suivanteVue.disabled = ! photoSuivante;
+				if ( document.activeElement === dialogue && ( focusAvant === precedente || focusAvant === suivanteVue ) ) {
+					( focusAvant.disabled ? document.getElementById( 'photos-fermer' ) : focusAvant ).focus();
+				}
+			};
+			requete.onerror = requete.ontimeout = function () {
+				if ( requeteVue !== requete || ! dialogue.open ) { return; }
+				requeteVue = null;
+				erreurVisionneuse( 'La photo n’a pas pu être chargée. Vérifie ta connexion, puis ferme et rouvre la photo pour réessayer.' );
+			};
+			requete.send();
 		}
 		imageVue.addEventListener( 'error', function () {
-			erreurVue.textContent = 'Cette photo n’est plus accessible. Recharge l’album : l’accès a peut-être changé ou la photo a été retirée.';
-			imageVue.removeAttribute( 'src' );
+			if ( imageVue.hasAttribute( 'src' ) ) { erreurVisionneuse(); }
 		} );
-		liens.forEach( function ( lien, position ) {
+		liens.forEach( function ( lien ) {
 			lien.addEventListener( 'click', function ( evenement ) {
 				evenement.preventDefault();
-				afficher( position );
+				lienDepart = lien;
 				dialogue.showModal();
+				afficher( lien.getAttribute( 'data-photo' ) );
 			} );
 		} );
 		document.getElementById( 'photos-fermer' ).addEventListener( 'click', function () { dialogue.close(); } );
 		dialogue.addEventListener( 'close', function () {
+			if ( requeteVue ) { requeteVue.abort(); requeteVue = null; }
 			imageVue.removeAttribute( 'src' );
-			if ( liens[ positionVue ] ) { liens[ positionVue ].focus(); }
+			telechargerVue.removeAttribute( 'href' );
+			if ( lienDepart ) { lienDepart.focus(); }
 		} );
-		precedente.addEventListener( 'click', function () { if ( positionVue > 0 ) { afficher( positionVue - 1 ); } } );
-		suivanteVue.addEventListener( 'click', function () { if ( positionVue + 1 < liens.length ) { afficher( positionVue + 1 ); } } );
+		precedente.addEventListener( 'click', function () { if ( photoPrecedente ) { afficher( photoPrecedente ); } } );
+		suivanteVue.addEventListener( 'click', function () { if ( photoSuivante ) { afficher( photoSuivante ); } } );
 		dialogue.addEventListener( 'keydown', function ( evenement ) {
-			if ( evenement.key === 'ArrowLeft' && positionVue > 0 ) { afficher( positionVue - 1 ); }
-			if ( evenement.key === 'ArrowRight' && positionVue + 1 < liens.length ) { afficher( positionVue + 1 ); }
+			if ( evenement.key === 'ArrowLeft' && photoPrecedente ) { evenement.preventDefault(); afficher( photoPrecedente ); }
+			if ( evenement.key === 'ArrowRight' && photoSuivante ) { evenement.preventDefault(); afficher( photoSuivante ); }
 		} );
+		var departToucher = null;
+		imageVue.addEventListener( 'touchstart', function ( evenement ) {
+			departToucher = evenement.touches.length === 1 ? { x: evenement.touches[0].clientX, y: evenement.touches[0].clientY } : null;
+		}, { passive: true } );
+		imageVue.addEventListener( 'touchcancel', function () { departToucher = null; } );
+		imageVue.addEventListener( 'touchend', function ( evenement ) {
+			if ( ! departToucher || ! evenement.changedTouches.length ) { return; }
+			var dx = evenement.changedTouches[0].clientX - departToucher.x;
+			var dy = evenement.changedTouches[0].clientY - departToucher.y;
+			departToucher = null;
+			if ( Math.abs( dx ) < 50 || Math.abs( dx ) < Math.abs( dy ) * 1.3 ) { return; }
+			if ( dx < 0 && photoSuivante ) { afficher( photoSuivante ); }
+			if ( dx > 0 && photoPrecedente ) { afficher( photoPrecedente ); }
+		}, { passive: true } );
 	}
 	window.addEventListener( 'pageshow', function ( evenement ) {
 		if ( evenement.persisted ) { window.location.reload(); }
