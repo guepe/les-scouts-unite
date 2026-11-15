@@ -32,4 +32,10 @@ Fiches du thème 2.10.1 (octobre 2026), fiches 5 et 7 revues pour la 3.1 (ta fic
 
 ## Mettre les fiches à jour
 
+### Complément 3.3 : les photos de camp
+
+[La fiche illustrée « Les photos du camp, depuis ton téléphone »](08-photos-camp.png) explique l’envoi depuis la pellicule, la reprise des échecs et la vérification avant publication. [Source modifiable](source/Photos.dc.html) · [Écran parent de démonstration](source/captures/photos-parent.png).
+
+Cette fiche complémentaire est fournie séparément ; le PDF historique de huit pages ci-dessus ne l’inclut pas.
+
 Les sources sont dans [`source/`](source/) : une page `.dc.html` par fiche (format du canevas Claude Design), `canvas.json` et les captures d’écran dans `source/captures/`. Après un changement d’écran dans WordPress ou dans le thème, refaire la capture concernée, adapter la fiche, puis regénérer les images et le PDF.

@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /** Version des rôles : l'augmenter pour réécrire les rôles au prochain chargement. */
-const SCOUTSUNITE_DROITS_VERSION = 5;
+const SCOUTSUNITE_DROITS_VERSION = 7;
 
 /**
  * Droits sur les réunions (type de contenu « reunion »).
@@ -74,6 +74,7 @@ function scoutsunite_droits_roles() {
 			array(
 				'read'                  => true,
 				'upload_files'          => true,
+				'scoutsunite_photos'    => true,
 				// Pages : limitées à celles de ses sections par scoutsunite_droits_limites().
 				'edit_pages'            => true,
 				'edit_others_pages'     => true,
@@ -99,7 +100,7 @@ function scoutsunite_droits_roles() {
 	add_role(
 		'scoutsunite_staff',
 		'Staff d’unité',
-		array_merge( $staff, $reunions, $fiches, array( 'manage_unite' => true ) )
+		array_merge( $staff, $reunions, $fiches, array( 'manage_unite' => true, 'scoutsunite_photos' => true, 'scoutsunite_gerer_photos' => true ) )
 	);
 
 	foreach ( array( 'administrator', 'editor' ) as $nom ) {
@@ -112,7 +113,7 @@ function scoutsunite_droits_roles() {
 	}
 	$admin = get_role( 'administrator' );
 	if ( $admin ) {
-		foreach ( array_merge( array( 'manage_unite' ), array_keys( $fiches ) ) as $cap ) {
+		foreach ( array_merge( array( 'manage_unite', 'scoutsunite_photos', 'scoutsunite_gerer_photos' ), array_keys( $fiches ) ) as $cap ) {
 			$admin->add_cap( $cap );
 		}
 	}

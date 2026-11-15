@@ -1,6 +1,6 @@
 # Mode d'emploi du site – Chefs d'unité
 
-Thème 2.10.0 · 24 octobre 2026
+Thème et extension 3.3.0 · 15 novembre 2026
 
 > Plus rapide à lire : [le site en 8 fiches](fiches-chefs-unite/), avec les vrais écrans ([PDF](fiches-chefs-unite/fiches-chefs-unite.pdf)).
 
@@ -20,6 +20,27 @@ Le site a trois rôles utiles. Chacun ne voit que ce qu’il peut faire, et Word
 | Réglages généraux, thème, extensions | oui | non | non |
 
 Dans la pratique : une ou deux personnes de confiance sont **Administrateur**, le staff d’unité a le rôle **Staff d’unité**, et chaque animateur a le rôle **Animateur**.
+
+## Les photos de camp et l’accès des parents
+
+Les animateurs ajoutent et vérifient les photos de leurs sections depuis le menu **Photos de camp**, aussi sur téléphone. Le [guide des animateurs](mode-emploi-animateurs.md#les-photos-du-camp-depuis-ton-téléphone) décrit les envois. Toi, tu gères les accès de toutes les sections.
+
+Tous les animateurs rattachés à la même section peuvent compléter l’album avec leur propre compte. Les tags (« Petit déjeuner », « Dîner »…) permettent de classer les photos dans le camp. Pour préparer un livre, **Exporter pour préparer un livre photo** fournit un ZIP des photos publiées de l’album ou du tag choisi, avec leurs tags et légendes. Il contient les versions optimisées ; le livre imprimé et le prestataire restent à choisir.
+
+1. Ouvre l’album de la section et de l’année, puis **Gérer l’accès et l’album**.
+2. Choisis **Ouvert** et **Enregistrer l’état**. Les nouvelles photos restent à vérifier avant leur publication.
+3. Touche **Créer une nouvelle clé**, puis confirme. Le lien avec la clé et son QR apparaissent une seule fois.
+4. Touche **Copier le message pour les parents**, puis colle-le dans le groupe des familles concernées. Le site ne l’envoie pas lui-même. Garde ce message : la clé n’est pas réaffichable ensuite.
+
+**Une clé perdue ou trop diffusée ?** Crée-en une nouvelle. L’ancienne et les accès déjà ouverts cessent de fonctionner ; transmets le nouveau message. Chaque album garde sa propre clé : aucune autre section ni année n’est ouverte par ce lien. La clé étant commune, on ne peut pas retirer l’accès à une seule famille.
+
+**Les états** : Brouillon = staff seulement ; Ouvert = envois et consultation parent ; Archivé = consultation parent, sans nouveaux envois ; Fermé = staff seulement. Fermer ou remettre en brouillon invalide aussi la clé : il faudra en créer une autre à la réouverture.
+
+**L’expiration** : tu peux choisir le dernier jour d’accès des parents. Les photos restent conservées après cette date ; elles ne sont jamais effacées automatiquement. Pour supprimer tout l’album, écris **SUPPRIMER** dans la partie correspondante, puis confirme. Le compteur d’espace indique quand il faut libérer de la place ; l’administrateur peut adapter les quotas.
+
+**Un retrait demandé par une famille ?** La référence est dans son message. Sélectionne la photo et choisis **Retirer de l’album parent**. Vérifie les autorisations avant chaque publication : un album privé ne les remplace pas. On ne peut pas rappeler les fichiers déjà téléchargés.
+
+**Avant la première utilisation**, l’administrateur vérifie le dossier privé, HTTPS et les exclusions de cache, selon le [README](../README.md#les-photos-de-camp). Si un message bloque l’espace, l’hébergement doit être configuré ; ne mets pas ces images dans la médiathèque publique. Fais sauvegarder aussi le dossier privé, avec une durée prévue pour les sauvegardes. Après restauration, réapplique les retraits et renouvelle les clés avant de rendre les albums accessibles.
 
 ## Donner accès à un animateur
 

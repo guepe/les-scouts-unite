@@ -30,6 +30,13 @@
 		},
 	};
 
+	wp.blocks.registerBlockType( 'scoutsunite/photos', Object.assign( {}, commun, {
+		title: 'Photos de camp',
+		description: 'Le lien vers l’espace privé des photos. Aucune photo n’est montrée sur le site public.',
+		icon: 'format-gallery',
+		edit: apercu( 'scoutsunite/photos' ),
+	} ) );
+
 	wp.blocks.registerBlockType( 'scoutsunite/prochaines-reunions', Object.assign( {}, commun, {
 		title: 'Prochaines réunions',
 		description: 'La prochaine réunion de chaque section, mise à jour automatiquement depuis l’agenda.',

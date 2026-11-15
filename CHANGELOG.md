@@ -2,6 +2,18 @@
 
 Les versions suivent le numéro `Version:` de `style.css`. Chaque version publiée a son zip dans les [Releases](https://github.com/guepe/les-scouts-unite/releases).
 
+## 3.3.0 – 2026-11-15
+
+**Les photos de camp** : un espace privé par section et année, intégré à l’extension.
+
+- **Photos de camp** dans le menu WordPress : les animateurs créent et alimentent les albums de leurs sections depuis leur téléphone. Sélection multiple, progression, reprise des échecs et détection des fichiers identiques ; les photos attendent une vérification avant publication.
+- **Parents** : un lien et une clé commune par album, sans compte à créer. Galerie paginée, visionneuse et téléchargement individuel d’une photo optimisée. Le bloc **Photos de camp** ajoute le lien d’entrée sur une page existante.
+- **Classement et préparation d’un livre** : plusieurs animateurs de la même section alimentent l’album ; tags libres à l’envoi ou sur une sélection, filtres par moment et export ZIP des photos publiées avec leurs tags et légendes. L’export est réservé aux comptes animateurs et staff, avec PHP ZIP ; le livre imprimé et l’imprimeur restent à définir.
+- **Staff d’unité** : ouverture, archivage, fermeture, expiration facultative et suppression ; une nouvelle clé invalide immédiatement les anciennes sessions. Le lien et son QR ne sont montrés qu’une fois, lors de la création de la clé.
+- **Stockage privé obligatoire** : photos et miniatures sont hors de la racine web, sans pièce jointe publique. Si le dossier ne peut pas être créé, l’administrateur doit préciser `SCOUTSUNITE_PHOTOS_DOSSIER` dans `wp-config.php`. Le module bloque l’usage plutôt que de stocker les images dans un dossier public. Exclure `/photos/` et `?su_photos=1` du cache de l’hébergeur ou du CDN.
+- **Images** : JPEG, PNG et WebP réencodés sans EXIF/GPS, 2 560 pixels au plus. HEIC converti localement si Imagick/libheif le permet ; message explicite sinon. Les originaux ne sont pas conservés sur le site. Quotas par défaut : 1 Go par album, 5 Go pour l’ensemble, configurables par l’administrateur.
+- **Conservation** : aucune suppression automatique des albums ; le staff garde la main tant qu’une durée n’a pas été décidée. Sessions parents de sept jours au plus, journal de gestion de 90 jours.
+
 ## 3.2.1 – 2026-11-05
 
 **Sécurité** : trois corrections après une revue du code. Mets le site à jour.

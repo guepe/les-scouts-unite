@@ -7,13 +7,14 @@
 	},
 	"steps": [
 		{
-			"step": "setSiteLanguage",
-			"language": "fr_FR"
+			"step": "defineWpConfigConsts",
+			"consts": {
+				"SCOUTSUNITE_PHOTOS_DOSSIER": "/photos-privees"
+			}
 		},
 		{
-			"step": "login",
-			"username": "admin",
-			"password": "password"
+			"step": "setSiteLanguage",
+			"language": "fr_FR"
 		},
 		{
 			"step": "activateTheme",

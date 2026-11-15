@@ -3,7 +3,7 @@ Theme Name: Les Scouts – Unité
 Theme URI: https://github.com/guepe/les-scouts-unite
 Author: Pierre-Henri Delaval
 Description: Thème de bloc pour le site d’une unité Les Scouts asbl, construit sur la charte graphique de la fédération : bleu de la fédération, toppings, couleurs de section et police Muli. Le nom de l’unité vient du titre du site ; tout se modifie dans l’éditeur de site.
-Version: 3.2.1
+Version: 3.4.0
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
@@ -1588,4 +1588,117 @@ a.lien-fleche:hover::after {
 	overflow-wrap: normal;
 	word-break: keep-all;
 	hyphens: manual;
+}
+
+/* ---------------------------------------------------------------------------
+   Photos de camp : espace privé, sans les ressources des pages publiques
+   ------------------------------------------------------------------------ */
+
+@font-face {
+	font-family: "Muli Photos";
+	font-weight: 400;
+	font-display: swap;
+	src: url("assets/fonts/Muli-Regular.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "Muli Photos";
+	font-weight: 800 900;
+	font-display: swap;
+	src: url("assets/fonts/Muli-ExtraBold.woff2") format("woff2");
+}
+
+.photos-page {
+	margin: 0;
+	background: var(--su-fond);
+	color: var(--su-bleu);
+	font: 1rem/1.6 "Muli Photos", "Segoe UI", sans-serif;
+}
+
+.photos-page *, .photos-page *::before, .photos-page *::after { box-sizing: border-box; }
+.photos-page [hidden] { display: none !important; }
+.photos-page a { color: inherit; }
+.photos-page h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); line-height: 1.15; margin: 0.35em 0; }
+.photos-page h2 { font-size: 1.4rem; line-height: 1.25; }
+.photos-page button, .photos-page input, .photos-page select, .photos-page textarea { font: inherit; }
+.photos-page button, .photos-page input, .photos-page select, .photos-page textarea, .photos__pagination a { min-height: 44px; }
+.photos-page button { border: 2px solid var(--su-bleu); border-radius: 0; padding: 0.65rem 1rem; background: var(--su-bleu); color: white; font-weight: 800; cursor: pointer; }
+.photos-page button:hover { background: var(--su-vert-fonce); border-color: var(--su-vert-fonce); }
+.photos-page button:disabled { opacity: 0.55; cursor: default; }
+.photos-page input:not([type="checkbox"]), .photos-page select, .photos-page textarea { border: 1px solid var(--su-trait); border-radius: 0; background: white; color: var(--su-bleu); padding: 0.65rem; max-width: 100%; }
+.photos-page textarea { width: 100%; overflow-wrap: anywhere; }
+.photos-page .photos__secondaire { background: white; color: var(--su-bleu); }
+.photos-page label { font-weight: 800; }
+.photos-page label:has(input[type="checkbox"]) { display: flex; align-items: center; min-height: 44px; gap: 0.5rem; }
+.photos-page input[type="checkbox"] { width: 22px; height: 22px; flex-shrink: 0; }
+.photos__entete { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.25rem max(1.25rem, calc((100vw - 70rem) / 2)); background: var(--su-bleu); color: white; border-top: 6px solid var(--su-vert); }
+.photos__entete a { font-size: 1.25rem; font-weight: 900; text-decoration: none; }
+.photos__entete span { font-size: 0.9rem; }
+.photos__contenu { max-width: 74rem; min-height: 70vh; margin: 0 auto; padding: 1.25rem 2rem 3rem; }
+.photos__navigation, .photos__actions, .photos__pagination { display: flex; align-items: center; flex-wrap: wrap; gap: 0.75rem 1.25rem; }
+.photos__navigation { justify-content: space-between; margin-bottom: 2rem; }
+.photos__navigation a, .photos__actions a { display: inline-flex; align-items: center; min-height: 44px; }
+.photos__section { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 900; margin: 0; }
+.photos__aide { font-size: 0.9rem; }
+.photos__avis { padding: 1rem; background: white; border-left: 5px solid var(--su-orange); overflow-wrap: anywhere; }
+.photos__vide { padding: 1.5rem 0; border-top: 1px solid var(--su-trait); }
+.photos__acces, .photos__formulaire { display: grid; gap: 0.65rem; max-width: 36rem; margin: 1.5rem 0; }
+.photos__formulaire { padding: 1.5rem 0; border-bottom: 1px solid var(--su-trait); }
+.photos__formulaire p { margin: 0.25rem 0; }
+.photos__formulaire button { justify-self: start; }
+.photos__filtres { display: flex; flex-wrap: wrap; gap: 1rem; margin: 1.5rem 0; }
+.photos__filtres label { display: grid; gap: 0.35rem; }
+.photos__albums { list-style: none; padding: 0; border-top: 1px solid var(--su-trait); }
+.photos__albums li { border-bottom: 1px solid var(--su-trait); }
+.photos__albums a { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.3rem 0; text-decoration: none; }
+.photos__albums strong { font-size: 1.15rem; }
+.photos__albums a:hover strong { text-decoration: underline; }
+.photos__envoi { background: white; padding: 1.5rem; margin: 2rem 0; }
+.photos__envoi h2 { margin-top: 0; }
+.photos__envoi > label, .photos__envoi input { display: block; }
+.photos__envoi input { width: 100%; margin: 0.4rem 0 1rem; }
+.photos__envoi progress { display: block; width: 100%; margin: 1rem 0; }
+.photos__file { margin: 1.25rem 0; padding: 0; list-style: none; max-height: 26rem; overflow-y: auto; }
+.photos__file li { display: grid; grid-template-columns: 3rem minmax(0, 1fr) auto; gap: 0.35rem 0.75rem; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--su-trait); font-size: 0.85rem; }
+.photos__file img { width: 3rem; height: 3rem; object-fit: cover; grid-row: span 2; }
+.photos__file span { overflow-wrap: anywhere; grid-column: 2; }
+.photos__file button { grid-column: 3; grid-row: 1 / 3; }
+.photos__grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1.25rem 1rem; }
+.photos__photo { margin: 0; min-width: 0; }
+.photos__photo img { display: block; width: 100%; height: 180px; object-fit: cover; background: var(--su-trait); }
+.photos__photo a { display: block; }
+.photos__photo figcaption { font-size: 0.8rem; padding-top: 0.5rem; overflow-wrap: anywhere; }
+.photos__photo figcaption > span { display: block; }
+.photos__galerie .photos__actions { margin-top: 1.25rem; }
+.photos__tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1rem 0 1.5rem; }
+.photos__tags a { display: inline-flex; align-items: center; min-height: 44px; padding: 0.4rem 0.75rem; border: 1px solid var(--su-trait); text-decoration: none; background: white; }
+.photos__tags a[aria-current="true"] { color: white; background: var(--su-bleu); }
+.photos__classement { margin: 1.5rem 0; padding: 1rem 0; border-top: 1px solid var(--su-trait); }
+.photos__classement summary { min-height: 44px; cursor: pointer; font-weight: 800; }
+.photos__classement > label, .photos__classement > input { display: block; margin-bottom: 0.6rem; }
+.photos__pagination { justify-content: space-between; margin-top: 2rem; }
+.photos__reglages { margin: 2rem 0; border-top: 2px solid var(--su-bleu); padding-top: 1rem; }
+.photos__reglages summary { cursor: pointer; font-size: 1.2rem; font-weight: 900; min-height: 44px; }
+.photos__reglages > p { overflow-wrap: anywhere; }
+.photos__partage { padding: 1.5rem; background: white; border-top: 5px solid var(--su-vert); margin: 2rem 0; }
+.photos__partage > summary { min-height: 44px; cursor: pointer; font-size: 1.2rem; font-weight: 900; }
+.photos__partage-outils { display: flex; align-items: start; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; }
+.photos__qr { display: block; width: 180px; height: 180px; margin-top: 1rem; }
+.photos__vue img { display: block; max-width: 100%; max-height: 75vh; margin: 1rem 0; object-fit: contain; }
+.photos__dialogue { width: min(74rem, 96vw); max-width: 96vw; max-height: 96vh; padding: 1rem; border: 0; background: var(--su-fond); color: var(--su-bleu); overflow-y: auto; }
+.photos__dialogue::backdrop { background: rgba(6, 47, 85, 0.9); }
+.photos__vue-entete { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.photos__dialogue > img { display: block; width: 100%; height: min(65vh, 700px); object-fit: contain; margin: 1rem 0; }
+.photos__pied { background: var(--su-bleu); color: white; padding: 1.5rem; text-align: center; font-size: 0.85rem; }
+.photos__evitement { position: absolute; left: -10000px; }
+.photos__evitement:focus { position: static; display: block; padding: 1rem; }
+
+@media (max-width: 40rem) {
+	.photos__contenu { padding: 1rem 1rem 2rem; }
+	.photos__entete span { display: none; }
+	.photos__envoi, .photos__partage { padding: 1rem; }
+	.photos__albums a { align-items: start; flex-direction: column; gap: 0.35rem; }
+	.photos__grille { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 0.65rem; }
+	.photos__photo img { height: 145px; }
+	.photos__galerie .photos__actions { align-items: stretch; flex-direction: column; }
 }

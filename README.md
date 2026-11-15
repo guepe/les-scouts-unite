@@ -107,6 +107,53 @@ Pour un site qui vient de l’ancien thème `scouts-11om-magnee` (versions 1.x),
 4. Les pages de section déjà créées gardent leur ancienne affiche : remplace la date écrite à la main par le bloc **Prochaine réunion d’une section** (choisis la section dans le panneau de droite).
 5. Si tu as modifié l’en-tête, ajoute toi-même le lien **Agenda** au menu.
 
+## Les photos de camp
+
+Depuis la 3.3, **Photos de camp** dans le menu WordPress ouvre un espace adapté au téléphone. Un album correspond à une section et une année. Les animateurs y envoient les photos de leurs sections, puis vérifient et publient leur sélection. Le staff d’unité ouvre l’accès et transmet aux parents un lien avec une clé commune à cet album. Les parents n’ont pas de compte à créer.
+
+L’espace existe à **`/photos/`**, sans créer de page WordPress. Le bloc **Photos de camp** peut ajouter son lien sur une page existante : il ne montre aucune image privée sur le site public. Le catalogue des parents ne contient que les albums déjà ouverts avec leurs liens ; la clé d’une année ne donne pas accès aux précédentes.
+
+Plusieurs comptes animateurs rattachés à la même section peuvent alimenter et relire le même album. Des **tags libres**, par exemple « Petit déjeuner », « Dîner » ou « Grand jeu », s’ajoutent dès l’envoi ou sur une sélection existante. La galerie se filtre par tag ; une photo peut en avoir plusieurs. Les tags des photos à vérifier ne sont pas montrés aux parents.
+
+**Exporter pour préparer un livre photo** télécharge un ZIP des photos publiées de l’album, ou du tag affiché, avec un index `photos.json` contenant leurs tags et légendes. Cet export est réservé aux animateurs de la section et au staff, exige l’extension PHP ZIP et est effacé du serveur après téléchargement. Il contient les versions optimisées ; la mise en page du livre, le choix d’un imprimeur et les commandes restent à définir.
+
+### Préparer le stockage privé (administrateur)
+
+Le module crée par défaut un dossier `scoutsunite-prive-…` à côté du dossier WordPress, **hors de la racine web du serveur**. Si cet emplacement est public ou inaccessible, il refuse les envois et l’accès parent. Aucun repli vers la médiathèque ou un dossier protégé seulement par `.htaccess`.
+
+Si nécessaire, demande à l’hébergeur de créer un dossier privé accessible en écriture par PHP, puis ajoute son chemin réel dans `wp-config.php`, avant le chargement de WordPress. Exemple de chemin à adapter, **pas un dossier dans `public_html`, `www` ou `htdocs`** :
+
+```php
+define( 'SCOUTSUNITE_PHOTOS_DOSSIER', '/home/ton-compte/photos-privees' );
+```
+
+Le serveur doit transmettre correctement `DOCUMENT_ROOT`, y compris si WordPress est dans un sous-dossier. Vérifie aussi qu’aucun alias du serveur ne sert ce dossier par HTTP. HTTPS est obligatoire, sauf sur `localhost` ou `127.0.0.1` pour les essais. Derrière un proxy HTTPS, la configuration habituelle de WordPress doit lui permettre de reconnaître la connexion sécurisée.
+
+**Cache de l’hébergeur ou du CDN** : exclure `/photos/`, ses sous-adresses et les requêtes contenant `su_photos=1`. Le module envoie `private, no-store`, sans ressources tierces ni appel à `wp_head`/`wp_footer` ; un cache placé avant PHP doit respecter ces exclusions.
+
+JPEG, PNG et WebP sont acceptés, à concurrence de la limite PHP du site et de 20 Mo par fichier, 40 mégapixels et 12 000 pixels de côté. Le serveur réencode la photo en JPEG, applique son orientation, retire les métadonnées et crée une miniature ; il garde au plus 2 560 pixels pour le téléchargement. Les originaux restent sur les téléphones. Pour HEIC, l’hébergeur doit fournir Imagick avec le décodeur HEIC/libheif ; la conversion est locale et fonctionne aussi avec WordPress 6.6 quand cette bibliothèque est disponible. Sinon, le message propose une version JPEG, sans transfert vers un convertisseur externe.
+
+Quotas par défaut : **1 Go par album et 5 Go au total**, miniatures comprises, vérifiés côté serveur sous un verrou atomique en base. Ils peuvent être adaptés dans `wp-config.php` :
+
+```php
+define( 'SCOUTSUNITE_PHOTOS_QUOTA_ALBUM', 2 * 1024 * 1024 * 1024 );
+define( 'SCOUTSUNITE_PHOTOS_QUOTA_TOTAL', 10 * 1024 * 1024 * 1024 );
+```
+
+### Partager et conserver
+
+Le staff ouvre l’album, choisit **Gérer l’accès et l’album → Ouvert**, puis **Créer une nouvelle clé**. Il copie immédiatement le message pour les parents ou le QR. La clé n’est montrée qu’une fois : seule son empreinte est enregistrée. Si elle est perdue ou trop diffusée, en créer une nouvelle invalide l’ancienne et toutes les sessions de cet album. Une fermeture invalide aussi la clé ; une réouverture exige une nouvelle clé.
+
+Une session parent dure sept jours au plus. Une date facultative peut fermer l’accès après un jour choisi. **Archivé** conserve la lecture parent et ferme les envois ; **Fermé** réserve la lecture au staff. Aucune suppression automatique des albums n’est activée : la durée de conservation reste un choix de l’unité. Les actions de gestion sont journalisées 90 jours, sans suivi individuel des parents.
+
+Avec une clé commune, toute personne recevant le lien peut ouvrir l’album. On ne peut ni révoquer une seule famille ni rappeler une photo déjà téléchargée. Vérifie les autorisations de diffusion avant publication et utilise **Retirer de l’album parent** si une photo doit disparaître.
+
+### Sauvegarder et restaurer
+
+Sauvegarde le dossier privé **et** les tables `scoutsunite_photos_*` de cette installation, avec les protections de tes autres sauvegardes. Désactiver l’extension ne détruit pas les albums et ne rend pas les fichiers publics. Une suppression dans l’interface efface les deux variantes et les données concernées sur le site, mais n’efface pas rétrospectivement les sauvegardes.
+
+Avant de rouvrir un site restauré, ferme les albums, réapplique les retraits intervenus depuis la sauvegarde puis crée de nouvelles clés : une sauvegarde ancienne peut contenir des photos retirées et des sessions auparavant valables. Garde séparément les références des retraits nécessaires à cette reprise et définis une durée de conservation des sauvegardes avec l’hébergeur.
+
 ## À compléter avant la mise en ligne
 
 Tout ce qui est surligné en orange pâle est un exemple à remplacer.
@@ -129,13 +176,17 @@ Ces blocs sont liés aux réglages dans les compositions du thème. Une page cr�
 Avec [WordPress Playground](https://wordpress.github.io/wordpress-playground/), sans rien installer d’autre que Node, depuis la racine du dépôt :
 
 ```sh
+mkdir -p /tmp/les-scouts-photos
 npx @wp-playground/cli@latest server --port=9400 \
   --mount=.:/wordpress/wp-content/themes/les-scouts-unite \
   --mount=./extension:/wordpress/wp-content/plugins/les-scouts-unite-extension \
+  --mount=/tmp/les-scouts-photos:/photos-privees \
   --blueprint=./blueprint.json
 ```
 
 Le thème est à la racine du dépôt, l’extension dans [`extension/`](extension/). Puis ouvre http://127.0.0.1:9400 (identifiant `admin`, mot de passe `password`). Le contenu d’exemple (pages, articles, réunions) vient de `playground/contenu-demo.php`, partagé avec la démo en ligne (`playground/demo.json`, qui installe le thème depuis GitHub).
+
+Le troisième montage partage les photos privées entre les workers du Playground, hors du dossier public. Le blueprint local ne connecte plus automatiquement tous les visiteurs : connecte-toi avec `admin` pour alimenter le site et ouvre une fenêtre privée pour essayer un lien parent. Le dossier `/tmp/les-scouts-photos` ne doit pas être placé dans le dépôt monté comme thème, qui est public dans WordPress.
 
 ### Tester
 

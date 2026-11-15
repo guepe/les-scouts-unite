@@ -1,10 +1,10 @@
 # Mode d'emploi du site – Animateurs
 
-Thème 2.10.1 · 24 octobre 2026
+Thème et extension 3.3.0 · 15 novembre 2026
 
 > Plus rapide à lire : [le site en 7 fiches](fiches-animateurs/), avec les vrais écrans ([PDF](fiches-animateurs/fiches-animateurs.pdf)).
 
-Ce guide t’explique, pas à pas, comment tenir à jour le site de l’unité pour ta section : les réunions, les documents et la page de ta section. Pas besoin d’être doué en informatique : tout se fait dans l’administration du site, depuis un ordinateur.
+Ce guide t’explique, pas à pas, comment tenir à jour le site de l’unité pour ta section : les réunions, les documents, les photos de camp et la page de ta section. Les photos s’envoient aussi directement depuis ton téléphone.
 
 ## Ton compte
 
@@ -65,6 +65,30 @@ Un document ajouté ici se télécharge sur la page de ta section (rubrique « L
 7. Clique sur **Publier**.
 
 Pour remplacer un document par sa nouvelle version, ouvre-le, choisis le nouveau fichier et clique sur **Mettre à jour** : le site propose aussitôt la nouvelle version, au même endroit. Les documents de toute l’unité (fiche médicale, autorisations) sont gérés par le staff d’unité et s’affichent déjà sur ta page.
+
+## Les photos du camp, depuis ton téléphone
+
+1. Connecte-toi au site avec ton compte habituel, puis touche **Photos de camp** dans le menu. Tu peux garder cette adresse en favori sur ton téléphone.
+2. Ouvre l’album de ta section et de l’année. S’il n’existe pas, touche **Créer un album**, choisis ta section et l’année du camp, puis **Créer l’album**.
+3. Dans **Ajouter des photos**, touche **Choisir des photos** et sélectionne jusqu’à 50 photos de ta pellicule. Tu peux aussi toucher **Prendre une photo**.
+4. Retire celles que tu ne veux pas envoyer. Tu peux ajouter un mot commun au lot et des **tags**, par exemple « Petit déjeuner, Grand jeu ». Sépare les tags par des virgules ; une photo peut en avoir jusqu’à huit.
+5. Touche **Envoyer les photos**. Garde la page ouverte : la progression indique ce qui est reçu. En cas de coupure, **Envoyer les photos restantes** reprend les échecs. Si tu fermes la page, resélectionne les fichiers manquants ; un fichier identique déjà reçu ne sera pas ajouté deux fois.
+6. Touche **Vérifier les photos reçues**, regarde-les et coche celles à publier. **Sélectionner les photos de cette page** permet de cocher le lot affiché.
+7. Après avoir vérifié les autorisations et écarté les images qui ne conviennent pas, touche **Publier la sélection**. Les parents ne voient jamais les photos encore « À vérifier ».
+
+**Pour retirer une photo** : sélectionne-la puis **Retirer de l’album parent**. Le staff pourra encore la consulter ; les parents ne pourront plus l’ouvrir ni la télécharger. **Supprimer la sélection** efface définitivement les fichiers du site, après confirmation. Les copies déjà téléchargées restent chez leurs destinataires.
+
+Le staff d’unité s’occupe de transmettre le lien et la clé aux parents. La clé est différente pour chaque section et chaque année. Un album archivé n’accepte plus d’envoi : demande au staff d’unité de le rouvrir si nécessaire.
+
+**À plusieurs** : tous les animateurs dont le compte est rattaché à ta section peuvent compléter ce même album et vérifier les photos. Chacun garde son compte habituel.
+
+**Pour classer après l’envoi** : sélectionne des photos, ouvre **Classer la sélection**, indique les tags puis **Ajouter ces tags**. Les filtres au-dessus de la grille permettent ensuite de retrouver un moment, côté parents aussi. **Retirer tous les tags de la sélection** permet de corriger un classement.
+
+**Pour préparer un livre photo** : ouvre **Exporter pour préparer un livre photo**, puis **Exporter les photos publiées (ZIP)**. Si un tag est sélectionné, seules ses photos publiées sont exportées. Le ZIP contient les images optimisées et un index des tags et légendes. Pour un grand tirage, retrouve les originaux sur les téléphones des animateurs. La mise en page du livre et l’imprimeur seront choisis ensuite.
+
+Le site accepte JPEG, PNG et WebP, et HEIC si le serveur le permet. Si ton iPhone envoie un HEIC refusé, choisis une version JPEG ou transmets le message au staff : l’hébergeur peut activer la conversion. Le site garde une version optimisée, sans les données de localisation ; garde tes originaux sur ton téléphone.
+
+**Si l’espace privé est indisponible**, contacte l’administrateur. N’ajoute pas les photos dans la médiathèque pour contourner ce message : ses fichiers sont publics.
 
 ## La page de ta section
 
