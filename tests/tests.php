@@ -314,6 +314,13 @@ $ok( ! is_wp_error( $prive ) && ! scoutsunite_photos_dans_dossier( $prive, realp
 $racine_photo_avant = $_SERVER['DOCUMENT_ROOT'] ?? null;
 unset( $_SERVER['DOCUMENT_ROOT'] );
 $ok( is_wp_error( scoutsunite_photos_dossier() ), 'albums : racine web inconnue, stockage bloqué plutôt que supposé privé' );
+$ok( ( function () {
+	// WP-CLI ou cron système n'ont pas de DOCUMENT_ROOT : le nettoyage doit pouvoir trouver le dossier déjà validé.
+	add_filter( 'wp_doing_cron', '__return_true' );
+	$dossier_cron = scoutsunite_photos_dossier();
+	remove_filter( 'wp_doing_cron', '__return_true' );
+	return ! is_wp_error( $dossier_cron );
+} )(), 'albums : le cron sans racine web retrouve le dossier privé, le nettoyage des fichiers peut tourner' );
 $_SERVER['DOCUMENT_ROOT'] = ABSPATH;
 $ok( scoutsunite_photos_dans_dossier( realpath( WP_CONTENT_DIR ), realpath( ABSPATH ) ), 'albums : un sous-dossier public est reconnu comme tel' );
 if ( null === $racine_photo_avant ) { unset( $_SERVER['DOCUMENT_ROOT'] ); } else { $_SERVER['DOCUMENT_ROOT'] = $racine_photo_avant; }
@@ -403,10 +410,11 @@ $wpdb->query( $wpdb->prepare( 'ALTER TABLE %i DROP INDEX section_annee', scoutsu
 $wpdb->query( $wpdb->prepare( 'ALTER TABLE %i ADD UNIQUE KEY section_annee (section,annee)', scoutsunite_photos_table( 'albums' ) ) );
 update_option( 'scoutsunite_photos_schema', 3 );
 unregister_block_type( 'scoutsunite/photos' );
+unregister_block_type( 'scoutsunite/photos-presentation' );
 scoutsunite_photos_initialiser();
 scoutsunite_agenda_flush(); // Comme en fin d'init, après la migration rejouée dans ce test.
 $album_migre = scoutsunite_photos_album( $album_b->id );
-$ok( 4 === (int) get_option( 'scoutsunite_photos_schema' ) && $album_b->adresse === $album_migre->adresse && $album_b->cle_hash === $album_migre->cle_hash && scoutsunite_photos_chemin( $image_photo ) && scoutsunite_photos_session_valide( $album_migre, $session_photo['jeton'] ), 'albums : migration sans changer les photos, liens, clés et sessions existantes' );
+$ok( SCOUTSUNITE_PHOTOS_SCHEMA === (int) get_option( 'scoutsunite_photos_schema' ) && $album_b->adresse === $album_migre->adresse && $album_b->cle_hash === $album_migre->cle_hash && scoutsunite_photos_chemin( $image_photo ) && scoutsunite_photos_session_valide( $album_migre, $session_photo['jeton'] ), 'albums : migration sans changer les photos, liens, clés et sessions existantes' );
 $second_b = scoutsunite_photos_executer( 'creer', array( 'section' => 'baladins', 'annee' => $annee_photo, 'titre' => 'Week-end de printemps' ) );
 $album_second = is_wp_error( $second_b ) ? null : scoutsunite_photos_album( $second_b['album'] );
 $ok( $album_second && $album_second->id !== $album_b->id && $album_second->adresse !== $album_b->adresse && scoutsunite_photos_cle_partage( $album_second ) !== scoutsunite_photos_cle_partage( $album_b ), 'albums : un animateur crée deux albums la même année, avec des clés distinctes après migration' );
@@ -448,6 +456,12 @@ wp_set_current_user( $anim_photo );
 $classement_photo = scoutsunite_photos_executer( 'taguer', array( 'album' => $album_b->id, 'photos' => array( $image_photo->id ), 'tags' => 'Petit déjeuner, Dîner' ) );
 $ok( ! is_wp_error( $classement_photo ) && 2 === count( scoutsunite_photos_tags_image( scoutsunite_photos_image( $image_photo->id ) ) ), 'albums : plusieurs animateurs de la section classent les photos du même album' );
 $ok( ! scoutsunite_photos_tags_album( $album_b ) && 2 === count( scoutsunite_photos_tags_album( $album_b, true ) ), 'albums : les tags des photos à vérifier ne sont pas révélés aux parents' );
+$tags_avant_numeriques = scoutsunite_photos_image( $image_photo->id )->tags;
+scoutsunite_photos_executer( 'taguer', array( 'album' => $album_b->id, 'photos' => array( $image_photo->id ), 'tags' => '2024, 0' ) );
+$tags_numeriques = scoutsunite_photos_tags_image( scoutsunite_photos_image( $image_photo->id ) );
+$ok( isset( $tags_numeriques['2024'], $tags_numeriques['0'], $tags_numeriques['diner'] ) && isset( scoutsunite_photos_tags_album( $album_b, true )['2024'] ), 'albums : un tag numérique (« 2024 », « 0 ») garde sa clé et ne perd pas les autres tags' );
+$ok( false !== strpos( scoutsunite_photos_image( $image_photo->id )->tags, '"2024":' ) && '{' === substr( scoutsunite_photos_tags_json( array( 0 => '0' ) ), 0, 1 ), 'albums : les tags sont toujours enregistrés comme un objet JSON, retrouvable par le filtre' );
+$wpdb->update( scoutsunite_photos_table( 'images' ), array( 'tags' => $tags_avant_numeriques ), array( 'id' => $image_photo->id ) );
 wp_set_current_user( $anim );
 $ok( false === strpos( file_get_contents( scoutsunite_photos_chemin( $image_photo ) ), 'SCOUTSUNITE-GPS-PRIVE' ) && false === strpos( file_get_contents( scoutsunite_photos_chemin( $image_photo, true ) ), 'SCOUTSUNITE-GPS-PRIVE' ), 'albums : métadonnées privées absentes de la photo et de la miniature' );
 $doublon_photo = $importer_photo( $album_b, $source_photo );
@@ -495,6 +509,65 @@ if ( class_exists( 'ZipArchive' ) ) {
 } else {
 	$ok( is_wp_error( $export_photo ) && 'zip' === $export_photo->get_error_code(), 'albums : absence de PHP ZIP expliquée sans export incomplet' );
 }
+/* Sélection des familles et demandes privées ------------------------------- */
+
+$_COOKIE[ scoutsunite_photos_cookie( $album_b->id ) ] = $session_photo['jeton'];
+wp_set_current_user( 0 );
+$selection_parent = array( (int) $image_photo->id );
+$selection_lue = scoutsunite_photos_selection_images( $album_b, $selection_parent );
+$ok( ! is_wp_error( $selection_lue ) && 1 === count( $selection_lue ), 'sélection : le parent retrouve les photos publiées de son album' );
+$ok( is_wp_error( scoutsunite_photos_selection_images( $album_l, $selection_parent ) ) && is_wp_error( scoutsunite_photos_selection_images( $album_b, array( $image_photo->id, 99999999 ) ) ), 'sélection : autre album et références inconnues refusés sans export partiel' );
+$ok( is_wp_error( scoutsunite_photos_selection_ids( '[1, -2]' ) ) && is_wp_error( scoutsunite_photos_selection_ids( array_fill( 0, 1001, 1 ) ) ), 'sélection : références invalides et liste trop longue refusées' );
+$nonce_selection = wp_create_nonce( scoutsunite_photos_nonce_action( 'selection', $album_b ) );
+$autre_session = scoutsunite_photos_ouvrir( $album_b, $cle_photo['cle'] );
+$_COOKIE[ scoutsunite_photos_cookie( $album_b->id ) ] = $autre_session['jeton'];
+$ok( ! wp_verify_nonce( $nonce_selection, scoutsunite_photos_nonce_action( 'selection', $album_b ) ), 'sélection : le nonce d’une famille n’est pas réutilisable par une autre session' );
+$_COOKIE[ scoutsunite_photos_cookie( $album_b->id ) ] = $session_photo['jeton'];
+$export_parent = scoutsunite_photos_exporter( $album_b, '', $selection_parent );
+if ( class_exists( 'ZipArchive' ) ) {
+	$zip_parent = new ZipArchive();
+	$ouvert_parent = ! is_wp_error( $export_parent ) && true === $zip_parent->open( $export_parent );
+	$index_parent = $ouvert_parent ? json_decode( $zip_parent->getFromName( 'photos.json' ), true ) : array();
+	$ok( $ouvert_parent && 2 === $zip_parent->numFiles && (int) $image_photo->id === $index_parent['photos'][0]['reference'], 'sélection : ZIP parent limité à ses références explicites avec leur index' );
+	if ( $ouvert_parent ) { $zip_parent->close(); }
+	if ( ! is_wp_error( $export_parent ) ) { wp_delete_file( $export_parent ); }
+} else {
+	$ok( is_wp_error( $export_parent ), 'sélection : absence de PHP ZIP expliquée au parent' );
+}
+$reference_demande = bin2hex( random_bytes( 16 ) );
+$donnees_demande = array( 'selection' => wp_json_encode( $selection_parent ), 'nom' => '<b>Parent exemple</b>', 'email' => 'parent@example.org', 'message' => "Un souvenir du camp.\nMerci au staff !", 'reference' => $reference_demande );
+$demande_parent = scoutsunite_photos_demander( $album_b, $donnees_demande );
+$demande_doublon = scoutsunite_photos_demander( $album_b, $donnees_demande );
+$demandes_album = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %i WHERE album = %d', scoutsunite_photos_table( 'demandes' ), $album_b->id ) );
+$id_demande = $demandes_album ? (int) $demandes_album[0]->id : 0;
+$ok( ! is_wp_error( $demande_parent ) && ! is_wp_error( $demande_doublon ) && 1 === count( $demandes_album ) && 'Parent exemple' === $demandes_album[0]->nom, 'demandes : enregistrement privé assaini et nouvel essai sans doublon' );
+$ok( false === strpos( wp_json_encode( $demande_parent ), 'parent@example.org' ) && is_wp_error( scoutsunite_photos_demande_gerer( $album_b, array( 'demande' => $id_demande ) ) ), 'demandes : accusé sans coordonnées, aucune gestion accordée au parent' );
+ob_start(); scoutsunite_photos_demandes_interface( $album_b );
+$ok( '' === ob_get_clean(), 'demandes : les parents ne voient pas la liste ni les coordonnées des familles' );
+$invalide_demande = $donnees_demande; $invalide_demande['email'] = 'adresse-invalide'; $invalide_demande['reference'] = bin2hex( random_bytes( 16 ) );
+$ok( is_wp_error( scoutsunite_photos_demander( $album_b, $invalide_demande ) ) && is_wp_error( scoutsunite_photos_demander( $album_l, $donnees_demande ) ), 'demandes : coordonnées invalides et album non autorisé refusés' );
+$wpdb->update( scoutsunite_photos_table( 'images' ), array( 'statut' => 'retiree' ), array( 'id' => $image_photo->id ) );
+$ok( is_wp_error( scoutsunite_photos_selection_images( $album_b, $selection_parent ) ) && ! scoutsunite_photos_selection_images( $album_b, $selection_parent, false ), 'sélection : photo retirée refusée à l’export et écartée de l’aperçu' );
+$wpdb->update( scoutsunite_photos_table( 'images' ), array( 'statut' => 'publiee' ), array( 'id' => $image_photo->id ) );
+unset( $_COOKIE[ scoutsunite_photos_cookie( $album_b->id ) ] );
+$ok( is_wp_error( scoutsunite_photos_selection_images( $album_b, $selection_parent ) ) && is_wp_error( scoutsunite_photos_demander( $album_b, $donnees_demande ) ), 'sélection : sans session, ni aperçu ni demande privée' );
+wp_set_current_user( $anim );
+ob_start(); scoutsunite_photos_demandes_interface( $album_b ); $demandes_gestion = ob_get_clean();
+$ok( false !== strpos( $demandes_gestion, 'parent@example.org' ) && ! is_wp_error( scoutsunite_photos_demande_gerer( $album_b, array( 'demande' => $id_demande ) ) ), 'demandes : l’animateur de la section consulte et traite une demande' );
+$ok( is_wp_error( scoutsunite_photos_demande_gerer( $album_l, array( 'demande' => $id_demande ) ) ), 'demandes : un identifiant forgé ne change pas d’album' );
+$_COOKIE[ scoutsunite_photos_cookie( $album_b->id ) ] = $session_photo['jeton']; wp_set_current_user( 0 );
+$donnees_attente = $donnees_demande; $donnees_attente['reference'] = bin2hex( random_bytes( 16 ) );
+scoutsunite_photos_demander( $album_b, $donnees_attente );
+$wpdb->update( scoutsunite_photos_table( 'demandes' ), array( 'traitee_le' => time() - 91 * DAY_IN_SECONDS ), array( 'id' => $id_demande ) );
+scoutsunite_photos_demandes_nettoyer();
+$reste_demande = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE album = %d', scoutsunite_photos_table( 'demandes' ), $album_b->id ) );
+$ok( $reste_demande && 'nouvelle' === $reste_demande->etat && (int) $reste_demande->id !== $id_demande, 'demandes : nettoyage des demandes traitées depuis 90 jours, sans effacer celles à préparer' );
+wp_set_current_user( $anim );
+$efface_demande = scoutsunite_photos_demande_gerer( $album_b, array( 'demande' => $reste_demande->id ), true );
+$ok( ! is_wp_error( $efface_demande ) && scoutsunite_photos_chemin( $image_photo ), 'demandes : effacer les coordonnées et la demande conserve les photos de l’album' );
+wp_set_current_user( 0 ); $donnees_attente['reference'] = bin2hex( random_bytes( 16 ) ); scoutsunite_photos_demander( $album_b, $donnees_attente );
+unset( $_COOKIE[ scoutsunite_photos_cookie( $album_b->id ) ] ); wp_set_current_user( $staff );
+
 // Plus d'une page : les voisines doivent ignorer les photos privées et respecter le tag.
 $photos_parcours = array();
 for ( $i = 0; $i < 27; $i++ ) {
@@ -528,6 +601,7 @@ $ok( ! scoutsunite_photos_session_valide( $album_b, $session_photo['jeton'] ) &&
 $_COOKIE[ scoutsunite_photos_cookie( $album_b->id ) ] = $session_photo['jeton'];
 wp_set_current_user( 0 );
 $ok( is_wp_error( scoutsunite_photos_visionner( $album_b, $image_photo->id ) ), 'albums : le renouvellement coupe aussi les appels de la visionneuse' );
+$ok( is_wp_error( scoutsunite_photos_demander( $album_b, $donnees_demande ) ) && is_wp_error( scoutsunite_photos_exporter( $album_b, '', $selection_parent ) ), 'sélection : le renouvellement coupe aussi les demandes et exports de l’ancien accès' );
 wp_set_current_user( $staff );
 $ok( is_wp_error( scoutsunite_photos_executer( 'cle', array( 'album' => $album_b->id, 'version' => $ancienne_version ) ) ), 'albums : recharger une ancienne demande ne renouvelle pas la clé une seconde fois' );
 $session_photo = scoutsunite_photos_ouvrir( $album_b, $nouvelle_cle['cle'] );
@@ -571,6 +645,7 @@ $ok( is_wp_error( $quota_photo ) && 'quota' === $quota_photo->get_error_code() &
 $wpdb->update( scoutsunite_photos_table( 'images' ), array( 'taille' => $poids_reel ), array( 'id' => $image_photo->id ) );
 $verrou_photo = scoutsunite_photos_verrou();
 $ok( ! is_wp_error( $verrou_photo ) && is_wp_error( scoutsunite_photos_verrou() ), 'albums : les mutations concurrentes sont protégées par un verrou' );
+$ok( ! is_wp_error( scoutsunite_photos_ouvrir( $album_b, $cle_expiration['cle'] ) ), 'albums : un parent ouvre son lien même pendant un envoi d’animateur (verrou tenu)' );
 scoutsunite_photos_deverrouiller( 'un-autre-jeton' );
 $ok( is_wp_error( scoutsunite_photos_verrou() ), 'albums : un autre processus ne peut pas libérer le verrou détenu' );
 if ( ! is_wp_error( $verrou_photo ) ) { scoutsunite_photos_deverrouiller( $verrou_photo ); }
@@ -578,6 +653,7 @@ $chemin_efface = scoutsunite_photos_chemin( $image_photo );
 $ok( is_wp_error( scoutsunite_photos_executer( 'supprimer_album', array( 'album' => $album_b->id ) ) ), 'albums : suppression complète avec confirmation obligatoire' );
 scoutsunite_photos_executer( 'supprimer_album', array( 'album' => $album_b->id, 'confirmation' => 'SUPPRIMER' ) );
 $ok( ! scoutsunite_photos_album( $album_b->id ) && ! is_file( $chemin_efface ) && ! scoutsunite_photos_image( $image_photo->id ), 'albums : suppression complète des données et fichiers privés' );
+$ok( ! $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM %i WHERE album = %d', scoutsunite_photos_table( 'demandes' ), $album_b->id ) ), 'demandes : supprimer l’album efface aussi les demandes et coordonnées associées' );
 foreach ( array_filter( array( $album_l, $album_ancien, $album_second ) ) as $album_test ) {
 	scoutsunite_photos_executer( 'supprimer_album', array( 'album' => $album_test->id, 'confirmation' => 'SUPPRIMER' ) );
 }
@@ -599,6 +675,16 @@ if ( null === $contexte_avant ) { unset( $_SERVER['HTTP_SEC_FETCH_SITE'] ); } el
 wp_set_current_user( $admin );
 
 /* Thème et extension ------------------------------------------------------- */
+
+$page_photos = get_post( (int) get_option( 'scoutsunite_photos_presentation_page' ) );
+$presentation_photos = scoutsunite_photos_presentation();
+$ok( $page_photos && 'publish' === $page_photos->post_status && false !== strpos( $presentation_photos, 'section-louveteaux' ) && false === strpos( $presentation_photos, '#cle=' ) && false === strpos( $presentation_photos, 'parent@example.org' ), 'présentation : page publique publiée avec les sections, sans clé ni coordonnées privées' );
+$ancienne_presentation = $page_photos->post_content;
+wp_update_post( array( 'ID' => $page_photos->ID, 'post_content' => 'Texte conservé par le staff.' ) );
+delete_option( 'scoutsunite_photos_presentation_page' );
+scoutsunite_photos_presentation_installer();
+$ok( (int) $page_photos->ID === (int) get_option( 'scoutsunite_photos_presentation_page' ) && 'Texte conservé par le staff.' === get_post( $page_photos->ID )->post_content, 'présentation : une page existante est conservée, sans écrasement ni doublon' );
+wp_update_post( array( 'ID' => $page_photos->ID, 'post_content' => $ancienne_presentation ) );
 
 $ok( wp_get_theme()->get( 'Version' ) === $extension, 'thème et extension à la même version' );
 wp_set_current_user( $admin );

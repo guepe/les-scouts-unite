@@ -34,7 +34,14 @@
 		title: 'Photos de camp',
 		description: 'Le lien vers l’espace privé des photos. Aucune photo n’est montrée sur le site public.',
 		icon: 'format-gallery',
+		attributes: { section: { type: 'string', default: '' } },
 		edit: apercu( 'scoutsunite/photos' ),
+	} ) );
+	wp.blocks.registerBlockType( 'scoutsunite/photos-presentation', Object.assign( {}, commun, {
+		title: 'Présentation des photos de camp',
+		description: 'Le fonctionnement des albums privés pour les familles, sans afficher leurs photos.',
+		icon: 'format-gallery',
+		edit: apercu( 'scoutsunite/photos-presentation' ),
 	} ) );
 
 	wp.blocks.registerBlockType( 'scoutsunite/prochaines-reunions', Object.assign( {}, commun, {

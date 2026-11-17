@@ -3,7 +3,7 @@ Theme Name: Les Scouts – Unité
 Theme URI: https://github.com/guepe/les-scouts-unite
 Author: Pierre-Henri Delaval
 Description: Thème de bloc pour le site d’une unité Les Scouts asbl, construit sur la charte graphique de la fédération : bleu de la fédération, toppings, couleurs de section et police Muli. Le nom de l’unité vient du titre du site ; tout se modifie dans l’éditeur de site.
-Version: 3.5.0
+Version: 3.5.2
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
@@ -1691,21 +1691,123 @@ a.lien-fleche:hover::after {
 .photos__partage > summary { min-height: 44px; cursor: pointer; font-size: 1.2rem; font-weight: 900; }
 .photos__partage-outils { display: flex; align-items: start; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; }
 .photos__qr { display: block; width: 180px; height: 180px; margin-top: 1rem; }
-.photos__vue img { display: block; max-width: 100%; max-height: 75vh; margin: 1rem 0; object-fit: contain; }
-.photos__dialogue { width: min(74rem, 96vw); max-width: 96vw; max-height: 96vh; padding: 1rem; border: 0; background: var(--su-fond); color: var(--su-bleu); overflow-y: auto; }
-.photos__dialogue::backdrop { background: rgba(6, 47, 85, 0.9); }
-.photos__vue-entete { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-.photos__dialogue > img { display: block; width: 100%; height: min(65vh, 700px); object-fit: contain; margin: 1rem 0; touch-action: pan-y pinch-zoom; }
+/* Vue des familles : une galerie continue et un visionneur plein écran, dans l'esprit de Photos sur iPhone. */
+.photos__contenu { --photos-marge: 2rem; }
+.photos__contenu:has(.photos__selection:not([hidden])) { padding-bottom: 6rem; }
+.photos-page:has(.photos__selection:not([hidden])) .photos__pied { padding-bottom: 5rem; }
+.photos__titre { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 0.75rem; }
+.photos__titre h1 { font-size: clamp(1.5rem, 5vw, 2rem); font-weight: 900; letter-spacing: -0.02em; line-height: 1.1; margin: 0.25rem 0; text-wrap: balance; }
+.photos__section { margin: 0; font-size: 0.95rem; font-weight: 800; letter-spacing: 0; text-transform: none; color: var(--su-vert-fonce); }
+.photos__masque { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.photos__selection--vide { display: none; }
+/* Album d'une famille : la grille occupe tout l'écran, sans en-tête ni pied de site autour. */
+.photos-page:has(.photos__galerie--famille) .photos__entete, .photos-page:has(.photos__galerie--famille) .photos__pied { display: none; }
+.photos__contenu:has(.photos__galerie--famille) { max-width: none; padding: 0 0 6rem; min-height: 100vh; }
+.photos__contenu:has(.photos__galerie--famille) > :is(.photos__navigation, .photos__titre, .photos__quitter, .photos__avis) { margin-left: var(--photos-marge); margin-right: var(--photos-marge); }
+.photos__contenu:has(.photos__galerie--famille) .photos__navigation { margin-top: 0.5rem; margin-bottom: 0; }
+.photos__contenu:has(.photos__galerie--famille) .photos__quitter { justify-content: center; margin-top: 1.5rem; }
+.photos__quitter .photos__aide { margin: 0; }
+.photos__photo { position: relative; }
+.photos__galerie--famille .photos__tags { position: sticky; top: 0; z-index: 5; flex-wrap: nowrap; overflow-x: auto; gap: 0.5rem; margin: 0 0 0.25rem; padding: 0.5rem var(--photos-marge); background: var(--su-fond); scrollbar-width: none; overscroll-behavior-x: contain; }
+.photos__galerie--famille .photos__tags::-webkit-scrollbar { display: none; }
+.photos__galerie--famille .photos__tags a { flex: 0 0 auto; border: 0; font-weight: 800; }
+.photos__galerie--famille .photos__grille { grid-template-columns: repeat(auto-fill, minmax(min(100%, 10rem), 1fr)); gap: 3px; margin-top: 0.5rem; }
+.photos-page .photos__contenu .photos__quitter button { border: 0; background: transparent; color: var(--su-bleu); text-decoration: underline; font-weight: 700; }
+.photos__galerie--famille .photos__photo img { height: auto; aspect-ratio: 1; transition: opacity 120ms ease; }
+.photos__galerie--famille .photos__ouvrir:active img { opacity: 0.8; }
+.photos__galerie--famille .photos__ouvrir:focus-visible { outline-offset: -4px; }
+.photos__suite { height: 1px; }
+/* Le cœur se pose sur la photo, sans cadre : il est plein quand la photo est marquée. */
+.photos-page .photos__photo > .photos__marquer { position: absolute; right: 0; bottom: 0; z-index: 1; min-width: 48px; height: 48px; padding: 0; border: 0; background: radial-gradient(circle at 62% 62%, rgba(6, 47, 85, 0.5), rgba(6, 47, 85, 0) 68%); }
+.photos__coeur { display: block; width: 24px; height: 24px; fill: none; stroke: white; stroke-width: 2; stroke-linejoin: round; transition: transform 200ms var(--su-ease); }
+.photos-page .photos__marquer[aria-pressed="true"] .photos__coeur { fill: var(--su-rouge); stroke: white; transform: scale(1.1); }
+.photos-page .photos__retour { gap: 0.6rem; font-weight: 800; text-decoration: none; }
+.photos__retour::before { content: ""; width: 10px; height: 10px; border: solid currentColor; border-width: 0 0 3px 3px; transform: rotate(45deg); }
+/* Visionneur plein écran. */
+.photos__dialogue { position: fixed; inset: 0; width: 100%; max-width: none; height: 100vh; height: 100dvh; max-height: none; margin: 0; padding: 0; border: 0; background: var(--su-bleu-nuit); color: white; overflow: hidden; }
+.photos__dialogue[open] { display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto; }
+.photos__dialogue:not([open]) { display: none; }
+.photos__dialogue::backdrop { background: var(--su-bleu-nuit); }
+.photos__dialogue--repli[open] { z-index: 9999; }
+.photos--visionneuse { overflow: hidden; }
+.photos--visionneuse .photos__contenu > :not(.photos__dialogue), .photos--visionneuse .photos__entete, .photos--visionneuse .photos__pied { pointer-events: none; }
+.photos-page .photos__dialogue button, .photos-page .photos__dialogue a { background: transparent; border: 0; color: white; text-decoration: none; }
+.photos-page .photos__dialogue button:hover:not(:disabled), .photos-page .photos__dialogue a:hover { background: rgba(255, 255, 255, 0.14); }
+.photos__vue-entete { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: max(0.5rem, env(safe-area-inset-top)) max(0.5rem, env(safe-area-inset-right)) 0.25rem max(0.5rem, env(safe-area-inset-left)); }
+.photos__vue-entete #photos-fermer { grid-column: 1; grid-row: 1; justify-self: start; padding: 0 1rem; }
+.photos__vue-entete #photos-vue-titre { grid-column: 2; grid-row: 1; margin: 0; font-weight: 800; font-variant-numeric: tabular-nums; }
+.photos__cadre { position: relative; width: 100%; height: 100%; min-height: 0; margin: 0; touch-action: pan-y pinch-zoom; }
+.photos__cadre img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; background: transparent; opacity: 1; transition: opacity 180ms ease, transform 280ms var(--su-ease); }
+.photos__cadre img.photos__image-arrive { opacity: 0; transform: scale(0.98); }
+.photos__cadre img.photos__image-arrive--suivante { transform: translateX(2.5rem); }
+.photos__cadre img.photos__image-arrive--precedente { transform: translateX(-2.5rem); }
+#photos-vue-legende { grid-row: 3; margin: 0; padding: 0.5rem 1rem 0; text-align: center; overflow-wrap: anywhere; }
+#photos-vue-legende:empty { display: none; }
+@keyframes photos-apparait { from { opacity: 0; } to { opacity: 1; } }
+#photos-vue-erreur { position: absolute; top: 50%; left: 0; right: 0; margin: 0; padding: 0 1rem; text-align: center; pointer-events: none; animation: photos-apparait 200ms 500ms both; }
+#photos-vue-erreur:empty { display: none; }
+.photos-page .photos__fleche { position: absolute; top: 50%; z-index: 2; display: flex; align-items: center; justify-content: center; width: 52px; height: 72px; margin-top: -36px; padding: 0; font-size: 0; }
+.photos__fleche--precedente { left: env(safe-area-inset-left); }
+.photos__fleche--suivante { right: env(safe-area-inset-right); }
+.photos__fleche::before { content: ""; display: block; width: 14px; height: 14px; border: solid white; border-width: 0 0 3px 3px; transform: rotate(45deg); }
+.photos__fleche--suivante::before { transform: rotate(-135deg); }
+.photos__fleche:disabled { opacity: 0.25; }
+@media (hover: none) and (pointer: coarse) { .photos-page .photos__fleche:not(:focus-visible) { opacity: 0; } }
+.photos__vue-pied { display: flex; align-items: center; justify-content: space-between; padding: 0.25rem max(0.75rem, env(safe-area-inset-right)) max(0.5rem, env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left)); }
+.photos-page .photos__vue-pied .photos__marquer { min-width: 52px; height: 52px; padding: 0; }
+.photos__vue-pied .photos__coeur { width: 28px; height: 28px; }
+.photos__vue-pied #photos-telecharger { display: inline-flex; align-items: center; min-height: 52px; padding: 0 1rem; font-weight: 800; }
+/* Ma sélection : une barre en bas de l'écran, qui s'ouvre vers le haut. */
+.photos__selection { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; margin: 0; background: white; border-top: 2px solid var(--su-bleu); padding-bottom: env(safe-area-inset-bottom); }
+.photos__selection > details { padding: 0 max(var(--photos-marge), env(safe-area-inset-left)); }
+.photos__selection > details[open] { max-height: 80vh; max-height: 80dvh; overflow-y: auto; overscroll-behavior: contain; }
+.photos__selection > details > summary { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; background: white; font-weight: 900; }
+@media (prefers-reduced-motion: reduce) { .photos__cadre img, .photos__coeur, .photos__galerie--famille .photos__photo img { transition: none; } .photos__cadre img.photos__image-arrive--suivante, .photos__cadre img.photos__image-arrive--precedente { transform: none; } #photos-vue-erreur { animation: none; } }
+.photos--visionneuse { overflow: hidden; }
+.photos--visionneuse .photos__contenu > :not(.photos__dialogue), .photos--visionneuse .photos__entete, .photos--visionneuse .photos__pied { pointer-events: none; }
+.photos__selection summary, .photos__demandes > summary { cursor: pointer; font-weight: 800; min-height: 44px; padding: 0.6rem 0; }
+.photos__selection-liste { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 1rem; max-height: 24rem; overflow-y: auto; }
+.photos__selection-liste img { display: block; width: 100%; height: 110px; object-fit: cover; }
+.photos__selection-liste a { display: block; font-size: 0.85rem; }
+.photos__selection-liste button { font-size: 0.8rem; margin-top: 0.4rem; }
+.photos__demandes { margin: 1rem 0 2rem; border-top: 1px solid var(--su-trait); }
+.photos__demande { padding: 1rem; margin: 1rem 0; background: white; border: 1px solid var(--su-trait); }
+.photos__demande h3 { margin-top: 0; }
+.photos__demande-message { white-space: pre-wrap; overflow-wrap: anywhere; }
 .photos__pied { background: var(--su-bleu); color: white; padding: 1.5rem; text-align: center; font-size: 0.85rem; }
 .photos__evitement { position: absolute; left: -10000px; }
 .photos__evitement:focus { position: static; display: block; padding: 1rem; }
 
 @media (max-width: 40rem) {
-	.photos__contenu { padding: 1rem 1rem 2rem; }
+	.photos__contenu { --photos-marge: 1rem; padding: 1rem 1rem 2rem; }
+	.photos__galerie--famille .photos__grille { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; }
 	.photos__entete span { display: none; }
 	.photos__envoi, .photos__partage { padding: 1rem; }
 	.photos__albums a { align-items: start; flex-direction: column; gap: 0.35rem; }
 	.photos__grille { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 0.65rem; }
 	.photos__photo img { height: 145px; }
 	.photos__galerie .photos__actions { align-items: stretch; flex-direction: column; }
+}
+
+/* Présentation publique des albums, sans aucune donnée privée. */
+.photos-promo { width: calc(100% - 2rem); max-width: 78rem; margin: 2.5rem auto; padding: clamp(1.25rem, 4vw, 2.5rem); display: flex; align-items: center; justify-content: space-between; gap: 2rem; background: #F2F5F8; border-top: 5px solid #95C11F; color: #0A4275; }
+.photos-promo h2 { font-size: clamp(1.5rem, 3vw, 2.25rem); line-height: 1.1; margin: 0.3rem 0 0.75rem; }
+.photos-promo p { max-width: 48rem; margin: 0; }
+.photos-promo__surtitre { font-size: 0.85rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.08em; }
+.photos-promo .wp-block-buttons { flex: 0 0 auto; }
+.photos-presentation__intro { display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; gap: 2rem; }
+.photos-presentation h2 { font-size: clamp(1.7rem, 3.5vw, 2.5rem); line-height: 1.1; }
+.photos-presentation__intro figure { margin: 0; }
+.photos-presentation__intro img { width: 100%; height: auto; object-fit: cover; aspect-ratio: 3/2; }
+.photos-presentation figcaption, .photos-presentation__aide { font-size: 0.9rem; }
+.photos-presentation__etapes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin: 3rem 0; }
+.photos-presentation__etapes article { padding: 1.5rem; background: #F2F5F8; border-top: 4px solid #95C11F; }
+.photos-presentation__etapes h3, .photos-presentation__sections h3 { font-size: 1.3rem; }
+.photos-presentation__etapes article > span { display: inline-flex; width: 44px; height: 44px; justify-content: center; align-items: center; background: #0A4275; color: white; font-weight: 900; }
+.photos-presentation__sections-grille { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.photos-presentation__sections-grille article { padding: 1.5rem; border: 1px solid #DCE4EC; scroll-margin-top: 2rem; }
+.photos-presentation__confiance { margin: 3rem 0 0; padding: 1.5rem; background: #F2F5F8; border-left: 5px solid #95C11F; }
+@media (max-width: 48rem) {
+ .photos-promo { flex-direction: column; align-items: start; gap: 1.25rem; }
+ .photos-presentation__intro, .photos-presentation__etapes, .photos-presentation__sections-grille { grid-template-columns: 1fr; }
 }

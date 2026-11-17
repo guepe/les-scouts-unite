@@ -1,13 +1,13 @@
-# Le site de l’unité en 9 fiches – pour le staff d’unité
+# Le site de l’unité en 10 fiches – pour le staff d’unité
 
 Un geste par fiche, avec les vrais écrans de WordPress : ce que le staff d’unité règle une fois, et ce qu’il tient à jour pour toute l’unité. Pour les réunions et les documents d’une section, les [fiches des animateurs](../fiches-animateurs/) valent aussi pour le staff d’unité, dans toutes les sections.
 
-**[Télécharger toutes les fiches en PDF](fiches-chefs-unite.pdf)** (10 pages)
+**[Télécharger toutes les fiches en PDF](fiches-chefs-unite.pdf)** (11 pages)
 
 Le même contenu en texte, plus détaillé : [Mode d’emploi pour les chefs d’unité](../mode-emploi-chefs-unite.md).
 
 <p>
-<a href="00-couverture.png"><img src="00-couverture.png" width="260" alt="Couverture : le site de l’unité en 9 fiches"></a>
+<a href="00-couverture.png"><img src="00-couverture.png" width="260" alt="Couverture : le site de l’unité en 10 fiches"></a>
 <a href="01-donner-acces.png"><img src="01-donner-acces.png" width="260" alt="Fiche 1 : donner accès à un animateur"></a>
 <a href="02-le-staff.png"><img src="02-le-staff.png" width="260" alt="Fiche 2 : le staff et les cartes"></a>
 <a href="03-bon-a-savoir-whatsapp.png"><img src="03-bon-a-savoir-whatsapp.png" width="260" alt="Fiche 3 : Bon à savoir et WhatsApp"></a>
@@ -17,6 +17,7 @@ Le même contenu en texte, plus détaillé : [Mode d’emploi pour les chefs d�
 <a href="07-reglages-mise-a-jour.png"><img src="07-reglages-mise-a-jour.png" width="260" alt="Fiche 7 : réglages et mise à jour"></a>
 <a href="08-ca-coince.png"><img src="08-ca-coince.png" width="260" alt="Fiche 8 : ça coince ?"></a>
 <a href="09-photos-camp.png"><img src="09-photos-camp.png" width="260" alt="Fiche 9 : Partager les photos du camp"></a>
+<a href="10-souvenirs-parents.png"><img src="10-souvenirs-parents.png" width="260" alt="Fiche 10 : les demandes des parents"></a>
 </p>
 
 | Fiche | Ce qu’on y apprend |
@@ -31,8 +32,9 @@ Le même contenu en texte, plus détaillé : [Mode d’emploi pour les chefs d�
 | [7 · Réglages et mise à jour](07-reglages-mise-a-jour.png) | Fuseau horaire, permaliens, installer une nouvelle version (extension et thème) |
 | [8 · Ça coince ?](08-ca-coince.png) | Les neuf soucis les plus courants, dont le cache PHP après une mise à jour |
 | [9 · Partager les photos du camp](09-photos-camp.png) | Partager, fermer, renouveler les accès et supprimer un album |
+| [10 · Les demandes des parents](10-souvenirs-parents.png) | Consulter les demandes privées, préparer le souvenir et effacer les coordonnées |
 
-Fiches de la version **3.5.0** (15 novembre 2026), avec des captures prises sur le site de démonstration.
+Fiches de la version **3.5.1** (15 novembre 2026), avec des captures prises sur le site de démonstration.
 
 ## Mettre les fiches à jour
 
@@ -40,7 +42,7 @@ Fiches de la version **3.5.0** (15 novembre 2026), avec des captures prises sur 
 
 [La fiche illustrée « Donner accès aux photos du camp »](09-photos-camp.png) explique l’ouverture de l’album, le lien et le QR retrouvables, la fermeture et le renouvellement. [Source modifiable](source/Photos.dc.html).
 
-Cette fiche est incluse dans le PDF de dix pages ci-dessus.
+Cette fiche est incluse dans le PDF de onze pages ci-dessus.
 
 Les sources sont dans [`source/`](source/) : une page `.dc.html` par fiche (format du canevas Claude Design), `canvas.json` et les captures d’écran dans `source/captures/`. Après un changement d’écran dans WordPress ou dans le thème, refaire la capture concernée, adapter la fiche, puis regénérer les images et le PDF.
 

@@ -88,6 +88,9 @@ function scoutsunite_photos_origine_valide() {
  * @return string Action de nonce.
  */
 function scoutsunite_photos_nonce_action( $operation, $album = null ) {
+	if ( $album && in_array( $operation, array( 'selection', 'exporter_selection', 'demander' ), true ) ) {
+		return 'scoutsunite_photos_selection_' . $album->id . '_' . scoutsunite_photos_selection_parent( $album );
+	}
 	if ( 'quitter' === $operation && $album ) {
 		return 'scoutsunite_photos_quitter_' . hash( 'sha256', scoutsunite_photos_jeton( $album->id ) );
 	}
@@ -136,6 +139,9 @@ function scoutsunite_photos_requete() {
 	$adresse  = get_query_var( 'su_album' );
 	$album    = is_string( $adresse ) && preg_match( '/^[a-f0-9]{24}$/D', $adresse ) ? scoutsunite_photos_album( $adresse ) : null;
 	$resultat = null;
+	if ( isset( $_GET['su_selection'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification -- entrée dédiée qui contrôle méthode, origine, session et nonce.
+		scoutsunite_photos_selection_requete( $album );
+	}
 	if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) ) {
 		$donnees = wp_unslash( $_POST ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- chaque valeur est lue par scoutsunite_photos_texte(), les sélections sont validées dans executer().
 		$action  = scoutsunite_photos_texte( $donnees, 'operation' );
@@ -160,8 +166,13 @@ function scoutsunite_photos_requete() {
 			scoutsunite_photos_poser_cookie( $album->id, '', time() - HOUR_IN_SECONDS );
 			wp_safe_redirect( scoutsunite_photos_url() );
 			exit;
-		} elseif ( 'exporter' === $action ) {
-			$resultat = scoutsunite_photos_exporter( $album, sanitize_title( scoutsunite_photos_texte( $donnees, 'tag' ) ) );
+		} elseif ( 'demander' === $action ) {
+			$resultat = scoutsunite_photos_demander( $album, $donnees );
+		} elseif ( in_array( $action, array( 'demande_traiter', 'supprimer_demande' ), true ) ) {
+			$resultat = scoutsunite_photos_demande_gerer( $album, $donnees, 'supprimer_demande' === $action );
+		} elseif ( in_array( $action, array( 'exporter', 'exporter_selection' ), true ) ) {
+			$selection = 'exporter_selection' === $action ? scoutsunite_photos_selection_ids( $donnees['selection'] ?? null ) : null;
+			$resultat = is_wp_error( $selection ) ? $selection : scoutsunite_photos_exporter( $album, sanitize_title( scoutsunite_photos_texte( $donnees, 'tag' ) ), $selection );
 			if ( ! is_wp_error( $resultat ) ) {
 				try {
 					header( 'Content-Type: application/zip' );
@@ -318,20 +329,21 @@ function scoutsunite_photos_page( $album, $resultat = null, $demande_album = fal
 	?>
 	<!doctype html>
 	<html lang="fr-BE"><head>
-	<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 	<meta name="robots" content="noindex,nofollow,noarchive">
 	<title><?php echo esc_html( 'Photos de camp · ' . get_bloginfo( 'name' ) ); ?></title>
 	<?php if ( scoutsunite_extension_theme_url( 'style.css' ) ) : ?>
 		<link rel="stylesheet" href="<?php echo esc_url( scoutsunite_extension_theme_url( 'style.css' ) . '?photos=' . rawurlencode( scoutsunite_extension_version( 'assets/js/photos.js' ) ) ); ?>">
 	<?php endif; ?>
 	<script src="<?php echo esc_url( scoutsunite_extension_url( 'assets/js/photos.js' ) . '?ver=' . rawurlencode( scoutsunite_extension_version( 'assets/js/photos.js' ) ) ); ?>" defer></script>
+	<script src="<?php echo esc_url( scoutsunite_extension_url( 'assets/js/photos-selection.js' ) . '?ver=' . rawurlencode( scoutsunite_extension_version( 'assets/js/photos-selection.js' ) ) ); ?>" defer></script>
 	</head><body class="photos-page">
 	<a class="photos__evitement" href="#contenu-photos">Aller au contenu</a>
 	<header class="photos__entete"><a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php echo esc_html( get_bloginfo( 'name' ) ); ?></a><span>Les souvenirs du camp</span></header>
 	<main id="contenu-photos" class="photos__contenu">
-	<nav class="photos__navigation" aria-label="Photos"><a href="<?php echo esc_url( scoutsunite_photos_url() ); ?>">Tous mes albums</a>
+	<nav class="photos__navigation" aria-label="Photos"><a class="photos__retour" href="<?php echo esc_url( scoutsunite_photos_url() ); ?>">Mes albums</a>
 	<?php if ( current_user_can( 'scoutsunite_photos' ) ) : ?><a href="<?php echo esc_url( admin_url() ); ?>">Administration</a>
-	<?php else : ?><a href="<?php echo esc_url( wp_login_url( scoutsunite_photos_url( $album ) ) ); ?>">Accès animateur</a><?php endif; ?></nav>
+	<?php elseif ( ! $lecture ) : ?><a href="<?php echo esc_url( wp_login_url( scoutsunite_photos_url( $album ) ) ); ?>">Accès animateur</a><?php endif; ?></nav>
 	<?php if ( $resultat ) : ?>
 		<p class="photos__avis" role="status"><?php echo esc_html( is_wp_error( $resultat ) ? $resultat->get_error_message() : ( $resultat['message'] ?? '' ) ); ?></p>
 	<?php endif; ?>
@@ -347,17 +359,19 @@ function scoutsunite_photos_page( $album, $resultat = null, $demande_album = fal
 			<button type="submit">Ouvrir l’album</button>
 		</form><p class="photos__aide">Ce lien est réservé aux familles du camp. Garde-le dans le cercle des parents concernés.</p>
 	<?php elseif ( $lecture ) : ?>
-		<div class="photos__titre"><p class="photos__section"><?php echo esc_html( ( scoutsunite_photos_sections()[ $album->section ] ?? '' ) . ' · ' . $album->annee ); ?></p><h1><?php echo esc_html( $album->titre ?: 'Souvenirs du camp' ); ?></h1></div>
+		<div class="photos__titre"><h1><?php echo esc_html( $album->titre ?: 'Souvenirs du camp' ); ?></h1><p class="photos__section"><?php echo esc_html( ( scoutsunite_photos_sections()[ $album->section ] ?? '' ) . ' · ' . $album->annee ); ?></p></div>
 		<?php if ( $gestion ) : ?>
 			<p class="photos__aide">Album <?php echo esc_html( array( 'brouillon' => 'en brouillon', 'ouvert' => 'ouvert', 'archive' => 'archivé', 'ferme' => 'fermé' )[ $album->etat ] ?? '' ); ?> · <?php echo esc_html( size_format( scoutsunite_photos_poids( $album->id ) ) . ' / ' . size_format( scoutsunite_photos_quota() ) ); ?></p>
 			<?php scoutsunite_photos_gestion_formulaire( $album ); ?>
+			<?php scoutsunite_photos_demandes_interface( $album ); ?>
 			<?php if ( in_array( $album->etat, array( 'brouillon', 'ouvert' ), true ) ) : scoutsunite_photos_envoi_formulaire( $album ); endif; ?>
 		<?php else : ?>
 			<form method="post" id="photos-acces" hidden><?php scoutsunite_photos_champs( 'ouvrir', $album ); ?><input type="hidden" id="photos-cle" name="cle" value=""></form>
 		<?php endif; ?>
+		<?php scoutsunite_photos_selection_interface( $album ); ?>
 		<?php scoutsunite_photos_galerie( $album, $gestion ); ?>
 		<?php if ( ! $gestion ) : ?>
-			<form method="post" class="photos__quitter"><?php scoutsunite_photos_champs( 'quitter', $album ); ?><button type="submit" class="photos__secondaire">Fermer</button><span class="photos__aide">Pour revenir, rouvre le lien reçu du staff.</span></form>
+			<form method="post" class="photos__quitter"><?php scoutsunite_photos_champs( 'quitter', $album ); ?><button type="submit" class="photos__secondaire" data-confirmer="Quitter cet album sur ce navigateur ? Pour y revenir, il faudra rouvrir le lien reçu du staff.">Quitter définitivement cet album</button><span class="photos__aide photos__masque">Pour revenir, rouvre le lien reçu du staff.</span></form>
 		<?php endif; ?>
 	<?php else : ?>
 		<h1>Photos de camp</h1><p>Les souvenirs, rangés par section et par année.</p>
@@ -431,6 +445,15 @@ function scoutsunite_photos_envoi_formulaire( $album ) {
 }
 
 /**
+ * Cœur dessiné (pas un caractère) : plein quand la photo est marquée, grâce à aria-pressed.
+ *
+ * @return string SVG sans donnée variable.
+ */
+function scoutsunite_photos_coeur() {
+	return '<svg class="photos__coeur" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 20.4S3.6 15.3 2.6 10.2C2 7 4 4.4 7 4.4c2 0 3.7 1.1 5 3.1 1.3-2 3-3.1 5-3.1 3 0 5 2.6 4.4 5.8-1 5.1-9.4 10.2-9.4 10.2z"/></svg>';
+}
+
+/**
  * Galerie paginée, relecture et visionneuse accessible avec un repli sans JavaScript.
  *
  * @param object $album Album.
@@ -439,15 +462,16 @@ function scoutsunite_photos_envoi_formulaire( $album ) {
 function scoutsunite_photos_galerie( $album, $gestion ) {
 	global $wpdb;
 	$modification = $gestion && ( current_user_can( 'scoutsunite_gerer_photos' ) || in_array( $album->etat, array( 'brouillon', 'ouvert' ), true ) );
+	$par_page = $gestion ? 24 : 60; // Les familles défilent : plus de photos par page, la suite arrive toute seule.
 	$page   = isset( $_GET['p'] ) && is_scalar( $_GET['p'] ) ? max( 1, min( 10000, absint( $_GET['p'] ) ) ) : 1; // phpcs:ignore WordPress.Security.NonceVerification -- pagination en lecture seule.
 	$tag    = isset( $_GET['tag'] ) && is_string( $_GET['tag'] ) ? sanitize_title( wp_unslash( $_GET['tag'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification -- filtre de lecture, jamais une permission.
 	$motif  = '%"' . $wpdb->esc_like( $tag ) . '":%';
 	$statut = $gestion ? '' : 'publiee';
 	$total  = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE album = %d AND (%s = %s OR statut = %s) AND (%s = %s OR tags LIKE %s)', scoutsunite_photos_table( 'images' ), $album->id, $statut, '', $statut, $tag, '', $motif ) );
-	$images = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %i WHERE album = %d AND (%s = %s OR statut = %s) AND (%s = %s OR tags LIKE %s) ORDER BY id DESC LIMIT 24 OFFSET %d', scoutsunite_photos_table( 'images' ), $album->id, $statut, '', $statut, $tag, '', $motif, ( $page - 1 ) * 24 ) );
+	$images = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %i WHERE album = %d AND (%s = %s OR statut = %s) AND (%s = %s OR tags LIKE %s) ORDER BY id DESC LIMIT %d OFFSET %d', scoutsunite_photos_table( 'images' ), $album->id, $statut, '', $statut, $tag, '', $motif, $par_page, ( $page - 1 ) * $par_page ) );
 	$vue    = isset( $_GET['voir'] ) && is_scalar( $_GET['voir'] ) ? scoutsunite_photos_visionner( $album, absint( $_GET['voir'] ), $tag ) : null; // phpcs:ignore WordPress.Security.NonceVerification -- visionneuse soumise aux mêmes droits que les images.
 	if ( $vue && ! is_wp_error( $vue ) ) {
-		echo '<section class="photos__vue"><a href="' . esc_url( add_query_arg( array( 'p' => (int) ceil( $vue['position'] / 24 ), 'tag' => $tag ), scoutsunite_photos_url( $album ) ) ) . '">← Fermer la photo</a><p>Photo ' . (int) $vue['position'] . ' sur ' . (int) $vue['total'] . '</p><img src="' . esc_url( $vue['image'] ) . '" alt="' . esc_attr( $vue['legende'] ) . '"><nav class="photos__actions" aria-label="Parcourir les photos">';
+		echo '<section class="photos__vue" data-photo="' . (int) $vue['photo'] . '"><a href="' . esc_url( add_query_arg( array( 'p' => (int) ceil( $vue['position'] / $par_page ), 'tag' => $tag ), scoutsunite_photos_url( $album ) ) ) . '">← Fermer la photo</a><p>Photo ' . (int) $vue['position'] . ' sur ' . (int) $vue['total'] . '</p><img src="' . esc_url( $vue['image'] ) . '" alt="' . esc_attr( $vue['legende'] ) . '"><nav class="photos__actions" aria-label="Parcourir les photos">';
 		foreach ( array( 'precedente' => 'Précédente', 'suivante' => 'Suivante' ) as $sens => $libelle ) {
 			if ( $vue[ $sens ] ) {
 				echo '<a href="' . esc_url( add_query_arg( array( 'voir' => $vue[ $sens ], 'tag' => $tag ), scoutsunite_photos_url( $album ) ) ) . '">' . esc_html( $libelle ) . '</a>';
@@ -456,24 +480,25 @@ function scoutsunite_photos_galerie( $album, $gestion ) {
 		echo '<a href="' . esc_url( $vue['telecharger'] ) . '">Télécharger cette photo</a></nav></section>';
 	}
 	?>
-	<section class="photos__galerie"><h2><?php echo (int) $total; ?> photo<?php echo 1 === $total ? '' : 's'; ?> du camp</h2>
-	<nav class="photos__tags" aria-label="Classer les photos par moment"><a href="<?php echo esc_url( scoutsunite_photos_url( $album ) ); ?>" <?php echo ! $tag ? 'aria-current="true"' : ''; ?>>Tous les moments</a><?php foreach ( scoutsunite_photos_tags_album( $album, $gestion ) as $cle_tag => $nom_tag ) : ?><a href="<?php echo esc_url( add_query_arg( 'tag', $cle_tag, scoutsunite_photos_url( $album ) ) ); ?>" <?php echo $tag === $cle_tag ? 'aria-current="true"' : ''; ?>><?php echo esc_html( $nom_tag ); ?></a><?php endforeach; ?></nav>
+	<section class="photos__galerie<?php echo $gestion ? '' : ' photos__galerie--famille'; ?>"><h2 class="<?php echo $gestion ? '' : 'photos__masque'; ?>"><?php echo (int) $total; ?> photo<?php echo 1 === $total ? '' : 's'; ?> du camp</h2>
+	<?php $tags_dispo = scoutsunite_photos_tags_album( $album, $gestion ); if ( $tags_dispo || $gestion || $tag ) : ?><nav class="photos__tags" aria-label="Classer les photos par moment"><a href="<?php echo esc_url( scoutsunite_photos_url( $album ) ); ?>" <?php echo ! $tag ? 'aria-current="true"' : ''; ?>>Tous les moments</a><?php foreach ( $tags_dispo as $cle_tag => $nom_tag ) : ?><a href="<?php echo esc_url( add_query_arg( 'tag', $cle_tag, scoutsunite_photos_url( $album ) ) ); ?>" <?php echo $tag === $cle_tag ? 'aria-current="true"' : ''; ?>><?php echo esc_html( $nom_tag ); ?></a><?php endforeach; ?></nav><?php endif; ?>
 	<?php if ( ! $total ) : ?><p class="photos__vide">Les photos arrivent bientôt. Repasse après les nouvelles du staff.</p><?php endif; ?>
 	<?php if ( $modification && $images ) : ?><form method="post"><?php wp_nonce_field( 'scoutsunite_photos', '_wpnonce', false ); ?><input type="hidden" name="album" value="<?php echo (int) $album->id; ?>"><label><input type="checkbox" id="photos-tout"> Sélectionner les photos de cette page</label><?php endif; ?>
 	<div class="photos__grille"><?php foreach ( $images as $image ) :
 		$url = scoutsunite_photos_url( $album );
 		?>
-		<figure class="photos__photo"><a class="photos__ouvrir" href="<?php echo esc_url( add_query_arg( array( 'voir' => $image->id, 'tag' => $tag ), $url ) ); ?>" data-photo="<?php echo (int) $image->id; ?>" data-image="<?php echo esc_url( add_query_arg( 'fichier', $image->id, $url ) ); ?>">
-		<img loading="lazy" width="480" height="360" src="<?php echo esc_url( add_query_arg( array( 'fichier' => $image->id, 'format' => 'mini' ), $url ) ); ?>" alt="<?php echo esc_attr( $image->legende ?: 'Photo du camp, référence ' . $image->id ); ?>"></a>
-		<figcaption><?php if ( $gestion ) : ?><div class="photos__photo-outils"><label><?php if ( $modification ) : ?><input type="checkbox" name="photos[]" value="<?php echo (int) $image->id; ?>"><?php endif; ?> Photo <?php echo (int) $image->id; ?> — <?php echo esc_html( array( 'attente' => 'À vérifier', 'publiee' => 'Publiée', 'retiree' => 'Retirée' )[ $image->statut ] ?? '' ); ?></label>
-		<?php if ( $modification ) : ?><button type="submit" name="photo_supprimer" value="<?php echo (int) $image->id; ?>" class="photos__poubelle photos__secondaire" aria-label="Supprimer la photo <?php echo (int) $image->id; ?>" title="Supprimer cette photo" data-confirmer="Supprimer définitivement cette photo ?"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/></svg></button><?php endif; ?></div><?php endif; ?>
-		<?php if ( $image->legende ) : ?><span><?php echo esc_html( $image->legende ); ?></span><?php endif; ?><span><?php echo esc_html( implode( ' · ', array_values( scoutsunite_photos_tags_image( $image ) ) ) ); ?></span><span><?php echo esc_html( wp_date( 'j F Y', strtotime( $image->ajoute_le . ' UTC' ) ) ); ?></span></figcaption></figure>
+		<figure class="photos__photo<?php echo $gestion ? '' : ' photos__photo--famille'; ?>"><a class="photos__ouvrir" href="<?php echo esc_url( add_query_arg( array( 'voir' => $image->id, 'tag' => $tag ), $url ) ); ?>" data-photo="<?php echo (int) $image->id; ?>" data-image="<?php echo esc_url( add_query_arg( 'fichier', $image->id, $url ) ); ?>">
+		<img loading="lazy" width="480" height="480" src="<?php echo esc_url( add_query_arg( array( 'fichier' => $image->id, 'format' => 'mini' ), $url ) ); ?>" alt="<?php echo esc_attr( $image->legende ?: 'Photo du camp, référence ' . $image->id ); ?>"></a>
+		<?php if ( 'publiee' === $image->statut ) : ?><button type="button" class="photos__marquer photos__secondaire" data-photo="<?php echo (int) $image->id; ?>" aria-label="Marquer la photo <?php echo (int) $image->id; ?>" aria-pressed="false" hidden><?php echo scoutsunite_photos_coeur(); // phpcs:ignore WordPress.Security.EscapeOutput -- SVG constant. ?></button><?php endif; ?>
+		<?php if ( $gestion ) : ?><figcaption><div class="photos__photo-outils"><label><?php if ( $modification ) : ?><input type="checkbox" name="photos[]" value="<?php echo (int) $image->id; ?>"><?php endif; ?> Photo <?php echo (int) $image->id; ?> — <?php echo esc_html( array( 'attente' => 'À vérifier', 'publiee' => 'Publiée', 'retiree' => 'Retirée' )[ $image->statut ] ?? '' ); ?></label>
+		<?php if ( $modification ) : ?><button type="submit" name="photo_supprimer" value="<?php echo (int) $image->id; ?>" class="photos__poubelle photos__secondaire" aria-label="Supprimer la photo <?php echo (int) $image->id; ?>" title="Supprimer cette photo" data-confirmer="Supprimer définitivement cette photo ?"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/></svg></button><?php endif; ?></div>
+		<?php if ( $image->legende ) : ?><span><?php echo esc_html( $image->legende ); ?></span><?php endif; ?><span><?php echo esc_html( implode( ' · ', array_values( scoutsunite_photos_tags_image( $image ) ) ) ); ?></span><span><?php echo esc_html( wp_date( 'j F Y', strtotime( $image->ajoute_le . ' UTC' ) ) ); ?></span></figcaption><?php endif; ?></figure>
 	<?php endforeach; ?></div>
 	<?php if ( $modification && $images ) : ?><div class="photos__actions"><button type="submit" name="operation" value="retirer" class="photos__secondaire">Retirer de l’album parent</button><button type="submit" name="operation" value="supprimer_photo" class="photos__secondaire" data-confirmer="Supprimer définitivement les photos sélectionnées ?">Supprimer la sélection</button></div><details class="photos__classement"><summary>Classer ou remettre en ligne la sélection</summary><label for="photos-tags-selection">Tags à ajouter</label><input id="photos-tags-selection" name="tags" maxlength="330" placeholder="Petit déjeuner, Dîner"><button type="submit" name="operation" value="taguer">Ajouter ces tags</button><button type="submit" name="operation" value="effacer_tags" class="photos__secondaire">Retirer tous les tags de la sélection</button><p>Pour rétablir des photos retirées ou publier d’anciennes photos « À vérifier » :</p><button type="submit" name="operation" value="publier">Remettre la sélection en ligne</button></details></form><?php endif; ?>
-	<nav class="photos__pagination" aria-label="Pages de photos"><?php if ( $page > 1 ) : ?><a href="<?php echo esc_url( add_query_arg( array( 'p' => $page - 1, 'tag' => $tag ), scoutsunite_photos_url( $album ) ) ); ?>">← Photos précédentes</a><?php endif; ?><?php if ( $page * 24 < $total ) : ?><a href="<?php echo esc_url( add_query_arg( array( 'p' => $page + 1, 'tag' => $tag ), scoutsunite_photos_url( $album ) ) ); ?>">Photos suivantes →</a><?php endif; ?></nav>
+	<nav class="photos__pagination" aria-label="Pages de photos"><?php if ( $page > 1 ) : ?><a href="<?php echo esc_url( add_query_arg( array( 'p' => $page - 1, 'tag' => $tag ), scoutsunite_photos_url( $album ) ) ); ?>">← Photos précédentes</a><?php endif; ?><?php if ( $page * $par_page < $total ) : ?><a rel="next" href="<?php echo esc_url( add_query_arg( array( 'p' => $page + 1, 'tag' => $tag ), scoutsunite_photos_url( $album ) ) ); ?>">Photos suivantes →</a><?php endif; ?></nav>
 	<?php if ( $gestion ) : ?><details class="photos__classement"><summary>Exporter pour préparer un livre photo</summary><p>Le ZIP contient les photos publiées<?php echo $tag ? ' de ce moment' : ''; ?> et leurs tags. Ce sont les versions optimisées, de 2 560 pixels au plus. Pour de grands tirages, garde les originaux.</p><form method="post"><?php scoutsunite_photos_champs( 'exporter', $album ); ?><input type="hidden" name="tag" value="<?php echo esc_attr( $tag ); ?>"><button type="submit">Exporter les photos publiées (ZIP)</button></form></details><?php endif; ?>
 	</section>
-	<dialog id="photos-visionneuse" class="photos__dialogue" tabindex="-1" aria-labelledby="photos-vue-titre" data-url="<?php echo esc_url( add_query_arg( 'tag', $tag, scoutsunite_photos_url( $album ) ) ); ?>"><div class="photos__vue-entete"><p id="photos-vue-titre">Photo du camp</p><button type="button" id="photos-fermer" autofocus>Fermer</button></div><img id="photos-vue-image" alt=""><p id="photos-vue-erreur" role="status"></p><div class="photos__actions"><button type="button" id="photos-precedente" disabled>Précédente</button><button type="button" id="photos-suivante" disabled>Suivante</button><a id="photos-telecharger">Télécharger cette photo</a></div></dialog>
+	<dialog id="photos-visionneuse" class="photos__dialogue" tabindex="-1" aria-labelledby="photos-vue-titre" data-album-url="<?php echo esc_url( scoutsunite_photos_url( $album ) ); ?>" data-url="<?php echo esc_url( add_query_arg( 'tag', $tag, scoutsunite_photos_url( $album ) ) ); ?>"><div class="photos__vue-entete"><p id="photos-vue-titre">Photo du camp</p><button type="button" id="photos-fermer" autofocus>Fermer</button></div><div class="photos__cadre" id="photos-vue-cadre"><img id="photos-vue-image" alt=""></div><p id="photos-vue-legende"></p><p id="photos-vue-erreur" role="status"></p><button type="button" id="photos-precedente" class="photos__fleche photos__fleche--precedente" disabled>Photo précédente</button><button type="button" id="photos-suivante" class="photos__fleche photos__fleche--suivante" disabled>Photo suivante</button><div class="photos__vue-pied"><button type="button" id="photos-marquer-vue" class="photos__marquer photos__secondaire" aria-label="Marquer cette photo" aria-pressed="false" hidden><?php echo scoutsunite_photos_coeur(); // phpcs:ignore WordPress.Security.EscapeOutput -- SVG constant. ?></button><a id="photos-telecharger">Télécharger</a></div></dialog>
 	<?php
 }
 

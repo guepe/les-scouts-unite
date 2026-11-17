@@ -1,8 +1,8 @@
 # Mode d'emploi du site – Chefs d'unité
 
-Thème et extension 3.5.0 · 15 novembre 2026
+Thème et extension 3.5.2 · 17 novembre 2026
 
-> Plus rapide à lire : [le site en 9 fiches](fiches-chefs-unite/), avec les vrais écrans ([PDF](fiches-chefs-unite/fiches-chefs-unite.pdf)).
+> Plus rapide à lire : [le site en 10 fiches](fiches-chefs-unite/), avec les vrais écrans ([PDF](fiches-chefs-unite/fiches-chefs-unite.pdf)).
 
 Ce guide est pour le staff d’unité : régler le site une fois, donner accès aux animateurs, puis tenir à jour ce qui concerne toute l’unité. Pour les réunions et les documents d’une section, le [guide des animateurs](mode-emploi-animateurs.md) explique le détail ; tu peux faire tout ce qu’il décrit, pour toutes les sections.
 
@@ -42,11 +42,19 @@ Chaque album garde sa propre clé, différente des autres sections et années. L
 
 **L’expiration** : tu peux choisir le dernier jour d’accès des parents. Les photos restent conservées après cette date ; elles ne sont jamais effacées automatiquement. Pour supprimer tout l’album, ouvre **Supprimer l’album**, sous le panneau de partage, écris **SUPPRIMER**, puis confirme. Cette action est réservée aux administrateurs et au staff d’unité. Les animateurs peuvent utiliser la poubelle à côté d’une photo ou supprimer une sélection, avec confirmation. Le compteur d’espace indique quand il faut libérer de la place ; l’administrateur peut adapter les quotas.
 
-**Consultation parent** : la visionneuse permet de passer d’une photo à l’autre dans tout l’album, ou le tag choisi, avec les boutons ou un balayage au doigt. Le petit bouton **Fermer** en bas de l’album efface seulement l’accès de cet album sur ce navigateur ; le parent doit rouvrir son lien pour revenir. Les demandes de retrait ne sont plus affichées, en attendant un futur parcours.
+**Consultation parent** : la visionneuse permet de passer d’une photo à l’autre dans tout l’album, ou le tag choisi, avec les boutons ou un balayage au doigt. Le passage conserve la photo affichée pendant que la suivante arrive, sans recharger la page. Le petit bouton **Fermer** en bas de l’album efface seulement l’accès de cet album sur ce navigateur ; le parent doit rouvrir son lien pour revenir. Les demandes de retrait ne sont plus affichées, en attendant un futur parcours.
+
+**Les souvenirs des parents** : le cœur sous chaque miniature ou dans la visionneuse marque une photo. Dans **Ma sélection**, le parent retrouve ses choix de tout l’album, peut **Tout marquer dans l’album**, enlever un choix, vider sa sélection ou **Exporter ma sélection (ZIP)**. Ses choix restent sur ce navigateur jusqu’à son effacement volontaire ; seuls les numéros des photos sont mémorisés, jamais les images. Un autre appareil ne retrouve pas ces choix. Le bouton **Fermer** coupe l’accès, mais conserve la sélection pour une prochaine ouverture avec le lien.
+
+**Les demandes au staff** : dans **Ma sélection → Préparer une demande au staff**, le parent donne son nom, son e-mail et un message. Dans l’album, ouvre **Demandes des parents** : tu vois les coordonnées, le message et les références, puis tu peux exporter les photos encore disponibles et **Marquer comme traitée**. Contacte le parent pour confirmer le souvenir, les exemplaires et les modalités. Le site n’envoie pas d’e-mail automatique, ne prend aucun paiement et ne transmet rien à un imprimeur. Chaque animateur voit les demandes de ses sections ; le staff d’unité les voit toutes. **Effacer la demande** supprime ses coordonnées sans toucher aux photos. Les demandes traitées sont effacées après 90 jours ; pense à traiter ou effacer celles en attente.
+
+**Faire connaître les photos** : la page publique **Photos de camp**, à `/photos-de-camp/`, explique le parcours aux familles. Un encart y mène depuis l’accueil et chaque page de section, y compris les pages déjà créées. Elle ne montre aucune photo privée ni lien secret. À la première visite, le parent doit ouvrir le lien ou scanner le QR donné par le staff. Ensuite, **Ouvrir mes albums** retrouve les accès de son navigateur. La page existe dans **Pages** : le staff peut modifier son contenu, la dépublier ou la supprimer ; elle n’est pas recréée à chaque visite.
 
 **Un retrait demandé par une famille ?** La référence est dans son message. Sélectionne la photo et choisis **Retirer de l’album parent**. Vérifie les autorisations avant chaque publication : un album privé ne les remplace pas. On ne peut pas rappeler les fichiers déjà téléchargés.
 
 **Avant la première utilisation**, l’administrateur vérifie le dossier privé, HTTPS et les exclusions de cache, selon le [README](../README.md#les-photos-de-camp). Si un message bloque l’espace, l’hébergement doit être configuré ; ne mets pas ces images dans la médiathèque publique. Fais sauvegarder aussi le dossier privé, avec une durée prévue pour les sauvegardes. Après restauration, réapplique les retraits et renouvelle les clés avant de rendre les albums accessibles.
+
+[Voir la présentation publique de démonstration](fiches-chefs-unite/source/captures/photos-presentation.png).
 
 ## Donner accès à un animateur
 

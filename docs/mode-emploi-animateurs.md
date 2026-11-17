@@ -1,8 +1,8 @@
 # Mode d'emploi du site – Animateurs
 
-Thème et extension 3.5.0 · 15 novembre 2026
+Thème et extension 3.5.2 · 17 novembre 2026
 
-> Plus rapide à lire : [le site en 8 fiches](fiches-animateurs/), avec les vrais écrans ([PDF](fiches-animateurs/fiches-animateurs.pdf)).
+> Plus rapide à lire : [le site en 9 fiches](fiches-animateurs/), avec les vrais écrans ([PDF](fiches-animateurs/fiches-animateurs.pdf)).
 
 Ce guide t’explique, pas à pas, comment tenir à jour le site de l’unité pour ta section : les réunions, les documents, les photos de camp et la page de ta section. Les photos s’envoient aussi directement depuis ton téléphone.
 
@@ -83,7 +83,13 @@ Pour remplacer un document par sa nouvelle version, ouvre-le, choisis le nouveau
 
 **Pour retirer une photo** : sélectionne-la puis **Retirer de l’album parent**. Le staff de la section peut encore la consulter ; les parents ne peuvent plus l’ouvrir ni la télécharger. La **poubelle à côté de la photo**, après confirmation, efface ses fichiers du site. Pour plusieurs photos, coche-les puis **Supprimer la sélection**. La poubelle individuelle n’efface que sa photo, même si d’autres sont cochées. Un nouvel envoi d’une photo retirée ne la republie pas : utilise **Remettre la sélection en ligne** pour la rétablir volontairement. Les copies déjà téléchargées restent chez leurs destinataires. Seuls les administrateurs et le staff d’unité peuvent supprimer tout l’album.
 
-**Côté parents** : toucher une photo ouvre la visionneuse. Les boutons, les flèches du clavier ou un balayage au doigt permettent de parcourir tout l’album, ou seulement le tag affiché. Le bouton **Fermer** dans la visionneuse revient à la grille. Le petit bouton **Fermer en bas de l’album** efface l’accès mémorisé à cet album : il faut rouvrir le lien pour revenir. Les demandes de retrait ne sont plus proposées dans cette interface, en attendant un parcours plus complet.
+**Côté parents** : toucher une photo ouvre la visionneuse. Les boutons, les flèches du clavier ou un balayage au doigt permettent de parcourir tout l’album, ou seulement le tag affiché. La photo reste affichée pendant le chargement de la suivante, sans recharger la page. Le bouton **Fermer** dans la visionneuse revient à la grille. Le petit bouton **Fermer en bas de l’album** efface l’accès mémorisé à cet album : il faut rouvrir le lien pour revenir. Les demandes de retrait ne sont plus proposées dans cette interface, en attendant un parcours plus complet.
+
+**Les souvenirs des parents** : le cœur sous chaque miniature ou dans la visionneuse marque une photo. Dans **Ma sélection**, le parent retrouve ses choix de tout l’album, peut **Tout marquer dans l’album**, enlever un choix, vider sa sélection ou **Exporter ma sélection (ZIP)**. Ses choix restent sur ce navigateur jusqu’à son effacement volontaire ; seuls les numéros des photos sont mémorisés, jamais les images. Un autre appareil ne retrouve pas ces choix. Le bouton **Fermer** coupe l’accès, mais conserve la sélection pour une prochaine ouverture avec le lien.
+
+**Les demandes au staff** : dans **Ma sélection → Préparer une demande au staff**, le parent donne son nom, son e-mail et un message. Dans l’album, ouvre **Demandes des parents** : tu vois les coordonnées, le message et les références, puis tu peux exporter les photos encore disponibles et **Marquer comme traitée**. Contacte le parent pour confirmer le souvenir, les exemplaires et les modalités. Le site n’envoie pas d’e-mail automatique, ne prend aucun paiement et ne transmet rien à un imprimeur. Chaque animateur voit les demandes de ses sections ; le staff d’unité les voit toutes. **Effacer la demande** supprime ses coordonnées sans toucher aux photos. Les demandes traitées sont effacées après 90 jours ; pense à traiter ou effacer celles en attente.
+
+**Faire connaître les photos** : la page publique **Photos de camp**, à `/photos-de-camp/`, explique le parcours aux familles. Un encart y mène depuis l’accueil et chaque page de section, y compris les pages déjà créées. Elle ne montre aucune photo privée ni lien secret. À la première visite, le parent doit ouvrir le lien ou scanner le QR donné par le staff. Ensuite, **Ouvrir mes albums** retrouve les accès de son navigateur. La page existe dans **Pages** : le staff peut modifier son contenu, la dépublier ou la supprimer ; elle n’est pas recréée à chaque visite.
 
 **À plusieurs** : tous les animateurs dont le compte est rattaché à ta section peuvent publier dans le même album et gérer son accès. Chacun garde son compte habituel.
 

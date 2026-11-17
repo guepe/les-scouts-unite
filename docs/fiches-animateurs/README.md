@@ -1,13 +1,13 @@
-# Le site de l’unité en 8 fiches – pour les animateurs
+# Le site de l’unité en 9 fiches – pour les animateurs
 
 Un geste par fiche, avec les vrais écrans de WordPress. Les fiches se lisent sur un téléphone et s’envoient en images dans le groupe WhatsApp du staff.
 
-**[Télécharger toutes les fiches en PDF](fiches-animateurs.pdf)** (9 pages)
+**[Télécharger toutes les fiches en PDF](fiches-animateurs.pdf)** (10 pages)
 
-Le même contenu en texte, plus détaillé : [Mode d’emploi pour les animateurs](../mode-emploi-animateurs.md). Pour le staff d’unité : [les 9 fiches des chefs d’unité](../fiches-chefs-unite/) et le [mode d’emploi pour les chefs d’unité](../mode-emploi-chefs-unite.md).
+Le même contenu en texte, plus détaillé : [Mode d’emploi pour les animateurs](../mode-emploi-animateurs.md). Pour le staff d’unité : [les 10 fiches des chefs d’unité](../fiches-chefs-unite/) et le [mode d’emploi pour les chefs d’unité](../mode-emploi-chefs-unite.md).
 
 <p>
-<a href="00-couverture.png"><img src="00-couverture.png" width="260" alt="Couverture : le site de l’unité en 8 fiches"></a>
+<a href="00-couverture.png"><img src="00-couverture.png" width="260" alt="Couverture : le site de l’unité en 9 fiches"></a>
 <a href="01-ajouter-une-reunion.png"><img src="01-ajouter-une-reunion.png" width="260" alt="Fiche 1 : ajouter une réunion"></a>
 <a href="02-annuler-une-reunion.png"><img src="02-annuler-une-reunion.png" width="260" alt="Fiche 2 : une réunion n’a pas lieu ?"></a>
 <a href="03-toutes-les-semaines.png"><img src="03-toutes-les-semaines.png" width="260" alt="Fiche 3 : tous les samedis, en une fois"></a>
@@ -16,6 +16,7 @@ Le même contenu en texte, plus détaillé : [Mode d’emploi pour les animateur
 <a href="06-ce-que-voient-les-parents.png"><img src="06-ce-que-voient-les-parents.png" width="260" alt="Fiche 6 : ce que voient les parents"></a>
 <a href="07-ca-coince.png"><img src="07-ca-coince.png" width="260" alt="Fiche 7 : ça coince ?"></a>
 <a href="08-photos-camp.png"><img src="08-photos-camp.png" width="260" alt="Fiche 8 : Les photos du camp, depuis ton téléphone"></a>
+<a href="09-souvenirs-parents.png"><img src="09-souvenirs-parents.png" width="260" alt="Fiche 9 : les souvenirs des parents"></a>
 </p>
 
 | Fiche | Ce qu’on y apprend |
@@ -29,8 +30,9 @@ Le même contenu en texte, plus détaillé : [Mode d’emploi pour les animateur
 | [6 · Ce que voient les parents](06-ce-que-voient-les-parents.png) | La page de section, le programme frigo, le calendrier |
 | [7 · Ça coince ?](07-ca-coince.png) | Les six soucis les plus courants |
 | [8 · Les photos du camp, depuis ton téléphone](08-photos-camp.png) | Créer plusieurs albums, publier, partager le lien et le QR, supprimer une photo |
+| [9 · Les souvenirs des parents](09-souvenirs-parents.png) | Marquer, exporter et transmettre une demande privée au staff |
 
-Fiches de la version **3.5.0** (15 novembre 2026), avec des captures prises sur le site de démonstration.
+Fiches de la version **3.5.1** (15 novembre 2026), avec des captures prises sur le site de démonstration.
 
 ## Mettre les fiches à jour
 
@@ -38,7 +40,7 @@ Fiches de la version **3.5.0** (15 novembre 2026), avec des captures prises sur 
 
 [La fiche illustrée « Les photos du camp, depuis ton téléphone »](08-photos-camp.png) explique l’envoi depuis la pellicule, la publication directe et le partage autonome. [Source modifiable](source/Photos.dc.html) · [Écran parent de démonstration](source/captures/photos-parent.png).
 
-Cette fiche est incluse dans le PDF de neuf pages ci-dessus.
+Cette fiche est incluse dans le PDF de dix pages ci-dessus.
 
 Les sources sont dans [`source/`](source/) : une page `.dc.html` par fiche (format du canevas Claude Design), `canvas.json` et les captures d’écran dans `source/captures/`. Après un changement d’écran dans WordPress ou dans le thème, refaire la capture concernée, adapter la fiche, puis regénérer les images et le PDF.
 

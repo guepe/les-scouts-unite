@@ -11,8 +11,8 @@ const { spawnSync } = require( 'node:child_process' );
 const { chromium } = require( process.env.SCOUTSUNITE_PLAYWRIGHT || 'playwright' );
 
 const livrets = [
-	[ 'fiches-animateurs', [ '00-couverture', '01-ajouter-une-reunion', '02-annuler-une-reunion', '03-toutes-les-semaines', '04-ajouter-un-document', '05-ta-page-de-section', '06-ce-que-voient-les-parents', '07-ca-coince', '08-photos-camp' ] ],
-	[ 'fiches-chefs-unite', [ '00-couverture', '01-donner-acces', '02-le-staff', '03-bon-a-savoir-whatsapp', '04-activite-unite', '05-documents-unite', '06-pages-et-menu', '07-reglages-mise-a-jour', '08-ca-coince', '09-photos-camp' ] ]
+	[ 'fiches-animateurs', [ '00-couverture', '01-ajouter-une-reunion', '02-annuler-une-reunion', '03-toutes-les-semaines', '04-ajouter-un-document', '05-ta-page-de-section', '06-ce-que-voient-les-parents', '07-ca-coince', '08-photos-camp', '09-souvenirs-parents' ] ],
+	[ 'fiches-chefs-unite', [ '00-couverture', '01-donner-acces', '02-le-staff', '03-bon-a-savoir-whatsapp', '04-activite-unite', '05-documents-unite', '06-pages-et-menu', '07-reglages-mise-a-jour', '08-ca-coince', '09-photos-camp', '10-souvenirs-parents' ] ]
 ];
 
 ( async () => {

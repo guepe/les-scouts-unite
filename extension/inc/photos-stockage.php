@@ -30,9 +30,15 @@ function scoutsunite_photos_dans_dossier( $chemin, $racine ) {
  * @return string|WP_Error
  */
 function scoutsunite_photos_dossier() {
+	static $memo = array();
 	$chemin = defined( 'SCOUTSUNITE_PHOTOS_DOSSIER' ) ? SCOUTSUNITE_PHOTOS_DOSSIER : dirname( untrailingslashit( ABSPATH ) ) . '/scoutsunite-prive-' . substr( hash( 'sha256', home_url() ), 0, 12 );
 	if ( ! is_string( $chemin ) || ! path_is_absolute( $chemin ) || false !== strpos( $chemin, '://' ) ) {
 		return new WP_Error( 'stockage', 'Le dossier privé des photos doit être un chemin absolu sur le serveur.' );
+	}
+	// Mémorisé pendant la requête : chaque photo demande ce chemin et les contrôles coûtent des accès disque.
+	$cle_memo = $chemin . '|' . ( isset( $_SERVER['DOCUMENT_ROOT'] ) ? $_SERVER['DOCUMENT_ROOT'] : '' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- simple clé de mémoire.
+	if ( isset( $memo[ $cle_memo ] ) ) {
+		return $memo[ $cle_memo ];
 	}
 	// Vérifier les ancêtres avant toute création, puis le chemin réel créé : un lien ne contourne pas la règle.
 	$ancetre = $chemin;
@@ -41,10 +47,15 @@ function scoutsunite_photos_dossier() {
 	}
 	$racines = array( realpath( ABSPATH ), realpath( WP_CONTENT_DIR ) );
 	$racine_web = ! empty( $_SERVER['DOCUMENT_ROOT'] ) ? realpath( sanitize_text_field( wp_unslash( $_SERVER['DOCUMENT_ROOT'] ) ) ) : false;
-	if ( ! $racine_web ) {
+	// Hors requête web (WP-CLI, cron système), DOCUMENT_ROOT n'existe pas : le dossier a déjà été validé
+	// par les requêtes web, et les racines de WordPress restent contrôlées. Sans cela, le nettoyage ne tournerait jamais.
+	$hors_web = ( defined( 'WP_CLI' ) && WP_CLI ) || wp_doing_cron();
+	if ( ! $racine_web && ! $hors_web ) {
 		return new WP_Error( 'stockage_inconnu', 'Le serveur ne permet pas de vérifier la racine web. L’hébergeur doit renseigner DOCUMENT_ROOT avant d’ouvrir l’espace privé.' );
 	}
-	$racines[] = $racine_web;
+	if ( $racine_web ) {
+		$racines[] = $racine_web;
+	}
 	foreach ( array_filter( $racines ) as $racine ) {
 		if ( scoutsunite_photos_dans_dossier( (string) realpath( $ancetre ), $racine ) ) {
 			return new WP_Error( 'stockage_public', 'Le dossier des photos est dans un emplacement public. L’administrateur doit configurer SCOUTSUNITE_PHOTOS_DOSSIER hors de la racine web.' );
@@ -66,6 +77,7 @@ function scoutsunite_photos_dossier() {
 	if ( $nouveau ) {
 		chmod( $reel, 0700 );
 	}
+	$memo[ $cle_memo ] = $reel;
 	return $reel;
 }
 
@@ -318,7 +330,7 @@ function scoutsunite_photos_importer( $album, $source, $legende = '', $tags = ar
 		if ( scoutsunite_photos_poids( $album->id ) + $taille > scoutsunite_photos_quota() || scoutsunite_photos_poids() + $taille > scoutsunite_photos_quota( true ) ) {
 			return new WP_Error( 'quota', 'L’espace prévu pour les photos est plein. Demande au staff de libérer de la place.' );
 		}
-		$cree = $wpdb->insert( scoutsunite_photos_table( 'images' ), array( 'album' => $album->id, 'nom' => $nom, 'empreinte' => $empreinte, 'statut' => 'publiee', 'legende' => wp_html_excerpt( sanitize_text_field( $legende ), 180, '' ), 'tags' => wp_json_encode( $tags ), 'taille' => $taille, 'largeur' => $resultat['width'], 'hauteur' => $resultat['height'], 'auteur' => get_current_user_id(), 'ajoute_le' => gmdate( 'Y-m-d H:i:s' ) ), array( '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%s' ) );
+		$cree = $wpdb->insert( scoutsunite_photos_table( 'images' ), array( 'album' => $album->id, 'nom' => $nom, 'empreinte' => $empreinte, 'statut' => 'publiee', 'legende' => wp_html_excerpt( sanitize_text_field( $legende ), 180, '' ), 'tags' => scoutsunite_photos_tags_json( $tags ), 'taille' => $taille, 'largeur' => $resultat['width'], 'hauteur' => $resultat['height'], 'auteur' => get_current_user_id(), 'ajoute_le' => gmdate( 'Y-m-d H:i:s' ) ), array( '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%s' ) );
 		if ( ! $cree ) {
 			return new WP_Error( 'base', 'La photo n’a pas été enregistrée. Réessaie.' );
 		}
@@ -361,11 +373,12 @@ function scoutsunite_photos_effacer_fichiers( $image ) {
  *
  * @param object $album Album.
  * @param string $tag Tag facultatif, identifiant déjà assaini.
+ * @param array|null $selection Références explicites pour l'export parent ; null reste réservé au staff.
  * @return string|WP_Error Chemin d'un ZIP temporaire à effacer après le téléchargement.
  */
-function scoutsunite_photos_exporter( $album, $tag = '' ) {
+function scoutsunite_photos_exporter( $album, $tag = '', $selection = null ) {
 	global $wpdb;
-	if ( ! scoutsunite_photos_peut_gerer( $album ) ) {
+	if ( null === $selection ? ! scoutsunite_photos_peut_gerer( $album ) : ! scoutsunite_photos_selection_autorisee( $album ) ) {
 		return new WP_Error( 'interdit', 'L’export est réservé aux animateurs de la section et au staff.', array( 'status' => 403 ) );
 	}
 	if ( ! class_exists( 'ZipArchive' ) ) {
@@ -378,12 +391,27 @@ function scoutsunite_photos_exporter( $album, $tag = '' ) {
 	$chemin = '';
 	$pret   = false;
 	try {
-		$images = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %i WHERE album = %d AND statut = %s ORDER BY id', scoutsunite_photos_table( 'images' ), $album->id, 'publiee' ) );
-		if ( $tag ) {
+		$album = scoutsunite_photos_album( $album->id );
+		if ( null === $selection && ! scoutsunite_photos_peut_gerer( $album ) ) {
+			return new WP_Error( 'interdit', 'Tu n’as plus accès à cet album.' );
+		}
+		$images = null === $selection ? $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %i WHERE album = %d AND statut = %s ORDER BY id', scoutsunite_photos_table( 'images' ), $album->id, 'publiee' ) ) : scoutsunite_photos_selection_images( $album, $selection );
+		if ( is_wp_error( $images ) ) {
+			return $images;
+		}
+		if ( $tag && null === $selection ) {
 			$images = array_values( array_filter( $images, function ( $image ) use ( $tag ) { return isset( scoutsunite_photos_tags_image( $image )[ $tag ] ); } ) );
 		}
 		if ( ! $images ) {
 			return new WP_Error( 'vide', 'Publie au moins une photo dans cette sélection avant de l’exporter.' );
+		}
+		if ( null !== $selection && ! scoutsunite_photos_peut_gerer( $album ) ) {
+			$limite = 'su_photos_exports_' . scoutsunite_photos_selection_parent( $album );
+			$nombre = (int) get_transient( $limite );
+			if ( $nombre >= 5 ) {
+				return new WP_Error( 'essais', 'Plusieurs exports viennent d’être préparés. Attends dix minutes avant de recommencer.' );
+			}
+			set_transient( $limite, $nombre + 1, 10 * MINUTE_IN_SECONDS );
 		}
 		$dossier = scoutsunite_photos_dossier();
 		if ( is_wp_error( $dossier ) ) {

@@ -2,6 +2,23 @@
 
 Les versions suivent le numéro `Version:` de `style.css`. Chaque version publiée a son zip dans les [Releases](https://github.com/guepe/les-scouts-unite/releases).
 
+## 3.5.2 – 2026-11-17
+
+- **Album des parents, façon Photos sur iPhone** : grille serrée de vignettes carrées (3 par ligne sur téléphone, bord à bord), sans légendes sous les photos ; le cœur se pose sur la photo et se remplit quand tu la marques. Autour des photos, presque rien : ni en-tête ni pied de site, juste « ‹ Mes albums » et le nom de l’album. Les moments (tags) se parcourent par une bande de boutons qui reste en haut, seulement s’il y en a. La suite des photos arrive toute seule en descendant (60 photos par page ; les liens « Photos suivantes » restent sans JavaScript). La visionneuse prend tout l’écran : fond bleu nuit, « 3 sur 124 », légende en bas, cœur et téléchargement à portée de pouce ; balayage à gauche ou à droite pour changer de photo, vers le bas pour fermer. « Ma sélection » devient une barre en bas de l’écran qui s’ouvre vers le haut ; elle n’apparaît qu’à partir de la première photo marquée. Le bouton « Fermer » devient un lien discret en bas, renommé « Quitter définitivement cet album », avec une confirmation : il n’efface l’accès que sur ce navigateur. La vue des animateurs garde ses cases et ses outils.
+- **Corrections après relecture du code** :
+  - **Tags numériques** : un tag comme « 2024 » ou « 1 » perdait son identifiant à l’ajout d’un second tag, et le filtre par moment ne retrouvait plus la photo. Les tags sont maintenant toujours enregistrés comme un objet. Les photos déjà classées ne sont pas touchées ; si un tag numérique ne filtre plus, ajoute-le de nouveau à la sélection.
+  - **Parents pendant un envoi** : ouvrir un lien et préparer une demande ne passent plus par le verrou des envois. Un parent n’obtient plus « Un envoi est en cours » parce qu’un animateur publie des photos. Les envois, exports, suppressions et changements de clé restent sérialisés.
+  - **Nettoyage quotidien** : il tourne aussi avec WP-CLI ou un vrai cron serveur, où `DOCUMENT_ROOT` n’existe pas. Les contrôles d’emplacement public restent faits à chaque requête web. Les exports et variantes abandonnés ne s’accumulent plus sur ces hébergements.
+  - **Rapidité des sélections** : le contrôle du dossier privé est fait une seule fois par requête au lieu de deux fois par photo.
+
+## 3.5.1 – 2026-11-15
+
+- **Visionneuse fluide** : navigation JavaScript, même depuis un lien direct vers une photo ; l’image reste affichée pendant le chargement de la suivante, avec un fondu court et une seule photo préparée en mémoire. Les droits restent vérifiés à chaque changement, avec clavier, balayage et repli sans dialogue natif.
+- **Les choix des familles** : cœurs dans la grille et la visionneuse, sélection conservée par album sur ce navigateur jusqu’à effacement volontaire, aperçu, tout marquer dans l’album et export ZIP des seules photos choisies. Seules les références sont mémorisées ; les photos restent privées.
+- **Demande privée au staff** : nom, e-mail, message et références, consultables uniquement par les animateurs autorisés et le staff d’unité. Export de la sélection encore disponible, traitement et effacement de la demande ; nettoyage des demandes traitées après 90 jours. Aucun paiement ni envoi automatique à un imprimeur ou par e-mail.
+- **Faire connaître les photos** : page publique `/photos-de-camp/` et encart depuis l’accueil et chacune des quatre sections, aussi sur les pages existantes. Aucune image privée ni clé sur cette présentation. Une page personnalisée, dépubliée ou supprimée n’est pas écrasée.
+- **Documentation** : guides Markdown, nouvelle fiche sur la sélection des parents et nouvelle fiche sur les demandes au staff ; images et deux PDF mis à jour.
+
 ## 3.5.0 – 2026-11-15
 
 **Première release des photos de camp** : un espace privé intégré à l’extension, adapté au téléphone, pour les animateurs et les familles. Installe les deux ZIP, thème et extension, au même numéro de version.
